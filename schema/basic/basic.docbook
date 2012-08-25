@@ -64,7 +64,7 @@
       </table>
     </section>
     <section>
-      <title>IClienteConn</title>
+      <title>IClientConn</title>
       <table frame="all">
         <title/>
         <tgroup cols="3" align="left" colsep="1" rowsep="1">
@@ -74,7 +74,7 @@
           <thead>
             <row>
               <entry role="class-title">Interface</entry>
-              <entry role="class-name" namest="c2" nameend="c3">IClienteConn</entry>
+              <entry role="class-name" namest="c2" nameend="c3">IClientConn</entry>
             </row>
           </thead>
           <tbody>
