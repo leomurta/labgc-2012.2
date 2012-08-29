@@ -16,7 +16,7 @@
   <section id="interfaces">
     <title>Interfaces</title>
     <section>
-      <title>IClient</title>
+      <title>IWorkspace</title>
       <table frame="all">
         <title/>
         <tgroup cols="3" align="left" colsep="1" rowsep="1">
@@ -26,31 +26,7 @@
           <thead>
             <row>
               <entry role="class-title">Interface</entry>
-              <entry role="class-name" namest="c2" nameend="c3">IClient</entry>
-            </row>
-          </thead>
-          <tbody>
-            <row>
-              <entry namest="c1" nameend="c3">
-                <para/>
-              </entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-    </section>
-    <section>
-      <title>IFileManager</title>
-      <table frame="all">
-        <title/>
-        <tgroup cols="3" align="left" colsep="1" rowsep="1">
-          <colspec colname="c1"/>
-          <colspec colname="c2"/>
-          <colspec colname="c3"/>
-          <thead>
-            <row>
-              <entry role="class-title">Interface</entry>
-              <entry role="class-name" namest="c2" nameend="c3">IFileManager</entry>
+              <entry role="class-name" namest="c2" nameend="c3">IWorkspace</entry>
             </row>
           </thead>
           <tbody>
@@ -88,7 +64,7 @@
       </table>
     </section>
     <section>
-      <title>IServer</title>
+      <title>IStorage</title>
       <table frame="all">
         <title/>
         <tgroup cols="3" align="left" colsep="1" rowsep="1">
@@ -98,7 +74,7 @@
           <thead>
             <row>
               <entry role="class-title">Interface</entry>
-              <entry role="class-name" namest="c2" nameend="c3">IServer</entry>
+              <entry role="class-name" namest="c2" nameend="c3">IStorage</entry>
             </row>
           </thead>
           <tbody>
@@ -112,7 +88,7 @@
       </table>
     </section>
     <section>
-      <title>IStorage</title>
+      <title>IClient</title>
       <table frame="all">
         <title/>
         <tgroup cols="3" align="left" colsep="1" rowsep="1">
@@ -122,7 +98,87 @@
           <thead>
             <row>
               <entry role="class-title">Interface</entry>
-              <entry role="class-name" namest="c2" nameend="c3">IStorage</entry>
+              <entry role="class-name" namest="c2" nameend="c3">IClient</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry role="info-title" namest="c1" nameend="c3">
+                <para>Operations:</para>
+              </entry>
+            </row>
+            <row>
+              <entry role="feature-heading">
+                <para>visibility</para>
+              </entry>
+              <entry role="feature-heading">
+                <para>return</para>
+              </entry>
+              <entry role="feature-heading">
+                <para>name</para>
+              </entry>
+            </row>
+            <row>
+              <entry role="feature-detail">public</entry>
+              <entry role="feature-detail"/>
+              <entry role="feature-detail">commit</entry>
+            </row>
+            <row>
+              <entry role="comment"/>
+              <entry namest="c2" nameend="c3" role="comment"/>
+            </row>
+            <row>
+              <entry role="feature-detail">public</entry>
+              <entry role="feature-detail"/>
+              <entry role="feature-detail">update</entry>
+            </row>
+            <row>
+              <entry role="comment"/>
+              <entry namest="c2" nameend="c3" role="comment"/>
+            </row>
+            <row>
+              <entry role="feature-detail">public</entry>
+              <entry role="feature-detail"/>
+              <entry role="feature-detail">checkout</entry>
+            </row>
+            <row>
+              <entry role="comment"/>
+              <entry namest="c2" nameend="c3" role="comment"/>
+            </row>
+            <row>
+              <entry role="feature-detail">public</entry>
+              <entry role="feature-detail"/>
+              <entry role="feature-detail">release</entry>
+            </row>
+            <row>
+              <entry role="comment"/>
+              <entry namest="c2" nameend="c3" role="comment"/>
+            </row>
+            <row>
+              <entry role="feature-detail">public</entry>
+              <entry role="feature-detail"/>
+              <entry role="feature-detail">diff</entry>
+            </row>
+            <row>
+              <entry role="comment"/>
+              <entry namest="c2" nameend="c3" role="comment"/>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+    <section>
+      <title>IServer</title>
+      <table frame="all">
+        <title/>
+        <tgroup cols="3" align="left" colsep="1" rowsep="1">
+          <colspec colname="c1"/>
+          <colspec colname="c2"/>
+          <colspec colname="c3"/>
+          <thead>
+            <row>
+              <entry role="class-title">Interface</entry>
+              <entry role="class-name" namest="c2" nameend="c3">IServer</entry>
             </row>
           </thead>
           <tbody>
@@ -209,54 +265,6 @@
               <entry role="comment"/>
               <entry namest="c2" nameend="c3" role="comment"/>
             </row>
-          </tbody>
-        </tgroup>
-      </table>
-    </section>
-    <section>
-      <title>Client</title>
-      <table frame="all">
-        <title/>
-        <tgroup cols="3" align="left" colsep="1" rowsep="1">
-          <colspec colname="c1"/>
-          <colspec colname="c2"/>
-          <colspec colname="c3"/>
-          <thead>
-            <row>
-              <entry role="class-title">Class</entry>
-              <entry role="class-name" namest="c2" nameend="c3">Client</entry>
-            </row>
-          </thead>
-          <tbody>
-            <row>
-              <entry namest="c1" nameend="c3">
-                <para/>
-              </entry>
-            </row>
-            <section>
-              <title>Associations</title>
-              <para>visibility, type, properties.</para>
-              <para>public</para>
-              <para/>
-              <para>
-      Rolename: 
-    (none)</para>
-              <para>public</para>
-              <para/>
-              <para>
-      Rolename: 
-    (none)</para>
-              <para>public</para>
-              <para/>
-              <para>
-      Rolename: 
-    (none)</para>
-              <para>public</para>
-              <para/>
-              <para>
-      Rolename: 
-    (none)</para>
-            </section>
           </tbody>
         </tgroup>
       </table>
@@ -414,7 +422,7 @@
       </table>
     </section>
     <section>
-      <title>FileManager</title>
+      <title>Workspace</title>
       <table frame="all">
         <title/>
         <tgroup cols="3" align="left" colsep="1" rowsep="1">
@@ -424,7 +432,7 @@
           <thead>
             <row>
               <entry role="class-title">Class</entry>
-              <entry role="class-name" namest="c2" nameend="c3">FileManager</entry>
+              <entry role="class-name" namest="c2" nameend="c3">Workspace</entry>
             </row>
           </thead>
           <tbody>
@@ -485,6 +493,135 @@
       </table>
     </section>
     <section>
+      <title>Storage</title>
+      <table frame="all">
+        <title/>
+        <tgroup cols="3" align="left" colsep="1" rowsep="1">
+          <colspec colname="c1"/>
+          <colspec colname="c2"/>
+          <colspec colname="c3"/>
+          <thead>
+            <row>
+              <entry role="class-title">Class</entry>
+              <entry role="class-name" namest="c2" nameend="c3">Storage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry namest="c1" nameend="c3">
+                <para/>
+              </entry>
+            </row>
+            <section>
+              <title>Associations</title>
+              <para>visibility, type, properties.</para>
+              <para>public</para>
+              <para/>
+              <para>
+      Rolename: 
+    (none)</para>
+            </section>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+    <section>
+      <title>File</title>
+      <table frame="all">
+        <title/>
+        <tgroup cols="3" align="left" colsep="1" rowsep="1">
+          <colspec colname="c1"/>
+          <colspec colname="c2"/>
+          <colspec colname="c3"/>
+          <thead>
+            <row>
+              <entry role="class-title">Class</entry>
+              <entry role="class-name" namest="c2" nameend="c3">File</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry namest="c1" nameend="c3">
+                <para/>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+    <section>
+      <title>Client</title>
+      <table frame="all">
+        <title/>
+        <tgroup cols="3" align="left" colsep="1" rowsep="1">
+          <colspec colname="c1"/>
+          <colspec colname="c2"/>
+          <colspec colname="c3"/>
+          <thead>
+            <row>
+              <entry role="class-title">Class</entry>
+              <entry role="class-name" namest="c2" nameend="c3">Client</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry namest="c1" nameend="c3">
+                <para/>
+              </entry>
+            </row>
+            <section>
+              <title>Associations</title>
+              <para>visibility, type, properties.</para>
+              <para>public</para>
+              <para/>
+              <para>
+      Rolename: 
+    (none)</para>
+              <para>public</para>
+              <para/>
+              <para>
+      Rolename: 
+    (none)</para>
+              <para>public</para>
+              <para/>
+              <para>
+      Rolename: 
+    (none)</para>
+              <para>public</para>
+              <para/>
+              <para>
+      Rolename: 
+    (none)</para>
+            </section>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+    <section>
+      <title>Date</title>
+      <table frame="all">
+        <title/>
+        <tgroup cols="3" align="left" colsep="1" rowsep="1">
+          <colspec colname="c1"/>
+          <colspec colname="c2"/>
+          <colspec colname="c3"/>
+          <thead>
+            <row>
+              <entry role="class-title">Class</entry>
+              <entry role="class-name" namest="c2" nameend="c3">Date</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry namest="c1" nameend="c3">
+                <para/>
+              </entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+    <section>
       <title>Server</title>
       <table frame="all">
         <title/>
@@ -528,7 +665,7 @@
       </table>
     </section>
     <section>
-      <title>Storage</title>
+      <title>String</title>
       <table frame="all">
         <title/>
         <tgroup cols="3" align="left" colsep="1" rowsep="1">
@@ -538,7 +675,7 @@
           <thead>
             <row>
               <entry role="class-title">Class</entry>
-              <entry role="class-name" namest="c2" nameend="c3">Storage</entry>
+              <entry role="class-name" namest="c2" nameend="c3">String</entry>
             </row>
           </thead>
           <tbody>
@@ -547,15 +684,6 @@
                 <para/>
               </entry>
             </row>
-            <section>
-              <title>Associations</title>
-              <para>visibility, type, properties.</para>
-              <para>public</para>
-              <para/>
-              <para>
-      Rolename: 
-    (none)</para>
-            </section>
           </tbody>
         </tgroup>
       </table>
