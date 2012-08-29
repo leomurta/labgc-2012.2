@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  *
- * @author Felipe Ralph
+ * @author Felipe Ralph.
  */
 public interface IClient {
     public abstract boolean commit(File file);
