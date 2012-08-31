@@ -4,18 +4,36 @@
  */
 package br.uff.ic.labgc.client;
 
-import java.io.File;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 /**
  *
- * @author Felipe Ralph
+ * @author Felipe R
  */
 public interface IClient {
-    public abstract boolean commit(File file);
-    public abstract List<File> update();
-    public abstract List<File> checkout();
-    public abstract boolean release();
-    public abstract String diff(File file, String version);
+    
+    //comandos basicos
+    
+    boolean commit(File file, String message);
+    boolean release();
+    List<File> update();
+    List<File> checkout();
+    String diff(File file, String version);
+    
+    //comandos similares ao OS
+    
+    boolean add(File file);
+    boolean remove(File file);
+    boolean move(File file, String dest);
+    boolean copy(File file, String dest);
+    boolean mkdir(String name);
+    
+    //comandos do diretorio
+    
+    boolean revert(File file);
+    String status();
+    String log();
+    boolean resolve(File file);
     
 }
