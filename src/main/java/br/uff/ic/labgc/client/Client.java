@@ -17,9 +17,9 @@ public class Client implements IClient{
     
     private IServer server;
     
-    
-    
-    public boolean commit(File file, String message) {
+    //comandos para o servidor
+
+    public boolean commit(List<File> files, String message) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -31,18 +31,17 @@ public class Client implements IClient{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public boolean release() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     public String diff(File file, String version) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public boolean add(File file) {
+    public String log() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
+    
+    
+    //comandos similar ao OS - workspace
+    
     public boolean remove(File file) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -58,6 +57,12 @@ public class Client implements IClient{
     public boolean mkdir(String name) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    //comandos de diretorio
+    
+    public boolean add(File file) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
     public boolean revert(File file) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -67,13 +72,15 @@ public class Client implements IClient{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String log() {
+    public boolean release() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public boolean resolve(File file) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    
     
     
 }

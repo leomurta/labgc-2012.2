@@ -13,17 +13,16 @@ import java.util.*;
  */
 public interface IClient {
     
-    //comandos basicos
+    //comandos server
     
-    boolean commit(File file, String message);
-    boolean release();
+    boolean commit(List<File> files, String message);
     List<File> update();
     List<File> checkout();
     String diff(File file, String version);
+    String log();
     
     //comandos similares ao OS
     
-    boolean add(File file);
     boolean remove(File file);
     boolean move(File file, String dest);
     boolean copy(File file, String dest);
@@ -31,9 +30,10 @@ public interface IClient {
     
     //comandos do diretorio
     
+    boolean add(File file);
     boolean revert(File file);
     String status();
-    String log();
+    boolean release();
     boolean resolve(File file);
     
 }
