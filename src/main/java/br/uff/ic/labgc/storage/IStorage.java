@@ -10,4 +10,7 @@ package br.uff.ic.labgc.storage;
  */
 public interface IStorage {
     
+    public void save();
+    public void remove();
+    public void update();
 }
