@@ -13,7 +13,7 @@ import java.io.IOException;
 *
 * @author vyctorh
 */
-public class IWorkspace {
+public class Workspace {
     
     /**
 *
