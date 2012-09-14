@@ -10,6 +10,9 @@ package br.uff.ic.labgc.properties;
  */
 public interface IPropertiesConstants {
     public static String PROPERTIES_FILE_NAME = "br.uff.ic.labgc.properties.labgc";
-    public static String SERVER_CLASS = "serverclass";
+    public static String CONNECTOR_CLASS = "Connector";
+    public static String COMM_HTTP_PROTOCOL = "http";
+    public static String COMM_RMI_PROTOCOL = "rmi";
+    public static String COMM_FILE_PROTOCOL = "file";
     
 }

@@ -4,8 +4,8 @@
  */
 package br.uff.ic.labgc.comm.client;
 
+import br.uff.ic.labgc.exception.CommunicationException;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
-import br.uff.ic.labgc.server.IServer;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import org.junit.After;
@@ -49,11 +49,10 @@ public class CommunicationFactoryTest {
      * Test of getServer method, of class CommunicationFactory.
      */
     @Test
-    public void testGetServer() {
-        System.out.println("getServer");
+    public void testGetServer() throws CommunicationException {
         CommunicationFactory instance = CommunicationFactory.getFactory();
-        String expResult = bundle.getString(IPropertiesConstants.SERVER_CLASS);
-        String result = instance.getServer().getClass().getName();
+        String expResult = bundle.getString(IPropertiesConstants.COMM_FILE_PROTOCOL + IPropertiesConstants.CONNECTOR_CLASS);
+        String result = instance.getServer("file:///").getClass().getName();
         assertEquals(expResult, result);
     }
 }
