@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Cristiano
  */
-public class CommunicationClient implements IServer{
+public class RMIConnector implements IServer{
 
     public boolean commit(List<File> file, String message) {
         throw new UnsupportedOperationException("Not supported yet.");
