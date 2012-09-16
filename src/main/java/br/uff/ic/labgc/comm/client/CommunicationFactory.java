@@ -4,8 +4,10 @@
  */
 package br.uff.ic.labgc.comm.client;
 
+import br.uff.ic.labgc.exception.CommunicationException;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.IServer;
+import br.uff.ic.labgc.utils.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -42,24 +44,22 @@ public class CommunicationFactory {
      *
      * @return
      */
-    public synchronized IServer getServer() throws RuntimeException {
+    public IServer getServer(String url) throws CommunicationException {
 
-        if (commClient == null) {
-            ResourceBundle bundle = ResourceBundle.getBundle(IPropertiesConstants.PROPERTIES_FILE_NAME, 
-                    Locale.getDefault(), ClassLoader.getSystemClassLoader());
+        try {
+            URL connURL = new URL(url);
+            if (commClient == null) {
+                ResourceBundle bundle = ResourceBundle.getBundle(IPropertiesConstants.PROPERTIES_FILE_NAME,
+                        Locale.getDefault(), ClassLoader.getSystemClassLoader());
 
-            String serverClass = bundle.getString(IPropertiesConstants.SERVER_CLASS);
+                
+                String serverClass = bundle.getString(connURL.getProtocol() + IPropertiesConstants.CONNECTOR_CLASS);
 
-            try {
                 commClient = (IServer) Class.forName(serverClass).newInstance();
-            } catch (InstantiationException ex) {
-                Logger.getLogger(CommunicationFactory.class.getName()).log(Level.SEVERE, null, ex);
-                throw new RuntimeException("Não foi possível instanciar um servidor.", ex);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(CommunicationFactory.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(CommunicationFactory.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } catch (Exception ex) {
+            Logger.getLogger(CommunicationFactory.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CommunicationException("Não foi possível instanciar um servidor.", ex);
         }
         return commClient;
 
