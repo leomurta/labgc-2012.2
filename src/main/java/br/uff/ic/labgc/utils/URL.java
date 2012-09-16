@@ -20,6 +20,7 @@ public class URL {
     private String myProtocol;
     private String myHost;
     private String myUserName;
+    private String myRepo;
     private int myPort;
     private boolean myIsDefaultPort;
     private static final Map defaultPorts = new HashMap();
@@ -49,10 +50,25 @@ public class URL {
             throw new ApplicationException("Protocolo não suportado.");
         }
         if (IPropertiesConstants.COMM_FILE_PROTOCOL.equals(myProtocol)) {
-            String hostPort = url.substring("file://".length());
+
+            String hostPath = url.substring("file://".length());
+            int slashInd = hostPath.indexOf('/');
+            if (slashInd == -1) {
+                //sem path, apenas caminho
+                Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL local: ''" + url + "'' contém apenas nome de host, sem path.");
+                throw new ApplicationException("URL local: ''" + url + "'' contém apenas nome de host, sem path.");
+            }
+
+            myRepo = hostPath.substring(slashInd);
+            if (hostPath.equals(myRepo)) {
+                myHost = "";
+            } else {
+                myHost = hostPath.substring(0, slashInd);
+            }
+            
             java.net.URL testURL = null;
             try {
-                testURL = new java.net.URL(myProtocol + "://" + hostPort);
+                testURL = new java.net.URL(myProtocol + "://" + hostPath);
             } catch (MalformedURLException e) {
                 Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL malformada: ''" + url + "'': " + e.getLocalizedMessage());
                 throw new ApplicationException("URL malformada: ''" + url + "'': " + e.getLocalizedMessage());
@@ -75,12 +91,26 @@ public class URL {
                 Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL malformada: ''" + url + "''");
                 throw new ApplicationException("URL malformada: ''" + url + "''");
             }
+
+            myRepo = getPath(httpURL);
+            if ("".equals(myRepo)) {
+                Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL malformada: ''" + url + "'' contém apenas nome de host, sem path.");
+                throw new ApplicationException("URL malformada: ''" + url + "'' contém apenas nome de host, sem path.");
+            } else {
+                myRepo = myRepo.substring(1); //Retirando a barra inicial para representar o nome do repositório
+            }
+
+            if (myRepo.contains("/")) {
+                Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL malformada: ''" + url + "'' não pode conter ''/''");
+                throw new ApplicationException("URL malformada: ''" + url + "'' não pode conter ''/''");
+            }
+            
             myUserName = httpURL.getUserInfo();
             myPort = httpURL.getPort();
             myIsDefaultPort = myPort < 0;
             if (myPort < 0) {
                 Integer defaultPort;
-                    defaultPort = (Integer) defaultPorts.get(myProtocol);
+                defaultPort = (Integer) defaultPorts.get(myProtocol);
                 myPort = defaultPort != null ? defaultPort.intValue() : 0;
             }
         }
@@ -93,7 +123,7 @@ public class URL {
     /**
      * Retorna a porta padrão do protocolo informado.
      *
-     * @param protocol 
+     * @param protocol
      * @return default
      */
     public static int getDefaultPortNumber(String protocol) {
@@ -144,7 +174,7 @@ public class URL {
     /**
      * Retorna o usuário da url representada por este objeto.
      *
-     * @return 
+     * @return
      */
     public String getUserInfo() {
         return myUserName;
@@ -218,5 +248,13 @@ public class URL {
             path += '#' + ref;
         }
         return path;
+    }
+
+    public String getMyRepo() {
+        return myRepo;
+    }
+
+    public void setMyRepo(String myRepo) {
+        this.myRepo = myRepo;
     }
 }

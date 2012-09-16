@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.comm.client;
 
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.CommunicationException;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.IServer;
@@ -44,7 +45,7 @@ public class CommunicationFactory {
      *
      * @return
      */
-    public IServer getServer(String url) throws CommunicationException {
+    public IServer getServer(String url) throws ApplicationException {
 
         try {
             URL connURL = new URL(url);
@@ -56,8 +57,11 @@ public class CommunicationFactory {
                 String serverClass = bundle.getString(connURL.getProtocol() + IPropertiesConstants.CONNECTOR_CLASS);
 
                 commClient = (IServer) Class.forName(serverClass).newInstance();
+                commClient.registerRepository(connURL.getHost(), connURL.getMyRepo());
             }
-        } catch (Exception ex) {
+        } catch (ApplicationException ex) {
+            throw ex;
+        }catch (Exception ex) {
             Logger.getLogger(CommunicationFactory.class.getName()).log(Level.SEVERE, null, ex);
             throw new CommunicationException("Não foi possível instanciar um servidor.", ex);
         }

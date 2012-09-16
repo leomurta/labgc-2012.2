@@ -12,10 +12,13 @@ import java.util.*;
  * @author Felipe R
  */
 public interface IServer {
-    boolean commit(List<File> file, String message);
-    List<File> update();
-    List<File> checkout();
-    String diff(File file, String version);
-    String log();
+    public void registerRepository(String repHost, String repName);
+    public boolean commit(List<File> file, String message);
+    public List<File> update();
+    public List<File> checkout();
+    public String diff(File file, String version);
+    public String log();
+    public String getRepPath();
+    public String getRepHost();
     
 }
