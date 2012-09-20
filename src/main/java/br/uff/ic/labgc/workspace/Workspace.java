@@ -4,6 +4,7 @@
 */
 package br.uff.ic.labgc.workspace;
 
+import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -74,7 +75,7 @@ public class Workspace {
  
     }
 
-boolean revert(File file) {
+boolean revert(String diretorio) {
         return false;
  
     }
@@ -100,7 +101,7 @@ throws IOException, WorkspaceException {
         diretorio.mkdirs();
     }
     else{
-        throw new WorkspaceException ("ERRO: Diretório existente.");
+        throw new WorkspaceDirExisteException ("ERRO: Diretório existente.");
     }
        	File vcs = new File (diretorio, "vcs");
 	if (!vcs.exists()) {
