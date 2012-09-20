@@ -5,12 +5,18 @@
 package br.uff.ic.labgc.workspace;
 
 import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
+import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
+import br.uff.ic.labgc.exception.WorkspaceNaoDirException;
+import br.uff.ic.labgc.exception.WorkspaceRepNaoExisteException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.channels.FileChannel;
 
 
 /**
@@ -50,14 +56,21 @@ public class Workspace {
         return false;
         
     }
-
-
-    boolean copy(File file, String dest)
-    throws FileNotFoundException, IOException {
-
-        return false;
- 
-    }
+    
+public static boolean copy(File origem,File destino,boolean overwrite)
+throws FileNotFoundException, IOException {  
+      if (destino.exists() && !overwrite)
+         return false;  
+     
+      FileInputStream   fisOrigem = new FileInputStream(origem);  
+      FileOutputStream fisDestino = new FileOutputStream(destino);  
+      FileChannel fcOrigem = fisOrigem.getChannel();    
+      FileChannel fcDestino = fisDestino.getChannel();    
+      fcOrigem.transferTo(0, fcOrigem.size(), fcDestino);    
+      fisOrigem.close();    
+      fisDestino.close();  
+      return true;
+   } 
 
 
     boolean mkdir(String name)
@@ -75,10 +88,39 @@ public class Workspace {
  
     }
 
-boolean revert(String diretorio) {
-        return false;
- 
+public boolean revert(String diretorio)
+throws IOException, WorkspaceException {
+    
+    File diretorio1 = new File(diretorio); 
+    if (!diretorio1.exists()) {
+        throw new WorkspaceDirNaoExisteException ("ERRO: Diretório inexistente.");
+
     }
+        diretorio1 = new File(diretorio+File.separator + "vcs" ); 
+    // testa se existe o diretorio de versionamento
+    if (!diretorio1.exists()) {
+        throw new WorkspaceRepNaoExisteException ("ERRO: Não existe repositório.");
+       
+    }
+    // ler o diretório de controle vcs e cria um array com o conteúdo do diretório
+    File[] stDir = diretorio1.listFiles();
+        
+    // copia os arquivos
+    for (File file : stDir) { 
+        String name = file.getName();
+        String extensao = name.substring(name.lastIndexOf("."), name.length());
+        int pos = name.lastIndexOf(".");
+        if (pos > 0) {
+            name = name.substring(0, pos);
+        }
+        if (extensao == ".v"){
+                copy(file, new File(diretorio+"\\"+name),true);  
+         } 
+    }
+        
+    // se tudo deu certo    
+        return true;
+}
 
 String status() {
         return null;
