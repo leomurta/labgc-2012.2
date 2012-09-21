@@ -45,7 +45,7 @@ public class CommunicationFactory {
      *
      * @return
      */
-    public IServer getServer(String url) throws ApplicationException {
+    public IServer getServer(String url, String repoName) throws ApplicationException {
 
         try {
             URL connURL = new URL(url);
@@ -57,7 +57,7 @@ public class CommunicationFactory {
                 String serverClass = bundle.getString(connURL.getProtocol() + IPropertiesConstants.CONNECTOR_CLASS);
 
                 commClient = (IServer) Class.forName(serverClass).newInstance();
-                commClient.registerRepository(connURL.getHost(), connURL.getMyRepo());
+                commClient.registerRepository(connURL.getHost(), repoName);
             }
         } catch (ApplicationException ex) {
             throw ex;
