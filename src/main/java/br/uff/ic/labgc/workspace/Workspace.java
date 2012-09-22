@@ -4,6 +4,7 @@
 */
 package br.uff.ic.labgc.workspace;
 
+import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
 import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
@@ -18,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
+import java.util.*;
 
 
 /**
@@ -165,8 +167,8 @@ throw new UnsupportedOperationException("Not supported yet.");
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
 
-public static void criaWorkSpace(File diretorio, String versao, String repositorio, String login)
-throws IOException, WorkspaceException {
+public void createWorkspace(String diretorio, String repositorio)
+throws WorkspaceException {
     /*if (!diretorio.exists()) {
         diretorio.mkdirs();
     }
