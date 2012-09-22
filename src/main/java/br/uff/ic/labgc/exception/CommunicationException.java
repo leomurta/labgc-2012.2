@@ -14,6 +14,9 @@ public class CommunicationException extends ApplicationException {
     public CommunicationException(String message, Exception ex) {
         super(message, ex);
     }
+    public CommunicationException(String message, Throwable t) {
+        super(message, t);
+    }
     
     public CommunicationException(String message) {
         super(message);

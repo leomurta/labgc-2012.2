@@ -16,13 +16,13 @@ import java.util.logging.Logger;
  */
 public class URL {
 
-    private String myURL;
-    private String myProtocol;
-    private String myHost;
-    private String myUserName;
-    private String myRepo;
-    private int myPort;
-    private boolean myIsDefaultPort;
+    private String url;
+    private String protocol;
+    private String host;
+    private String userName;
+    private String repoServer;
+    private int port;
+    private boolean isDefaultPort;
     private static final Map defaultPorts = new HashMap();
 
     static {
@@ -43,13 +43,13 @@ public class URL {
             Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL mal formada.");
             throw new ApplicationException("URL malformada.");
         }
-        myProtocol = url.substring(0, index);
-        myProtocol = myProtocol.toLowerCase();
-        if (!defaultPorts.containsKey(myProtocol)) {
+        protocol = url.substring(0, index);
+        protocol = protocol.toLowerCase();
+        if (!defaultPorts.containsKey(protocol)) {
             Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "Protocolo não suportado.");
             throw new ApplicationException("Protocolo não suportado.");
         }
-        if (IPropertiesConstants.COMM_FILE_PROTOCOL.equals(myProtocol)) {
+        if (IPropertiesConstants.COMM_FILE_PROTOCOL.equals(protocol)) {
 
             String hostPath = url.substring("file://".length());
             int slashInd = hostPath.indexOf('/');
@@ -59,23 +59,23 @@ public class URL {
                 throw new ApplicationException("URL local: ''" + url + "'' contém apenas nome de host, sem path.");
             }
 
-            myRepo = hostPath.substring(slashInd);
-            if (hostPath.equals(myRepo)) {
-                myHost = "";
+            repoServer = hostPath.substring(slashInd);
+            if (hostPath.equals(repoServer)) {
+                host = "";
             } else {
-                myHost = hostPath.substring(0, slashInd);
+                host = hostPath.substring(0, slashInd);
             }
             
             java.net.URL testURL = null;
             try {
-                testURL = new java.net.URL(myProtocol + "://" + hostPath);
+                testURL = new java.net.URL(protocol + "://" + hostPath);
             } catch (MalformedURLException e) {
                 Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL malformada: ''" + url + "'': " + e.getLocalizedMessage());
                 throw new ApplicationException("URL malformada: ''" + url + "'': " + e.getLocalizedMessage());
             }
 
-            myUserName = testURL.getUserInfo();
-            myPort = testURL.getPort();
+            userName = testURL.getUserInfo();
+            port = testURL.getPort();
         } else {
             //Criando uma url de teste com http, visto que java.net.URL não funciona com protocolo RMI
             String testURL = IPropertiesConstants.COMM_HTTP_PROTOCOL + url.substring(index);
@@ -86,37 +86,37 @@ public class URL {
                 Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL malformada: ''" + url + "'': " + e.getLocalizedMessage());
                 throw new ApplicationException("URL malformada: ''" + url + "'': " + e.getLocalizedMessage());
             }
-            myHost = httpURL.getHost();
-            if ("".equals(myHost)) {
+            host = httpURL.getHost();
+            if ("".equals(host)) {
                 Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL malformada: ''" + url + "''");
                 throw new ApplicationException("URL malformada: ''" + url + "''");
             }
 
-            myRepo = getPath(httpURL);
-            if ("".equals(myRepo)) {
+            repoServer = getPath(httpURL);
+            if ("".equals(repoServer)) {
                 Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL malformada: ''" + url + "'' contém apenas nome de host, sem path.");
                 throw new ApplicationException("URL malformada: ''" + url + "'' contém apenas nome de host, sem path.");
             } else {
-                myRepo = myRepo.substring(1); //Retirando a barra inicial para representar o nome do repositório
+                repoServer = repoServer.substring(1); //Retirando a barra inicial para representar o nome do repositório
             }
 
-            if (myRepo.contains("/")) {
+            if (repoServer.contains("/")) {
                 Logger.getLogger(URL.class.getName()).log(Level.SEVERE, null, "URL malformada: ''" + url + "'' não pode conter ''/''");
                 throw new ApplicationException("URL malformada: ''" + url + "'' não pode conter ''/''");
             }
             
-            myUserName = httpURL.getUserInfo();
-            myPort = httpURL.getPort();
-            myIsDefaultPort = myPort < 0;
-            if (myPort < 0) {
+            userName = httpURL.getUserInfo();
+            port = httpURL.getPort();
+            isDefaultPort = port < 0;
+            if (port < 0) {
                 Integer defaultPort;
-                defaultPort = (Integer) defaultPorts.get(myProtocol);
-                myPort = defaultPort != null ? defaultPort.intValue() : 0;
+                defaultPort = (Integer) defaultPorts.get(protocol);
+                port = defaultPort != null ? defaultPort.intValue() : 0;
             }
         }
 
-        if (myHost != null) {
-            myHost = myHost.toLowerCase();
+        if (host != null) {
+            host = host.toLowerCase();
         }
     }
 
@@ -150,7 +150,7 @@ public class URL {
      * @return a protocol name (like <code>http</code>)
      */
     public String getProtocol() {
-        return myProtocol;
+        return protocol;
     }
 
     /**
@@ -159,7 +159,7 @@ public class URL {
      * @return
      */
     public String getHost() {
-        return myHost;
+        return host;
     }
 
     /**
@@ -168,7 +168,7 @@ public class URL {
      * @return
      */
     public int getPort() {
-        return myPort;
+        return port;
     }
 
     /**
@@ -176,8 +176,8 @@ public class URL {
      *
      * @return
      */
-    public String getUserInfo() {
-        return myUserName;
+    public String getUserName() {
+        return userName;
     }
 
     /**
@@ -185,15 +185,16 @@ public class URL {
      *
      * @return an encoded url string
      */
+    @Override
     public String toString() {
-        if (myURL == null) {
-            myURL = composeURL(getProtocol(), getUserInfo(), getHost(), myIsDefaultPort ? -1 : getPort());
+        if (url == null) {
+            url = composeURL(getProtocol(), getUserName(), getHost(), isDefaultPort ? -1 : getPort(), getRepoServer());
         }
-        return myURL;
+        return url;
     }
 
     public boolean hasPort() {
-        return !myIsDefaultPort;
+        return !isDefaultPort;
     }
 
     /**
@@ -203,37 +204,43 @@ public class URL {
      * @return <span class="javakeyword">true</span> se <code>obj</code> é uma
      * instância de <b>URL</b> e possui os mesmos componentes que este objeto.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null || obj.getClass() != URL.class) {
             return false;
         }
-        URL url = (URL) obj;
-        boolean eq = myProtocol.equals(url.myProtocol)
-                && myPort == url.myPort
-                && myHost.equals(url.myHost)
-                && hasPort() == url.hasPort();
-        if (myUserName == null) {
-            eq &= url.myUserName == null;
+        URL u = (URL) obj;
+        boolean eq = protocol.equals(u.getProtocol())
+                && port == u.getPort()
+                && host.equals(u.getHost())
+                && hasPort() == u.hasPort();
+        if (userName == null) {
+            eq &= u.getUserName() == null;
         } else {
-            eq &= myUserName.equals(url.myUserName);
+            eq &= userName.equals(u.getUserName());
+        }
+        if (repoServer == null) {
+            eq &= u.getRepoServer() == null;
+        } else {
+            eq &= userName.equals(u.getRepoServer());
         }
         return eq;
     }
 
-    private static String composeURL(String protocol, String userInfo, String host, int port) {
-        StringBuffer url = new StringBuffer();
-        url.append(protocol);
-        url.append("://");
+    private static String composeURL(String protocol, String userInfo, String host, int port, String repoServer) {
+        StringBuilder url = new StringBuilder();
+        url.append(protocol).append("://");
         if (userInfo != null) {
-            url.append(userInfo);
-            url.append("@");
+            url.append(userInfo).append("@");
         }
         if (host != null) {
             url.append(host);
         }
         if (port >= 0) {
-            url.append(":");
-            url.append(port);
+            url.append(":").append(port);
+        }
+        if (repoServer != null) {
+            url.append("/").append(repoServer);
         }
         return url.toString();
     }
@@ -250,11 +257,19 @@ public class URL {
         return path;
     }
 
-    public String getMyRepo() {
-        return myRepo;
+    /**
+     *
+     * @return
+     */
+    public String getRepoServer() {
+        return repoServer;
     }
 
-    public void setMyRepo(String myRepo) {
-        this.myRepo = myRepo;
+    /**
+     *
+     * @param myRepo
+     */
+    public void setRepoServer(String myRepo) {
+        this.repoServer = myRepo;
     }
 }
