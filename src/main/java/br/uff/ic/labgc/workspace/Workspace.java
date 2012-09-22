@@ -62,12 +62,21 @@ boolean copy(File origem,File destino,boolean overwrite)
 throws FileNotFoundException, IOException {  
       if (destino.exists() && !overwrite)
          return false;  
-     
-      FileInputStream   fisOrigem = new FileInputStream(origem);  
-      FileOutputStream fisDestino = new FileOutputStream(destino);  
+      
+      // FileChannel realiza as operações de leitura e gravação 
+      // com o máximo de eficiência otimizando operação de transferência de dados.
+      // Foi o que eu li pelo menos =]
+      
+      // Cria a stream para ler o arquivo original
+      FileInputStream   fisOrigem = new FileInputStream(origem); 
+      // Cria a stream para gravar o arquivo de destino
+      FileOutputStream fisDestino = new FileOutputStream(destino);
+      // Usa as streams para criar os canais correspondentes
       FileChannel fcOrigem = fisOrigem.getChannel();    
-      FileChannel fcDestino = fisDestino.getChannel();    
-      fcOrigem.transferTo(0, fcOrigem.size(), fcDestino);    
+      FileChannel fcDestino = fisDestino.getChannel();
+      // Transfere todo o volume para o arquivo de cópia com o número de bytes do arquivo original
+      fcOrigem.transferTo(0, fcOrigem.size(), fcDestino);
+      // Fecha
       fisOrigem.close();    
       fisDestino.close();  
       return true;
@@ -132,20 +141,24 @@ throws IOException, WorkspaceException {
         return true;
 }
 
-String status() {
+public String status() {
         throw new UnsupportedOperationException("Not supported yet.");
   
     }
 
-boolean release() {
+public boolean release() {
         throw new UnsupportedOperationException("Not supported yet.");
 
     }
 
-boolean resolve(File file) {
+public boolean resolve(File file) {
         throw new UnsupportedOperationException("Not supported yet.");
 
     }
+
+public boolean writeLocalData(){
+throw new UnsupportedOperationException("Not supported yet.");
+}
 
 // Cria esqueleto da WorkSpace
 // diretorio = diretorio completo do projeto, versao=versao do projeto
