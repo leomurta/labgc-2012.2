@@ -6,6 +6,7 @@ package br.uff.ic.labgc.workspace;
 
 import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
 import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
+import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
 import br.uff.ic.labgc.exception.WorkspaceNaoDirException;
 import br.uff.ic.labgc.exception.WorkspaceRepNaoExisteException;
@@ -36,7 +37,7 @@ public class Workspace {
     public boolean remove(File file)
     throws FileNotFoundException, IOException {
 
-        return false;
+        throw new UnsupportedOperationException("Not supported yet.");
    
     }
 
@@ -53,11 +54,11 @@ public class Workspace {
     throws FileNotFoundException, IOException
 {
 
-        return false;
+        throw new UnsupportedOperationException("Not supported yet.");
         
     }
     
-public static boolean copy(File origem,File destino,boolean overwrite)
+boolean copy(File origem,File destino,boolean overwrite)
 throws FileNotFoundException, IOException {  
       if (destino.exists() && !overwrite)
          return false;  
@@ -75,7 +76,8 @@ throws FileNotFoundException, IOException {
 
     boolean mkdir(String name)
     throws IOException {
-        return false;
+       
+        throw new UnsupportedOperationException("Not supported yet.");
 
  
     }
@@ -84,7 +86,7 @@ throws FileNotFoundException, IOException {
     
     boolean add(File file)
     throws IOException {
-        return false;
+        throw new UnsupportedOperationException("Not supported yet.");
  
     }
 
@@ -96,16 +98,15 @@ throws IOException, WorkspaceException {
         throw new WorkspaceDirNaoExisteException ("ERRO: Diretório inexistente.");
 
     }
-        diretorio1 = new File(diretorio+File.separator + "vcs" ); 
+    diretorio1 = new File(diretorio+File.separator+".labgc" );
+    
     // testa se existe o diretorio de versionamento
     if (!diretorio1.exists()) {
         throw new WorkspaceRepNaoExisteException ("ERRO: Não existe repositório.");
-       
     }
-    // ler o diretório de controle vcs e cria um array com o conteúdo do diretório
+    // procura pelo espelho - não existe um dir padrão pq extensão é a versão
     File[] stDir = diretorio1.listFiles();
-        
-    // copia os arquivos
+    boolean achou = false;
     for (File file : stDir) { 
         String name = file.getName();
         String extensao = name.substring(name.lastIndexOf("."), name.length());
@@ -113,31 +114,44 @@ throws IOException, WorkspaceException {
         if (pos > 0) {
             name = name.substring(0, pos);
         }
-        if (extensao == ".v"){
-                copy(file, new File(diretorio+"\\"+name),true);  
-         } 
+        if (name == "espelho"){
+            diretorio1=new File(diretorio+File.separator+name+extensao);
+            achou = true;
+        }
     }
-        
+    if (!achou) {
+        throw new WorkspaceEpelhoNaoExisteException ("ERRO: Não existe espelho.");
+    }
+    stDir = diretorio1.listFiles();
+    // copia os arquivos
+    for (File file : stDir) { 
+        String name = file.getName();
+        copy(file, new File(diretorio+"\\"+name),true);  
+         }     
     // se tudo deu certo    
         return true;
 }
 
 String status() {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet.");
   
     }
 
 boolean release() {
-        return false;
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 
 boolean resolve(File file) {
-        return false;
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
-// diretorio = diretorio raiz do projeto e raiz=caminho da raiz do repositorio e repositorio=caminho dentro da raiz
-public static void criaWorkSpace(File diretorio, String Raiz, String Repositorio)
+
+// Cria esqueleto da WorkSpace
+// diretorio = diretorio completo do projeto, versao=versao do projeto
+// repositorio=caminho do repositorio, login=usuario
+
+public static void criaWorkSpace(File diretorio, String versao, String repositorio, String login)
 throws IOException, WorkspaceException {
     if (!diretorio.exists()) {
         diretorio.mkdirs();
@@ -145,24 +159,27 @@ throws IOException, WorkspaceException {
     else{
         throw new WorkspaceDirExisteException ("ERRO: Diretório existente.");
     }
-       	File vcs = new File (diretorio, "vcs");
-	if (!vcs.exists()) {
-        vcs.mkdir();
-    }
-                
-        File entrada = new File (vcs, "Entrada");
-	entrada.createNewFile();
-                        
-	File raiz = new File (vcs, "raiz");
-	raiz.createNewFile();
-        FileWriter raizarq = new FileWriter(raiz, false);
-	PrintWriter out = new PrintWriter(raizarq);
-	out.println(Raiz);
-	out.close ();
-                
-	out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
-	out.println(Repositorio);
-	out.close ();
+    
+    // cria diretorio de controle
+    File vcs = new File (diretorio, ".labgc");
+    vcs.mkdir();
+    
+    // cria diretorio espelho da versao atual
+    File espelho = new File (vcs, "espelho.r"+versao);
+    espelho.mkdir();
+    
+    // guardando este lixo pq eu entendi melhor assim. Depois eu tiro.
+        //File raiz = new File (vcs, "repositorio");
+        //raiz.createNewFile();
+        //FileWriter raizarq = new FileWriter(raiz, false);
+        //PrintWriter out = new PrintWriter(raizarq);
+        //out.println(repositorio);
+        //out.close ();
+    
+    // cria arquivo repositorio com o caminho do repositorio remoto
+    PrintWriter out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
+    out.println(repositorio);
+    out.close ();
 }
 
 }
