@@ -6,9 +6,11 @@ package br.uff.ic.labgc.comm.client;
 
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.CommunicationException;
+import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.IServer;
 import br.uff.ic.labgc.utils.URL;
+import java.lang.reflect.Constructor;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -50,14 +52,10 @@ public class CommunicationFactory {
         try {
             URL connURL = new URL(url);
             if (commClient == null) {
-                ResourceBundle bundle = ResourceBundle.getBundle(IPropertiesConstants.PROPERTIES_FILE_NAME,
-                        Locale.getDefault(), ClassLoader.getSystemClassLoader());
+                String serverClass = ApplicationProperties.getPropertyValue(connURL.getProtocol() + IPropertiesConstants.CONNECTOR_CLASS);
 
-                
-                String serverClass = bundle.getString(connURL.getProtocol() + IPropertiesConstants.CONNECTOR_CLASS);
-
-                commClient = (IServer) Class.forName(serverClass).newInstance();
-                commClient.registerRepository(connURL.getHost(), repoName);
+                Constructor c = Class.forName(serverClass).getConstructor(String.class, String.class);
+                commClient = (IServer) c.newInstance(connURL.getHost(), repoName);
             }
         } catch (ApplicationException ex) {
             throw ex;

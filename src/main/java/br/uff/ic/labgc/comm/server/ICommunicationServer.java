@@ -22,4 +22,5 @@ public interface ICommunicationServer extends Remote {
     public String log() throws RemoteException;
     public String getRepPath() throws RemoteException;
     public String getRepHost() throws RemoteException;
+    public String hello(String name) throws RemoteException;
 }
