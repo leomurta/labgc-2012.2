@@ -8,14 +8,13 @@ package br.uff.ic.labgc.exception;
  *
  * @author victor
  */
-public class WorkspaceFileNotFoundException extends WorkspaceException{
+public class WorkspaceArqNaoExisteException extends WorkspaceException{
 
-    public WorkspaceFileNotFoundException(String message, Exception ex) {
+    public WorkspaceArqNaoExisteException(String message, Exception ex) {
     super(message, ex);
     }
     
-    public WorkspaceFileNotFoundException(String message) {
+    public WorkspaceArqNaoExisteException(String message) {
     super(message);
     }
 }
-
