@@ -112,6 +112,7 @@ throws IOException, WorkspaceException {
     // testa se existe o diretorio de versionamento
     if (!diretorio1.exists()) {
         throw new WorkspaceRepNaoExisteException ("ERRO: Não existe repositório.");
+       
     }
     // procura pelo espelho - não existe um dir padrão pq extensão é a versão
     File[] stDir = diretorio1.listFiles();
@@ -166,7 +167,7 @@ throw new UnsupportedOperationException("Not supported yet.");
 
 public static void criaWorkSpace(File diretorio, String versao, String repositorio, String login)
 throws IOException, WorkspaceException {
-    if (!diretorio.exists()) {
+    /*if (!diretorio.exists()) {
         diretorio.mkdirs();
     }
     else{
@@ -192,7 +193,19 @@ throws IOException, WorkspaceException {
     // cria arquivo repositorio com o caminho do repositorio remoto
     PrintWriter out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
     out.println(repositorio);
-    out.close ();
+    out.close ();*/
 }
+
+//implementar
+    public boolean canCreate(){
+        return false;
+    }
+    public void storeLocalData(List<VersionedItem> items){
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void setParam(String key, String value) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 
 }
