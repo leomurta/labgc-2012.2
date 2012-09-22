@@ -4,6 +4,8 @@
  */
 package br.uff.ic.labgc.server;
 
+import br.uff.ic.labgc.core.*;
+import br.uff.ic.labgc.exception.ServerException;
 import java.io.File;
 import java.util.List;
 
@@ -24,7 +26,7 @@ public class Server implements IServer{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<File> checkout() {
+    public List<VersionedItem> checkout(int revision, String token)throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -47,6 +49,10 @@ public class Server implements IServer{
 
     public String getRepHost() {
         return repHost;
+    }
+
+    public String login(String user, String pwd) throws ServerException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     

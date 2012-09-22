@@ -5,6 +5,6 @@
 package br.uff.ic.labgc.exception;
 
 
-public class ClientException extends ApplicationException {
+public abstract class ClientException extends ApplicationException {
     
 }

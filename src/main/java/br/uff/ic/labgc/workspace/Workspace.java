@@ -4,19 +4,11 @@
 */
 package br.uff.ic.labgc.workspace;
 
-import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
-import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
-import br.uff.ic.labgc.exception.WorkspaceException;
-import br.uff.ic.labgc.exception.WorkspaceNaoDirException;
-import br.uff.ic.labgc.exception.WorkspaceRepNaoExisteException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import br.uff.ic.labgc.core.*;
+import br.uff.ic.labgc.exception.*;
+import java.io.*;
 import java.nio.channels.FileChannel;
+import java.util.*;
 
 
 /**
@@ -137,9 +129,9 @@ boolean resolve(File file) {
 
     }
 // diretorio = diretorio raiz do projeto e raiz=caminho da raiz do repositorio e repositorio=caminho dentro da raiz
-public static void criaWorkSpace(File diretorio, String Raiz, String Repositorio)
+public void createWorkspace(String Raiz, String Repositorio)
 throws IOException, WorkspaceException {
-    if (!diretorio.exists()) {
+    /*if (!diretorio.exists()) {
         diretorio.mkdirs();
     }
     else{
@@ -162,7 +154,19 @@ throws IOException, WorkspaceException {
                 
 	out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
 	out.println(Repositorio);
-	out.close ();
+	out.close ();*/
 }
+
+//implementar
+    public boolean canCreate(){
+        return false;
+    }
+    public void storeLocalData(List<VersionedItem> items){
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void setParam(String key, String value) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 
 }

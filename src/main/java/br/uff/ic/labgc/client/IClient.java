@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.client;
 
+import br.uff.ic.labgc.exception.*;
 import java.io.*;
 import java.util.*;
 
@@ -17,7 +18,7 @@ public interface IClient {
     
     boolean commit(List<File> files, String message);
     List<File> update();
-    List<File> checkout();
+    
     String diff(File file, String version);
     String log();
     
@@ -31,9 +32,14 @@ public interface IClient {
     //comandos do diretorio
     
     boolean add(File file);
-    boolean revert(File file);
+    
     String status();
     boolean release();
     boolean resolve(File file);
+    
+    //implementados
+    boolean revert(String systemDirectory)throws ClientWorkspaceUnavailableException;
+    void checkout(String repository, String systemDirectory, int revision) throws ClientWorkspaceUnavailableException, ClientLoginRequiredException;
+    void login(String user, String pwd);
     
 }
