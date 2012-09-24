@@ -4,6 +4,8 @@
 */
 package br.uff.ic.labgc.workspace;
 
+import br.uff.ic.labgc.core.*;
+import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
 import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
@@ -12,8 +14,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
+import java.util.*;
 
 
 /**
@@ -159,10 +164,11 @@ public boolean resolve(File file) {
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
 
-public static void criaWorkSpace(File diretorio, String versao, String repositorio, String login)
-throws IOException, WorkspaceException {
-    /*if (!diretorio.exists()) {
-        diretorio.mkdirs();
+public void createWorkspace(String diretorio, String versao, String repositorio, String login)
+throws WorkspaceException, IOException {
+    File diretorio1 = new File (diretorio);
+    if (!diretorio1.exists()) {
+        diretorio1.mkdirs();
     }
     else{
         throw new WorkspaceDirExisteException ("ERRO: Diretório existente.");
@@ -187,7 +193,7 @@ throws IOException, WorkspaceException {
     // cria arquivo repositorio com o caminho do repositorio remoto
     PrintWriter out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
     out.println(repositorio);
-    out.close ();*/
+    out.close ();
 }
 
 //implementar

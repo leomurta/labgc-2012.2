@@ -128,11 +128,8 @@ public class Client implements IClient{
    
     //private
     private void createWorkspace(String systemDirectory)throws WorkspaceException{
-        try {
-            workspace.createWorkspace(systemDirectory,repository);
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
+         workspace.createWorkspace(systemDirectory,repository);
          workspace.setParam("token",loginToken);
     }
     
