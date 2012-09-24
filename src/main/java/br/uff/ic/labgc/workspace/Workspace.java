@@ -4,19 +4,15 @@
 */
 package br.uff.ic.labgc.workspace;
 
-import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
 import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
-import br.uff.ic.labgc.exception.WorkspaceNaoDirException;
 import br.uff.ic.labgc.exception.WorkspaceRepNaoExisteException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 
 
@@ -60,8 +56,9 @@ public class Workspace {
     
 boolean copy(File origem,File destino,boolean overwrite)
 throws FileNotFoundException, IOException {  
-      if (destino.exists() && !overwrite)
-         return false;  
+      if (destino.exists() && !overwrite) {
+        return false;
+    }  
       
       // FileChannel realiza as operações de leitura e gravação 
       // com o máximo de eficiência otimizando operação de transferência de dados.
@@ -157,9 +154,6 @@ public boolean resolve(File file) {
 
     }
 
-public boolean writeLocalData(){
-throw new UnsupportedOperationException("Not supported yet.");
-}
 
 // Cria esqueleto da WorkSpace
 // diretorio = diretorio completo do projeto, versao=versao do projeto
