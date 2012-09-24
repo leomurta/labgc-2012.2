@@ -17,6 +17,8 @@ import static org.junit.Assert.*;
  */
 public class UserJUnitTest {
     
+    private static UserDAO userDAO = new UserDAO();
+    
     public UserJUnitTest() {
     }
     
@@ -42,5 +44,9 @@ public class UserJUnitTest {
     //public void hello() {}
     
     @Test
-    public void testSave() {}
+    public void testAdd() {
+        User user = new User("Teste","teste");
+        int id = userDAO.add(user);
+        assertTrue("Usuário criado:",id != 0);
+    }
 }
