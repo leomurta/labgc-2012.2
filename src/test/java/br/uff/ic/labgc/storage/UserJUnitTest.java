@@ -45,8 +45,11 @@ public class UserJUnitTest {
     
     @Test
     public void testAdd() {
-        User user = new User("Teste","teste");
-        int id = userDAO.add(user);
-        assertTrue("Usuário criado:",id != 0);
+        User user1 = new User(1,"Teste","teste");
+        int id = userDAO.add(user1);
+        assertTrue("Usuário criado:",id == 1);
+        User user2 = new User(2,"Teste1","teste1");
+        id = userDAO.add(user2);
+        assertTrue("Usuário criado:",id == 2);
     }
 }

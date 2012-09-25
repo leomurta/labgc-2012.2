@@ -7,8 +7,10 @@
     <property name="hibernate.connection.url">jdbc:derby://localhost:1527/labgc</property>
     <property name="hibernate.connection.username">labgc</property>
     <property name="hibernate.connection.password">2012-2</property>
+<!--    <property name="show_sql">true</property> -->
     
-    <!-- Mapping files -->
-    <!--    <mapping resource="User.hbm.xml"/> -->
+    
+    <mapping resource="User.hbm.xml"/>
+    <!--<mapping resource="Revision.hbm.xml"/> -->
   </session-factory>
 </hibernate-configuration>

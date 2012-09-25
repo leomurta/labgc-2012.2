@@ -15,18 +15,7 @@ public class HibernateUtil
 
 	static 
 	{	
-            String curDir = System.getProperty("user.dir");
-            System.out.println("c--------> " + curDir);
-            String filename = "C:/Users/jokerfvd/Documents/GitHub/labgc-2012.2/src/main/resources/br/uff/ic/labgc/storage/util/hibernate.cfg.xml";
-            boolean exists = (new File(filename)).exists();
-            if (exists) {
-                System.out.println("Existe");
-            } else {
-                System.out.println("Não existe");
-            }
-            sessionFactory = new AnnotationConfiguration().configure(filename).buildSessionFactory();
-            //Configuration config = new Configuration().configure(filename);
-            //sessionFactory = config.buildSessionFactory();
+            sessionFactory = new Configuration().configure().buildSessionFactory();
             System.out.println("OIOIOI");
 	}
 
