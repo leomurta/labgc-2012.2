@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
 public class UserJUnitTest {
     
     private static UserDAO userDAO = new UserDAO();
+    private static ProjectUserDAO projectUserDAO = new ProjectUserDAO();
     
     public UserJUnitTest() {
     }
@@ -95,4 +96,5 @@ public class UserJUnitTest {
         userDAO.remove(user);
         userDAO.getUser(id);
     }
+    
 }

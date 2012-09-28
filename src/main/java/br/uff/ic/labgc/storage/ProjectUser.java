@@ -11,7 +11,21 @@ package br.uff.ic.labgc.storage;
 public class ProjectUser {
     private ProjectUserId id;
     private Project project;
-    int permission;
+    private String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+    
+    public void generateToken() {
+        this.token = user.getPassword();
+    }
+    int 
+            permission;
 
     public int getPermission() {
         return permission;

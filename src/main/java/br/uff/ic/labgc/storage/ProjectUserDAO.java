@@ -71,6 +71,22 @@ public class ProjectUserDAO {
 		{	throw new InfrastructureException(e);
 		}
 	}
+        
+        public ProjectUser getProjectUser(ProjectUserId projectUserId) {
+        try {
+            Session sessao = HibernateUtil.getSession();
+
+            ProjectUser pu = (ProjectUser)sessao.get(ProjectUser.class, projectUserId);
+
+            if (pu == null) {
+                throw new ObjectNotFoundException();
+            }
+
+            return pu;
+        } catch (HibernateException e) {
+            throw new InfrastructureException(e);
+        }
+    }
 
 	public List getProjectUsers()
 	{	try

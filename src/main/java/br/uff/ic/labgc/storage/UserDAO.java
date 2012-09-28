@@ -61,6 +61,23 @@ public class UserDAO {
         }
     }
     
+    public User getUserByUserName(String username) {
+        try {
+            Session sessao = HibernateUtil.getSession();
+
+            User user = (User) sessao.createQuery("from T_USER where username = :username")
+                    .setEntity("username", username).uniqueResult();
+
+            if (user == null) {
+                throw new ObjectNotFoundException();
+            }
+
+            return user;
+        } catch (HibernateException e) {
+            throw new InfrastructureException(e);
+        }
+    }
+    
     public List getUsers()
 	{	
             try

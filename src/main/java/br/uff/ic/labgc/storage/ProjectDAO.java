@@ -62,6 +62,23 @@ public class ProjectDAO {
         }
     }
     
+    public Project getProjectByName(String name) {
+        try {
+            Session sessao = HibernateUtil.getSession();
+
+            Project project = (Project) sessao.createQuery("from T_PROJECT where name = :name")
+                    .setEntity("name", name).uniqueResult();
+
+            if (project == null) {
+                throw new ObjectNotFoundException();
+            }
+
+            return project;
+        } catch (HibernateException e) {
+            throw new InfrastructureException(e);
+        }
+    }
+    
     public List getProjects()
 	{	
             try
