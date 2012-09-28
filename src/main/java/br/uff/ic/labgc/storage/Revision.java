@@ -4,52 +4,89 @@
  */
 package br.uff.ic.labgc.storage;
 
-import br.uff.ic.labgc.storage.ConfigurationItem.ConfigurationItemData;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.Set;
 
 /**
  *
  * @author jokerfvd
  */
-public class Revision implements IStorage{
+public class Revision {
 
-    public void save() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    private int id;
+    private Date date;
+    private String description;
+    private String number;
+    private User user;
+    private Project project;
+    private Set configItens = new HashSet();
+
+    public Revision(Date date, String description, String number, User user, Project project) {
+        this.date = date;
+        this.description = description;
+        this.number = number;
+        this.user = user;
+        this.project = project;
     }
 
-    public void remove() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Set getConfigItens() {
+        return configItens;
     }
 
-    public void update() {
-    throw new UnsupportedOperationException("Not supported yet.");
+    public void setConfigItens(Set configItens) {
+        this.configItens = configItens;
     }
-    public class RevisionData{
-        private int id;
-        private double timestamp;
-        private String description;
-        private String number;
+
+    public int getId() {
+        return id;
     }
-    private RevisionData data;
-    private List<ConfigurationItem.ConfigurationItemData> configItens;
-    
-    
-    public void setTimestamp(double timestamp){this.data.timestamp = timestamp;}
-    public void setDescription(String description){this.data.description = description;}
-    public void setNumber(String number){this.data.number = number;}
-    
-    public void setConfigurationItens(List<ConfigurationItemData> configItens){
-        this.configItens.clear();
-        Iterator<ConfigurationItemData> it = configItens.iterator();
-        while (it.hasNext()) {
-            this.configItens.add(it.next());
-	}
+
+    public void setId(int id) {
+        this.id = id;
     }
-    
-    public double getId(){return this.data.id;}
-    public double getTimestamp(){return this.data.timestamp;}
-    public String getDescription(){return this.data.description;}
-    public String getNumber(){return this.data.number;}
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+
 }

@@ -15,13 +15,12 @@ public class HibernateUtil
 
 	static 
 	{	
-            sessionFactory = new Configuration().configure().buildSessionFactory();
-            System.out.println("OIOIOI");
+            sessionFactory = new Configuration().configure("postgres.hibernate.cfg.xml").buildSessionFactory();
 	}
 
 	public static Session getSession() 
 	{	Session s = (Session) threadSession.get();
-		// Abre uma nova Sess�o, se a thread ainda n�o possui uma.
+		// Abre uma nova Sessao, se a thread ainda nao possui uma.
 		try 
 		{	if (s == null) 
 			{	s = sessionFactory.openSession();

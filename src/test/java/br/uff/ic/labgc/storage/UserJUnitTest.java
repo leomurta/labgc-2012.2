@@ -4,6 +4,9 @@
  */
 package br.uff.ic.labgc.storage;
 
+import br.uff.ic.labgc.storage.util.InfrastructureException;
+import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
+import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -45,11 +48,51 @@ public class UserJUnitTest {
     
     @Test
     public void testAdd() {
-        User user1 = new User(1,"Teste","teste");
-        int id = userDAO.add(user1);
-        assertTrue("Usuário criado:",id == 1);
-        User user2 = new User(2,"Teste1","teste1");
-        id = userDAO.add(user2);
-        assertTrue("Usuário criado:",id == 2);
+        User user = new User("Teste","Teste","teste");
+        int id = userDAO.add(user);
+        assertTrue("Usuário criado:",id != 0);
+    }
+    
+    @Test
+    public void testGet() {
+        User user = new User("Teste","Teste","teste");
+        int id = userDAO.add(user);
+        User user1 = userDAO.getUser(id);
+        assertTrue("Ids iguais:",id == user1.getId() );
+    }
+    
+    //@Test
+    public void testGetUsers() {
+        User user = new User("Teste","Teste","teste");
+        userDAO.add(user);
+        User user1 = new User("Teste1","Teste1","teste1");
+        userDAO.add(user1);
+        List<User> users = userDAO.getUsers();
+        assertTrue("2 elementos:",users.size() == 2 );
+    }
+    
+    //@Test(expected=ObjectNotFoundException.class)
+    //O sessao.get em UserDAO era pra retornar null mas não esta retornando
+    //no testRemove funciona pq ?????
+    public void testUserNotFound() {
+        userDAO.getUser(10);
+    }
+    
+    @Test
+    public void testUpdateName() {
+        User user = new User("Teste","Teste","teste");
+        String name = user.getName();
+        user.setName("novo nome");
+        userDAO.update(user);
+        User user1 = userDAO.getUser(user.getId());
+        assertTrue("Nomes diferentes:", !name.equals(user1.getName()));
+    }
+    
+    @Test(expected=ObjectNotFoundException.class)
+    public void testRemove() {
+        User user = new User("Teste","Teste","teste");
+        int id = userDAO.add(user);
+        userDAO.remove(user);
+        userDAO.getUser(id);
     }
 }

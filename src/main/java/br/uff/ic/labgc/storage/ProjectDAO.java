@@ -4,7 +4,9 @@
  */
 package br.uff.ic.labgc.storage;
 
-import br.uff.ic.labgc.storage.util.*;
+import br.uff.ic.labgc.storage.util.HibernateUtil;
+import br.uff.ic.labgc.storage.util.InfrastructureException;
+import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.util.List;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -13,62 +15,60 @@ import org.hibernate.Session;
  *
  * @author jokerfvd
  */
-public class UserDAO {
-
-    public int add(User user) {
+public class ProjectDAO {
+    public int add(Project project) {
         try {
             Session sessao = HibernateUtil.getSession();
-            sessao.save(user);
-            return user.getId();
+            sessao.save(project);
+            return project.getId();
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
     }
 
-    public void update(User user) {
+    public void update(Project project) {
         try {
             Session sessao = HibernateUtil.getSession();
 
-            sessao.update(user);
+            sessao.update(project);
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
     }
 
-    public void remove(User user) {
+    public void remove(Project project) {
         try {
             Session sessao = HibernateUtil.getSession();
 
-            sessao.delete(user);
+            sessao.delete(project);
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
     }
 
-    public User getUser(int id) {
+    public Project getProject(int id) {
         try {
             Session sessao = HibernateUtil.getSession();
 
-            User user = (User) sessao.get(User.class, id);
+            Project project = (Project) sessao.get(Project.class, id);
 
-            if (user == null) {
+            if (project == null) {
                 throw new ObjectNotFoundException();
             }
 
-            return user;
+            return project;
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
     }
     
-    public List getUsers()
+    public List getProjects()
 	{	
             try
             {
                 Session sessao = HibernateUtil.getSession();
 
-                return sessao.createQuery("from T_USER order by id").list();
-                //return sessao.createSQLQuery("select * from t_user order by id").list();
+                return sessao.createQuery("from T_PROJECT order by id").list();
             } catch (HibernateException e) {
                 throw new InfrastructureException(e);
             }

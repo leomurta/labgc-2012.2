@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="br.uff.ic.labgc.storage.Project" table="t_project">
+        <id name="id" column="id" type="int">      
+            <generator class="sequence">
+                <param name="sequence">SEQ_PROJECT</param>
+            </generator>       
+        </id>     
+        <property name="name" column="name" type="string" not-null="true"/>
+        <set name="projectUsers" order-by="USER_ID asc">
+            <key column="PROJEC_ID"/>
+            <one-to-many class="br.uff.ic.labgc.storage.ProjectUser"/>
+        </set>
+    </class>
+</hibernate-mapping>
