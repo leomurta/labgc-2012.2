@@ -49,5 +49,26 @@
       <artifactId>ejb3-persistence</artifactId>
       <version>1.0.1.GA</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbyclient</artifactId>
+      <version>10.9.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>jta</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.sql</groupId>
+      <artifactId>jdbc-stdext</artifactId>
+      <version>2.0</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>unknown.binary</groupId>
+      <artifactId>postgresql-9.1-901.jdbc4</artifactId>
+      <version>SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>

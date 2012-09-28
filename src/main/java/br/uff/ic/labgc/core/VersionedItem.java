@@ -31,6 +31,7 @@ public abstract class VersionedItem implements Serializable {
      */
     private String name;
     
+    
     /**
      * Nome do autor da última alteração no item.
      */

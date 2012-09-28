@@ -4,55 +4,77 @@
  */
 package br.uff.ic.labgc.storage;
 
-import java.util.Iterator;
-import java.util.List;
-import org.hibernate.SessionFactory;
-import org.hibernate.classic.Session;
-
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
  * @author jokerfvd
  */
-public class User implements IStorage{
-    
+public class User {
+
     private int id;
+
+    public Set getUserProjects() {
+        return userProjects;
+    }
+
+    public void setUserProjects(Set userProjects) {
+        this.userProjects = userProjects;
+    }
     private String name;
-    
-    private List<ConfigurationItem> revisions;
-    
-    public User(String name) {
+    private String username;
+    private String password;
+    private Set revisions = new HashSet();
+    private Set userProjects = new HashSet();
+
+    public Set getRevisions() {
+        return revisions;
+    }
+
+    public void setRevisions(Set revisions) {
+        this.revisions = revisions;
+    }
+
+    public User(String name, String username, String password) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
-    
-    public void setName(String name){this.name = name;}
-    public void setRevisions(List<ConfigurationItem> revisions){
-        this.revisions.clear();
-        Iterator<ConfigurationItem> it = revisions.iterator();
-        while (it.hasNext()) {
-            this.revisions.add(it.next());
-	}
-    }
-    
-    public int getId(){return this.id;}
-    public String getName(){return this.name;}
-    public List<ConfigurationItem> getRevisions(){return this.revisions;}
 
-    public void save() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        session.save(this);
-        session.close();
+    public void setUsername(String username) {
+        this.name = username;
     }
 
-    public void remove() {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        session.save(this);
-        session.close();
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    //public void setRevisions(Set revisions){ this.revisions = revisions;}
+    //public void setProjects(Set projects){ this.projects = projects;}
+
+    public int getId() {
+        return id;
     }
 
-    public void update() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public String getName() {
+        return name;
     }
-    
-    
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+    //public Set getRevisions(){return revisions;}
+    //public Set getProjects(){return projects;}
 }

@@ -27,7 +27,13 @@ import java.util.*;
 */
 
 public class Workspace {
+    private String LocalRepo;
     
+    
+    
+    public Workspace (String LocalRepo){
+        this.LocalRepo = LocalRepo;
+    }
     /**
 *
 * @param file
@@ -164,7 +170,7 @@ public boolean resolve(File file) {
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
 
-public void createWorkspace(String diretorio, String versao, String repositorio, String login)
+public void createWorkspace(String diretorio, String versao, String repositorio)
 throws WorkspaceException, IOException {
     File diretorio1 = new File (diretorio);
     if (!diretorio1.exists()) {
@@ -195,16 +201,46 @@ throws WorkspaceException, IOException {
     out.println(repositorio);
     out.close ();
 }
+// pode criar diretório - true: pode criar e false: existe diretório
+
+    public boolean canCreate(String diretorio)
+    throws WorkspaceException, IOException {
+        
+        File dirtemp = new File (diretorio);
+        if (! dirtemp.exists()) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    /*
+     * setParam - coloca em um arquivo um par chave/valor
+     */
+public void setParam(String key, String value) throws IOException {
+    File vcs = new File (LocalRepo, ".labgc");
+    File file = new File(vcs,"labgc.properties");
+    if (!file.exists()) {
+        file.createNewFile();
+    }
+    Properties properties = new Properties();
+   try {
+        properties.load(new FileInputStream(file));
+    } catch (IOException e) {
+    }
+   
+    properties.setProperty(key, value);
+    
+    try {
+        properties.store(new FileOutputStream(file), null);
+    } catch (IOException e) {
+    }
+    }
+
 
 //implementar
-    public boolean canCreate(){
-        return false;
-    }
-    public void storeLocalData(List<VersionedItem> items){
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 
-    public void setParam(String key, String value) {
+    public void storeLocalData(List<VersionedItem> items){
         throw new UnsupportedOperationException("Not yet implemented");
     }
 

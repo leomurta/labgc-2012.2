@@ -45,12 +45,15 @@ public class CommunicationFactory {
      * Retorna uma instância de servidor, conforme especificado na propriedade
      * serverclass do arquivo labgc.properties
      *
+     * @param hostName servidor de repositório. Caso seja localhost, devolverá uma instância local do servidor
+     * @param repoName Nome do repositório.
      * @return
      */
-    public IServer getServer(String url, String repoName) throws ApplicationException {
+    public IServer getServer(String hostName, String repoName) throws ApplicationException {
 
+        //TODO CRISTIANO não precisa receber o nome do repositório, pois isso vai ficar no token de login. mudar a lógica do server. se for hostname, devolver instância local, senão, devolver rmi
         try {
-            URL connURL = new URL(url);
+            URL connURL = new URL(hostName);
             if (commClient == null) {
                 String serverClass = ApplicationProperties.getPropertyValue(connURL.getProtocol() + IPropertiesConstants.CONNECTOR_CLASS);
 

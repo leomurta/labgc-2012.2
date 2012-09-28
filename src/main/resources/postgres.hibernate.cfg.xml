@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+    <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+    <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/labgc</property>
+    <property name="hibernate.connection.username">postgres</property>
+    <property name="hibernate.connection.password">admin</property>
+    <mapping resource="User.hbm.xml"/>
+    <mapping resource="Project.hbm.xml"/>
+    <mapping resource="Revision.hbm.xml"/>
+    <mapping resource="ConfigurationItem.hbm.xml"/>
+    <mapping resource="ProjectUser.hbm.xml"/>
+  </session-factory>
+</hibernate-configuration>

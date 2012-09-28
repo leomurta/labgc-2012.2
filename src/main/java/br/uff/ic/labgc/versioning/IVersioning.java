@@ -4,8 +4,6 @@
  */
 package br.uff.ic.labgc.versioning;
 
-import br.uff.ic.labgc.storage.ConfigurationItem.ConfigurationItemData;
-import br.uff.ic.labgc.storage.Revision.RevisionData;
 import java.util.List;
 
 /**
@@ -14,22 +12,22 @@ import java.util.List;
  */
 public interface IVersioning {
     
-    public RevisionData getRevisionInfo(String number);
+    //public RevisionData getRevisionInfo(String number);
     
-    public List<ConfigurationItemData> getRevision(String number);
+    //public List<ConfigurationItemData> getRevision(String number);
     
     //por enquanto User só tem nome, mas pode ter outras coisas
     public String getRevisionUserName(String number);
     
-    public List<ConfigurationItemData> getAllConfigurationItemVersions(String name);
+    //public List<ConfigurationItemData> getAllConfigurationItemVersions(String name);
     
-    public ConfigurationItemData getConfigurationItem(String name, String version);
+    //public ConfigurationItemData getConfigurationItem(String name, String version);
     
-    public ConfigurationItemData getConfigurationItemById(String name);
+    //public ConfigurationItemData getConfigurationItemById(String name);
     
     public String getHeadRevision();
     
     //retorna nova versão corrente ou gera exceção
-    public String addRevision(List<ConfigurationItemData> configitens);
+    //public String addRevision(List<ConfigurationItemData> configitens);
     
 }

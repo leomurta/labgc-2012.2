@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class name="br.uff.ic.labgc.storage.ProjectUser" table="t_project_user">
+      <composite-id name="id" class="br.uff.ic.labgc.storage.ProjectUserId"> 
+         <key-property    name="projectId"     column="PROJECT_ID"/>
+         <key-property    name="userId"   column="USER_ID"/> 
+      </composite-id>
+      <property name="permission" column="permission" type="int"/>
+      <property name="token" column="token" type="string"/>
+      
+      <many-to-one name="project" class="br.uff.ic.labgc.storage.Project"
+                   insert="false" update="false">
+         <column name="PROJECT_ID"/>
+      </many-to-one>
+      <many-to-one name="user" class="br.uff.ic.labgc.storage.User"
+                   insert="false" update="false">
+         <column name="USER_ID"/>
+      </many-to-one>
+      <!--
+           update, insert (opcionais - default=true) especificam se as colunas
+           mapeadas devem ou não ser incluídas em comandos SQL UPDATE e/ou INSERT. 
+           Ao se designar ambas as propriedades para false se permite a definição 
+           de uma associação "derivada" cujo valor é inicializado a partir de 
+           alguma outra propriedade mapeada para a mesma coluna.
+      -->
+      
+  </class>
+</hibernate-mapping>

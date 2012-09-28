@@ -5,8 +5,10 @@
 package br.uff.ic.labgc.comm.client;
 
 import br.uff.ic.labgc.comm.server.ICommunicationServer;
+import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.CommunicationException;
+import br.uff.ic.labgc.exception.ServerException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.IServer;
@@ -69,10 +71,6 @@ public class RMIConnector implements IServer{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<File> checkout() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     public String diff(File file, String version) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -82,6 +80,7 @@ public class RMIConnector implements IServer{
     }
 
     public void registerRepository(String repHost, String repName) {
+        //TODO CRISTIANO retirar este método. host será passado no construtor. repositório não precisa
         this.repHost = repHost;
         this.repPath = repName;
     }
@@ -102,5 +101,17 @@ public class RMIConnector implements IServer{
             throw new CommunicationException("Ocorreu um erro ao tentar executar a operação, verifique a exceção aninhada para mais detalhes.", 
                     ex.getCause());
         }
+    }
+
+    public List<VersionedItem> checkout(String revision, String token) throws ServerException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String login(String user, String pwd) throws ServerException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public byte[] getItemContent(String hash) throws ServerException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }
