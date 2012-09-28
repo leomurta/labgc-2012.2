@@ -96,7 +96,7 @@ public class Client implements IClient{
         return revert;
     }
 
-    public void checkout(String repository, String systemDirectory, int revision) throws ClientWorkspaceUnavailableException, ClientLoginRequiredException{
+    public void checkout(String host, String repository, String systemDirectory, int revision) throws ClientWorkspaceUnavailableException, ClientLoginRequiredException{
         
         this.repository = repository; 
             

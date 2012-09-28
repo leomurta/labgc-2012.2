@@ -39,7 +39,7 @@ public interface IClient {
     
     //implementados
     boolean revert(String systemDirectory)throws ClientWorkspaceUnavailableException;
-    void checkout(String repository, String systemDirectory, int revision) throws ClientWorkspaceUnavailableException, ClientLoginRequiredException;
+    void checkout(String host, String repository, String systemDirectory, int revision) throws ClientWorkspaceUnavailableException, ClientLoginRequiredException;
     void login(String user, String pwd);
     
 }
