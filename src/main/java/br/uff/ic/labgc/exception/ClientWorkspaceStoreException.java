@@ -4,7 +4,10 @@
  */
 package br.uff.ic.labgc.exception;
 
-
-public abstract class ClientException extends ApplicationException {
+/**
+ *
+ * @author proto
+ */
+public class ClientWorkspaceStoreException  extends ClientException{
     
 }

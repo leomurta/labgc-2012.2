@@ -53,7 +53,7 @@ public class CommunicationFactoryTest {
     public void testGetServer() throws ApplicationException {
         CommunicationFactory instance = CommunicationFactory.getFactory();
         String expResult = bundle.getString(IPropertiesConstants.COMM_FILE_PROTOCOL + IPropertiesConstants.CONNECTOR_CLASS);
-        String result = instance.getServer("file:///").getClass().getName();
+        String result = instance.getServer("file:///", "repositorio").getClass().getName();
         assertEquals(expResult, result);
     }
 }

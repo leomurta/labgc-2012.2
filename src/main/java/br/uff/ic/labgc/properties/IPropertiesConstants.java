@@ -14,5 +14,6 @@ public interface IPropertiesConstants {
     public static String COMM_HTTP_PROTOCOL = "http";
     public static String COMM_RMI_PROTOCOL = "rmi";
     public static String COMM_FILE_PROTOCOL = "file";
-    
+    public static String REPOSITORY_DEFAULT_RMI_URL = "repositoryDefaultURL";
+    public static String RMI_REPOSITORY_OBJECT = "repositoryRMIObject";
 }

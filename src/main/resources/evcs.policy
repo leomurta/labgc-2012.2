@@ -1,0 +1,7 @@
+/* AUTOMATICALLY GENERATED ON Sat Sep 22 11:07:35 BRT 2012*/
+/* DO NOT EDIT */
+
+grant codeBase "file:/F:/mybackups/Educacao/Mestrado-UFF/Git/labgc-2012.2/target/classes/" {
+  permission java.security.AllPermission;
+};
+
