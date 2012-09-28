@@ -26,7 +26,7 @@ public class Server implements IServer{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<VersionedItem> checkout(int revision, String token)throws ServerException {
+    public List<VersionedItem> checkout(String revision, String token)throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -39,6 +39,7 @@ public class Server implements IServer{
     }
 
     public void registerRepository(String repHost, String repName) {
+        //TODO FELIPE retirar este método. host será passado no construtor. repositório não precisa
         this.repHost = repHost;
         this.repPath = repName;
     }
@@ -52,6 +53,10 @@ public class Server implements IServer{
     }
 
     public String login(String user, String pwd) throws ServerException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public byte[] getItemContent(String hash) throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

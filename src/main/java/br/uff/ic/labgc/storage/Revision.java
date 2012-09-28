@@ -22,6 +22,7 @@ public class Revision {
     private String number;
     private User user;
     private Project project;
+    //TODO mudar de Set para VersionedItem
     private Set configItens = new HashSet();
 
     public Revision(Date date, String description, String number, User user, Project project) {

@@ -4,9 +4,12 @@
  */
 package br.uff.ic.labgc.comm.client;
 
+import br.uff.ic.labgc.exception.ServerException;
 import br.uff.ic.labgc.utils.URL;
 import java.io.File;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -74,13 +77,19 @@ public class RMIConnectorTest {
      */
     //@Test
     public void testCheckout() {
-        System.out.println("checkout");
-        RMIConnector instance = null;
-        List expResult = null;
-        List result = instance.checkout();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        try {
+            System.out.println("checkout");
+            String revision = null;
+            String token = null;
+            RMIConnector instance = null;
+            List expResult = null;
+            List result = instance.checkout(revision, token);
+            assertEquals(expResult, result);
+            // TODO review the generated test code and remove the default call to fail.
+            fail("The test case is a prototype.");
+        } catch (ServerException ex) {
+            Logger.getLogger(RMIConnectorTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

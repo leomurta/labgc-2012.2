@@ -64,6 +64,7 @@ public class RevisionDAO {
     
     public List getRevisions()
 	{	
+            //TODO DUVAL verificar a necessidade deste método
             try
             {
                 Session sessao = HibernateUtil.getSession();

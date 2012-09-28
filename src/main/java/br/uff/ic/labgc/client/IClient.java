@@ -39,6 +39,14 @@ public interface IClient {
     
     //implementados
     boolean revert(String systemDirectory)throws ClientWorkspaceUnavailableException;
+    /**
+     * Solicita o checkout de um repositório. Os checkouts são sempre de todo o repositório.
+     * @param repository URL do repositório
+     * @param systemDirectory Pasta onde será criado o workspace
+     * @param revision Número da revisão que se deseja. Caso seja desejada a revisão HEAD, passa a constant EVCSConstants.REVISION_HEAD
+     * @throws ClientWorkspaceUnavailableException
+     * @throws ClientLoginRequiredException 
+     */
     void checkout(String repository, String systemDirectory, int revision) throws ClientWorkspaceUnavailableException, ClientLoginRequiredException;
     void login(String user, String pwd);
     
