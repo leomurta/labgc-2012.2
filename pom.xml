@@ -66,9 +66,9 @@
       <type>pom</type>
     </dependency>
     <dependency>
-      <groupId>unknown.binary</groupId>
-      <artifactId>postgresql-9.1-901.jdbc4</artifactId>
-      <version>SNAPSHOT</version>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>9.1-901-1.jdbc4</version>
     </dependency>
   </dependencies>
 </project>
