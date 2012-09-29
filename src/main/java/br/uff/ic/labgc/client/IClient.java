@@ -64,7 +64,7 @@ public interface IClient {
      * @return
      * 
      */
-    public boolean isLogged()throws ClientServerNotAvailableException;
+    public boolean isLogged()throws ApplicationException;
      
     
 }

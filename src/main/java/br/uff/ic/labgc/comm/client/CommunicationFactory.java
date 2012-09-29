@@ -24,9 +24,6 @@ public class CommunicationFactory {
 
     private static CommunicationFactory instance;
 
-    public static IServer getFactory(String hostname, String repository) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
     private IServer commClient;
 
     private CommunicationFactory() {

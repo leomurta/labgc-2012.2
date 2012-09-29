@@ -173,10 +173,10 @@ public class Client implements IClient, IObservable, IObserver{
         }
     }
     
-    public boolean isLogged()throws ClientServerNotAvailableException{
+    public boolean isLogged()throws ApplicationException{
         
         if(server == null)
-            server  =  CommunicationFactory.getFactory(hostname,repository);
+            server  =  CommunicationFactory.getFactory().getServer(hostname,repository);
         
         if(loginToken == null && workspace.isWorkspace())
             loginToken = workspace.getParam("token");
