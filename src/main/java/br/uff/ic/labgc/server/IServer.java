@@ -14,11 +14,11 @@ import java.util.*;
  * @author Felipe R
  */
 public interface IServer {
-    public boolean commit(List<File> file, String message);
-    public List<File> update();
-    public List<VersionedItem> checkout(String revision, String token)throws ServerException;
+    public boolean commit(VersionedItem file, String message);
+    public VersionedItem update();
+    public VersionedItem checkout(String revision, String token)throws ServerException;
     public String login(String user, String pwd)throws ServerException;
-    public String diff(File file, String version);
+    public String diff(VersionedItem file, String version);
     public String log();
     public String getRepPath();
     public String getRepHost();

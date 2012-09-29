@@ -26,7 +26,7 @@ import java.util.*;
 * @author vyctorh
 */
 
-public class Workspace {
+public class Workspace implements IObservable{
     private String LocalRepo;
     
     
@@ -239,9 +239,67 @@ public void setParam(String key, String value) throws IOException {
 
 
 //implementar
-
-    public void storeLocalData(List<VersionedItem> items){
+    /**
+     * salva arquivos versionados, do servidor, para o workspace(disco local)
+     * @param items, arquivo de itens versionados, sendo que o conjunto contem arquivos e pastas
+     */
+    public void storeLocalData(VersionedItem items){
         throw new UnsupportedOperationException("Not yet implemented");
     }
+    /**
+     * retorna valor do hostname guardado na criacao do workspace
+     * @return 
+     */
+    public String getHostname() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    /**
+     * retorna o valor do relacionado ao repositorio do projeto no servidor. Valor adicionado na criacao do workspace
+     * @return 
+     */
+    public String getRepository() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    /**
+     * verifica se o localRepo e um workspace valido e inicializado
+     * @return 
+     */
+    public boolean isWorkspace() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    /**
+     * verifica a possibilidade de criar um  workspace, retorna true ou false
+     * @return 
+     */
+    public boolean canCreate() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    /**
+     * metodo para pegar o valor de um parametro salvo
+     * @param key, chave do parametro salvo
+     * @return 
+     */
+    public String getParam(String key) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    /**
+     * metodo da interface IObservable para adicionar observadores
+     * @param obs 
+     */
+    public void registerInterest(IObserver obs) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+    
+    public boolean revert() {//parametros alterados - corrigir e remover este
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+    public void createWorkspace(String hostname, String repository) {//parametros alterados - corrigir e remover este
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+   
+    
 
 }

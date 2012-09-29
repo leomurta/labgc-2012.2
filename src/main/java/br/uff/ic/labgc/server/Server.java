@@ -6,8 +6,7 @@ package br.uff.ic.labgc.server;
 
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ServerException;
-import java.io.File;
-import java.util.List;
+
 
 /**
  *
@@ -18,19 +17,19 @@ public class Server implements IServer{
     private String repPath;
     private String repHost;
     
-    public boolean commit(List<File> file, String message) {
+    public boolean commit(VersionedItem file, String message) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<File> update() {
+    public VersionedItem update() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<VersionedItem> checkout(String revision, String token)throws ServerException {
+    public VersionedItem checkout(String revision, String token)throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String diff(File file, String version) {
+    public String diff(VersionedItem file, String version) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -38,11 +37,7 @@ public class Server implements IServer{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void registerRepository(String repHost, String repName) {
-        //TODO FELIPE retirar este método. host será passado no construtor. repositório não precisa
-        this.repHost = repHost;
-        this.repPath = repName;
-    }
+   
 
     public String getRepPath() {
         return repPath;

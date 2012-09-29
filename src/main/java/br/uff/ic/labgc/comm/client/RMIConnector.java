@@ -13,13 +13,11 @@ import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.IServer;
 import br.uff.ic.labgc.utils.URL;
-import java.io.File;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,15 +61,15 @@ public class RMIConnector implements IServer{
         
     }
 
-    public boolean commit(List<File> file, String message) {
+    public boolean commit(VersionedItem file, String message) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<File> update() {
+    public VersionedItem update() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String diff(File file, String version) {
+    public String diff(VersionedItem file, String version) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -103,7 +101,7 @@ public class RMIConnector implements IServer{
         }
     }
 
-    public List<VersionedItem> checkout(String revision, String token) throws ServerException {
+    public VersionedItem checkout(String revision, String token) throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
