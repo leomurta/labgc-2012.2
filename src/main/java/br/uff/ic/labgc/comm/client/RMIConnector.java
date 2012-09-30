@@ -109,7 +109,7 @@ public class RMIConnector implements IServer{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public byte[] getItemContent(String hash) throws ServerException {
+    public byte[] getItemContent(String hash, String token) throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

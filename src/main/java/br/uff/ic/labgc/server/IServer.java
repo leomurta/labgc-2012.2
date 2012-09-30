@@ -54,8 +54,9 @@ public interface IServer {
     /**
      * Retorna o conteúdo do item versionado representado pelo hash informado.
      * @param hash Identifica o item versionado para o qual se deseja retornar o conteúdo
+     * @param token Identifica o usuário
      * @return Conteúdo do item versionado solicitado
      * @throws ServerException 
      */
-    public byte[] getItemContent(String hash) throws ServerException;
+    public byte[] getItemContent(String hash, String token) throws ServerException;
 }
