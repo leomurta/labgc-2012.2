@@ -167,7 +167,7 @@ public class Client implements IClient, IObservable, IObserver {
                 }
             }
 
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             throw new ClientServerNotAvailableException();
         }
     }

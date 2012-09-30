@@ -50,7 +50,7 @@ public class CommunicationServer implements ICommunicationServer {
     public String commit(VersionedItem item, String token) throws RemoteException {
         try {
             return server.commit(item, token);
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar commit.", ex);
         }
     }
@@ -58,7 +58,7 @@ public class CommunicationServer implements ICommunicationServer {
     public VersionedItem update(String revision, String token) throws RemoteException {
         try {
             return server.update(revision, token);
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar update.", ex);
         }
     }
@@ -66,7 +66,7 @@ public class CommunicationServer implements ICommunicationServer {
     public VersionedItem checkout(String revision, String token) throws RemoteException {
         try {
             return server.checkout(revision, token);
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar checkout.", ex);
         }
     }
@@ -74,7 +74,7 @@ public class CommunicationServer implements ICommunicationServer {
     public String log() throws RemoteException {
         try {
             return server.log();
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar log.", ex);
         }
     }
@@ -97,7 +97,7 @@ public class CommunicationServer implements ICommunicationServer {
     public String login(String user, String pwd, String repository) throws RemoteException {
         try {
             return server.login(user, pwd, repository);
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar login.", ex);
         }
     }
@@ -105,7 +105,7 @@ public class CommunicationServer implements ICommunicationServer {
     public String diff(VersionedItem item, String version) throws RemoteException {
         try {
             return server.diff(item, version);
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar diff.", ex);
         }
     }
@@ -113,7 +113,7 @@ public class CommunicationServer implements ICommunicationServer {
     public byte[] getItemContent(String hash) throws RemoteException {
         try {
             return server.getItemContent(hash);
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar getItemContent.", ex);
         }
     }
