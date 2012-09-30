@@ -14,14 +14,12 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
  *
  * @author Felipe R
  */
-public class Client implements IClient, IObservable, IObserver{
-    
-    
+public class Client implements IClient, IObservable, IObserver {
+
     /**
      * instancia do server
      */
@@ -46,36 +44,34 @@ public class Client implements IClient, IObservable, IObserver{
      * conjunto de observadores registrados na api client
      */
     private Set<IObserver> observers = new TreeSet<IObserver>();
-       
-    
+
     /**
      * Construtor para acesso sem area de trabalho(workspace)
      * @param hostname url ou ip do servidor
      * @param repository repositorio do projeto no servidor
      * @param systemDirectory diretorio do sistema que sera criado a workspace
      */
-    public Client(String hostname, String repository, String systemDirectory){
-        
+    public Client(String hostname, String repository, String systemDirectory) {
+
         this.hostname = hostname;
         this.repository = repository;
-        
+
         workspace = new Workspace(systemDirectory);
-    }  
+    }
+
     /**
      * Construtor para acesso com area de trabalho(workspace) ja existente
      * @param systemDirectory diretorio raiz da area de trabalho
      */
-    public Client(String systemDirectory){
-        
+    public Client(String systemDirectory) {
+
         workspace = new Workspace(systemDirectory);
-        
+
         this.hostname = workspace.getHostname();
         this.repository = workspace.getRepository();
-    } 
+    }
 
-    
     //comandos para o servidor
-
     public boolean commit(String message) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -123,100 +119,122 @@ public class Client implements IClient, IObservable, IObserver{
     public boolean resolve(String file) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
     //implementados
-    
-    public boolean revert()throws ClientWorkspaceUnavailableException{
+    public boolean revert() throws ClientException {
         boolean revert = false;
-        
-            revert = workspace.revert();
-       
+
+        revert = workspace.revert();
+
         return revert;
     }
-    
-    public void checkout(String revision) throws ClientWorkspaceUnavailableException, ClientLoginRequiredException{
-        
 
-        if(workspace.isWorkspace())
+    public void checkout(String revision) throws ClientException {
+
+
+        if (workspace.isWorkspace()) 
             throw new ClientWorkspaceUnavailableException();
-        
-        if(!workspace.canCreate())
+
+        if (!workspace.canCreate()) 
             throw new ClientWorkspaceUnavailableException();
-        
-        if(loginToken == null || loginToken.isEmpty())
+
+        if (loginToken == null || loginToken.isEmpty()) 
             throw new ClientLoginRequiredException();
-        
-        try{
-            this.createWorkspace();
-            VersionedItem item = server.checkout(revision,loginToken);
-            workspace.storeLocalData(item);
-        }
-        catch(WorkspaceException we){}
-        catch(ServerException se){}
-        catch(Exception e){}
-        
-    }
-   
-    public void login(String user, String pwd, String repository) {
+
         try {
-            loginToken = server.login(user, pwd, repository);
-            
-            if(workspace.isWorkspace())
+            this.createWorkspace();
+            VersionedItem item = server.checkout(revision, loginToken);
+            workspace.storeLocalData(item);
+        } catch (WorkspaceException we) {
+        } catch (ServerException se) {
+        } catch (Exception e) {
+        }
+
+    }
+
+    public void login(String user, String pwd) throws ClientException {
+        
+        this.getServer();
+        
+        try {
+            loginToken = server.login(user, pwd, this.repository);
+
+            if (workspace.isWorkspace()) {
                 try {
-                workspace.setParam("token",loginToken);
-            } catch (IOException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    workspace.setParam("token", loginToken);
+                } catch (IOException ex) {
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-                
+
         } catch (ServerException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ClientServerNotAvailableException();
         }
     }
-    
-    public boolean isLogged()throws ApplicationException{
-        
-        if(server == null)
-            server  =  CommunicationFactory.getFactory().getServer(hostname);
-        
-        if(loginToken == null && workspace.isWorkspace())
+
+    public boolean isLogged() throws ClientException {
+
+        this.getServer();
+
+        if (loginToken == null && workspace.isWorkspace()) 
             loginToken = workspace.getParam("token");
-            
-        if(loginToken == null || loginToken.isEmpty())
-            return false;
         
+        if (loginToken == null || loginToken.isEmpty()) 
+            return false;
+
         return true;
     }
-    
+
     //observer methods
-    public void registerInterest(IObserver obs){
+    public void registerInterest(IObserver obs) {
         observers.add(obs);
-        workspace.registerInterest(this);
+
+        IObserver clientObs = new IObserver() {
+
+            public void sendNotify(String msg) {
+                this.sendNotify(msg);
+            }
+        };
+
+        workspace.registerInterest(clientObs);
     }
-    
-    public void sendNotify(String msg){
-        
-        if(observers.size() > 0){
-            
+
+    public void sendNotify(String msg) {
+
+        if (observers.size() > 0) {
+
             Iterator<IObserver> iterator = observers.iterator();
-            
-            while(iterator.hasNext())
-                iterator.next().sendNotify(msg);   
+
+            while (iterator.hasNext()) 
+                iterator.next().sendNotify(msg);
         }
     }
-    
+
     //private 
     /**
      * metodo interno para criar o workspace
      * @throws WorkspaceException 
      */
-    private void createWorkspace()throws WorkspaceException{
-        
+    private void createWorkspace() throws WorkspaceException {
+
         workspace.createWorkspace(hostname, repository);
         try {
-            workspace.setParam("token",loginToken);
+            workspace.setParam("token", loginToken);
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    /**
+     * Recupera uma instancia de IServer;
+     * @throws ClientServerNotAvailableException, servidor nao disponivel 
+     */
+    private void getServer() throws ClientException {
+        if (server == null) {
+            try {
+                server = CommunicationFactory.getFactory().getServer(this.hostname);
+            } catch (ApplicationException ex) {
+                throw new ClientServerNotAvailableException();
+            }
+        }
+    }
 }
