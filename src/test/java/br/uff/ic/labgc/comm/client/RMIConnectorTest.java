@@ -6,7 +6,6 @@ package br.uff.ic.labgc.comm.client;
 
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ServerException;
-import br.uff.ic.labgc.utils.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.After;
@@ -132,20 +131,6 @@ public class RMIConnectorTest {
     }
 
     /**
-     * Test of registerRepository method, of class RMIConnector.
-     */
-    //@Test
-    public void testRegisterRepository() {
-        System.out.println("registerRepository");
-        String repHost = "";
-        String repName = "";
-        RMIConnector instance = null;
-        instance.registerRepository(repHost, repName);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
      * Test of getRepPath method, of class RMIConnector.
      */
     //@Test
@@ -180,7 +165,7 @@ public class RMIConnectorTest {
     public void testHello() throws Exception {
         System.out.println("hello");
         String name = "Joao da Silva";
-        RMIConnector instance = new RMIConnector(new URL("http://localhost:1099/repository"));
+        RMIConnector instance = new RMIConnector("localhost");
         String expResult = "Hello, Joao da Silva!";
         String result = instance.hello(name);
         assertEquals(expResult, result);

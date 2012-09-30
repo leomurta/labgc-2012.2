@@ -5,7 +5,6 @@
 package br.uff.ic.labgc.comm.client;
 
 import br.uff.ic.labgc.exception.ApplicationException;
-import br.uff.ic.labgc.exception.CommunicationException;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -50,10 +49,21 @@ public class CommunicationFactoryTest {
      * Test of getServer method, of class CommunicationFactory.
      */
     @Test
-    public void testGetServer() throws ApplicationException {
+    public void testGetServerLocal() throws ApplicationException {
         CommunicationFactory instance = CommunicationFactory.getFactory();
-        String expResult = bundle.getString(IPropertiesConstants.COMM_FILE_PROTOCOL + IPropertiesConstants.CONNECTOR_CLASS);
-        String result = instance.getServer("file:///", "repositorio").getClass().getName();
+        String expResult = bundle.getString(IPropertiesConstants.COMM_LOCAL_CONNECTOR);
+        String result = instance.getServer("localhost").getClass().getName();
+        assertEquals(expResult, result);
+    }
+    
+    /**
+     * Test of getServer method, of class CommunicationFactory.
+     */
+    @Test
+    public void testGetServerRemoto() throws ApplicationException {
+        CommunicationFactory instance = CommunicationFactory.getFactory();
+        String expResult = bundle.getString(IPropertiesConstants.COMM_REMOTE_CONNECTOR);
+        String result = instance.getServer("127.0.0.1").getClass().getName();
         assertEquals(expResult, result);
     }
 }

@@ -14,11 +14,6 @@ import java.util.List;
  */
 public class VersionedFile extends VersionedItem implements Serializable {
     private static final long serialVersionUID = 3529717766546453848L;
-    //TODO CRISTIANO size vai passar para o VersionedItem. no caso de diretórios, terá o tamanho da sub-árvore.
-    /**
-     * Tamanho do arquivo, em bytes
-     */
-    private long size = 0L;
     
     /**
      * Conteúdo do arquivo
@@ -29,14 +24,6 @@ public class VersionedFile extends VersionedItem implements Serializable {
      * Indica se o conteúdo do item foi carregado. Caso não tenha sido carregado, o primeiro get no conteúdo o buscará no repositório.
      */
     private boolean loaded;
-    
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
 
     public byte[] getContent() {
         return content;

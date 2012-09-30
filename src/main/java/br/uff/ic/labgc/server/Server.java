@@ -12,12 +12,12 @@ import br.uff.ic.labgc.exception.ServerException;
  *
  * @author Felipe R
  */
-public class Server implements IServer{
+public class Server extends AbstractServer{
+    public Server(String hostName) {
+        super(hostName);
+    }
 
-    private String repPath;
-    private String repHost;
-    
-    public String commit(VersionedItem file, String message) throws ServerException {
+    public String commit(VersionedItem file, String token) throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -37,17 +37,8 @@ public class Server implements IServer{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-   
-
-    public String getRepPath() {
-        return repPath;
-    }
-
-    public String getRepHost() {
-        return repHost;
-    }
-
     public String login(String user, String pwd, String repository)throws ServerException {
+        setRepPath(repository);
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

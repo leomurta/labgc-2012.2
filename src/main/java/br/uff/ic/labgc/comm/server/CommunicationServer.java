@@ -4,17 +4,19 @@
  */
 package br.uff.ic.labgc.comm.server;
 
+import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
+import br.uff.ic.labgc.exception.ServerException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import java.io.File;
+import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -27,7 +29,6 @@ public class CommunicationServer implements ICommunicationServer {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());            
         }
-        
         try {
             String name = ApplicationProperties.getPropertyValue(IPropertiesConstants.RMI_REPOSITORY_OBJECT);
             ICommunicationServer server = new CommunicationServer();
@@ -41,35 +42,19 @@ public class CommunicationServer implements ICommunicationServer {
         }
     }
 
-    public void registerRepository(String repHost, String repName) throws RemoteException {
+    public String commit(VersionedItem item, String token) throws RemoteException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public boolean commit(List<File> file, String message) throws RemoteException {
+     public VersionedItem update(String revision, String token) throws RemoteException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public List<File> update() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public List<File> checkout() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String diff(File file, String version) throws RemoteException {
+    public VersionedItem checkout(String revision, String token)throws RemoteException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public String log() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String getRepPath() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String getRepHost() throws RemoteException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -85,6 +70,18 @@ public class CommunicationServer implements ICommunicationServer {
             throw new RemoteException("Erro remoto", ae);
         }
         return "Hello, " + name + "!";
+    }
+
+    public String login(String user, String pwd, String repository) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String diff(VersionedItem file, String version) throws RemoteException{
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public byte[] getItemContent(String hash) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
 }

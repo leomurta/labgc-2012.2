@@ -11,3 +11,8 @@ Passos para a inicialização do servidor:
         -Djava.rmi.server.hostname=localhost
         -Djava.security.policy=evcs.policy
            br.uff.ic.labgc.comm.server.CommunicationServer
+4. E o cliente:
+   java -cp c:\app\classes;c:\app\target\evcs.jar
+        -Djava.rmi.server.codebase=file:/c:/app/target/evcs.jar
+        -Djava.security.policy=evcs.policy
+           br.uff.ic.labgc.App

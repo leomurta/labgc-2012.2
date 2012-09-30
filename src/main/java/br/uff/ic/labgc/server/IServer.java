@@ -6,8 +6,6 @@ package br.uff.ic.labgc.server;
 
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.*;
-import java.io.*;
-import java.util.*;
 
 /**
  *

@@ -46,6 +46,10 @@ public abstract class VersionedItem implements Serializable {
      * Hash do item versionado
      */
     private String hash;
+    /**
+     * Tamanho acumulado dos itens contidos neste VersionedItem
+     */
+    protected long size = 0L;
     
     public int getLastChangedRevision() {
         return lastChangedRevision;
@@ -98,5 +102,17 @@ public abstract class VersionedItem implements Serializable {
     public String generateHash() {
         this.hash = UUID.randomUUID().toString();
         return this.hash;
+    }
+
+    /**
+     * Retorna o tamanho acumulado de todos os itens contidos neste VersionedItem.
+     * @return 
+     */
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
     }
 }

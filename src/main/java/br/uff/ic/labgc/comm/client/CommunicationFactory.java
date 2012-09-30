@@ -9,10 +9,9 @@ import br.uff.ic.labgc.exception.CommunicationException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.IServer;
-import br.uff.ic.labgc.utils.URL;
 import java.lang.reflect.Constructor;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,10 +22,10 @@ import java.util.logging.Logger;
 public class CommunicationFactory {
 
     private static CommunicationFactory instance;
-
-    private IServer commClient;
+    private HashMap<String, IServer> commClient;
 
     private CommunicationFactory() {
+        commClient = new HashMap<String, IServer>(2);
     }
 
     /**
@@ -46,28 +45,31 @@ public class CommunicationFactory {
      * Retorna uma instância de servidor, conforme especificado na propriedade
      * serverclass do arquivo labgc.properties
      *
-     * @param hostName servidor de repositório. Caso seja localhost, devolverá uma instância local do servidor
-     * @param repoName Nome do repositório.
-     * @return
+     * @param hostName servidor de repositório. Caso seja localhost, devolverá
+     * uma instância local do servidor.
+     * @return Instância local ou remota que implementa a interface IServer.
      */
-    public IServer getServer(String hostName, String repoName) throws ApplicationException {
-
-        //TODO CRISTIANO não precisa receber o nome do repositório, pois isso vai ficar no token de login. mudar a lógica do server. se for hostname, devolver instância local, senão, devolver rmi
-        try {
-            URL connURL = new URL(hostName);
-            if (commClient == null) {
-                String serverClass = ApplicationProperties.getPropertyValue(connURL.getProtocol() + IPropertiesConstants.CONNECTOR_CLASS);
-
-                Constructor c = Class.forName(serverClass).getConstructor(String.class, String.class);
-                commClient = (IServer) c.newInstance(connURL.getHost(), repoName);
-            }
-        } catch (ApplicationException ex) {
-            throw ex;
-        }catch (Exception ex) {
-            Logger.getLogger(CommunicationFactory.class.getName()).log(Level.SEVERE, null, ex);
-            throw new CommunicationException("Não foi possível instanciar um servidor.", ex);
+    public IServer getServer(String hostName) throws ApplicationException {
+        IServer retorno = null;
+        if (hostName == null || "".equals(hostName)) {
+            throw new ApplicationException("hostName não pode ser nulo ou vazio.");
         }
-        return commClient;
+        if (commClient.get(hostName) == null) {
+            try {
+                String commStrategy = IPropertiesConstants.COMM_LOCAL_CONNECTOR;
+                if (!IPropertiesConstants.COMM_LOCAL_HOST.equalsIgnoreCase(hostName)) {
+                    commStrategy = IPropertiesConstants.COMM_REMOTE_CONNECTOR;
+                }
+
+                String serverClass = ApplicationProperties.getPropertyValue(commStrategy);
+                Constructor c = Class.forName(serverClass).getConstructor(String.class);
+                commClient.put(hostName, (IServer) c.newInstance(hostName));
+            } catch (Exception ex) {
+                Logger.getLogger(CommunicationFactory.class.getName()).log(Level.SEVERE, null, ex);
+                throw new CommunicationException("Não foi possível instanciar um servidor.", ex);
+            }
+        }
+        return commClient.get(hostName);
 
     }
 }
