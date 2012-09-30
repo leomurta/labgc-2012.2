@@ -41,23 +41,24 @@ public interface IClient {
     /**
      * Desfaz as alteracoes ainda nao comitadas do espaco de trabalho
      * @return
-     * @throws ClientWorkspaceUnavailableException 
+     * @throws ClientWorkspaceUnavailableException, workspace nao existe ou nao disponivel
      */
-    boolean revert()throws ClientWorkspaceUnavailableException;
+    boolean revert()throws ClientException;
     /**
      * Solicita o checkout de um repositório. Os checkouts são sempre de todo o repositório.
      * @param revision Número da revisão que se deseja. Caso seja desejada a revisão HEAD, passa a constant EVCSConstants.REVISION_HEAD
-     * @throws ClientWorkspaceUnavailableException
-     * @throws ClientLoginRequiredException 
+     * @throws ClientWorkspaceUnavailableException, workspace nao existe ou nao disponivel
+     * @throws ClientLoginRequiredException , necessario logar para executar essa funcionalidade
      */
-    void checkout(String revision) throws ClientWorkspaceUnavailableException, ClientLoginRequiredException;
+    void checkout(String revision) throws ClientException;
      /**
      * Executa login no servidor
      * @param user usuario cadastrado no sistema
      * @param pwd senha cadastrada no sistema
      * @param repository repositório no qual se deseja efetuar o login
+     * @throws ClientServerNotAvailableException, servidor nao pode ser contactado
      */
-    void login(String user, String pwd, String repository);
+    void login(String user, String pwd) throws ClientException;
     /**
      * Retorna true, quando o token de login existir no cliente e falso quando nao existir o token.
      * O metodo instancia o servidor e traz o token do arquivo para a memoria. Pode lancar excessoes em caso de falha ao conectar para o servidor
@@ -65,7 +66,7 @@ public interface IClient {
      * @return
      * 
      */
-    public boolean isLogged()throws ApplicationException;
+    public boolean isLogged()throws ClientException;
      
     
 }
