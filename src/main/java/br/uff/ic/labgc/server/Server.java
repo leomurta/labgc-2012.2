@@ -17,11 +17,11 @@ public class Server implements IServer{
     private String repPath;
     private String repHost;
     
-    public boolean commit(VersionedItem file, String message) {
+    public String commit(VersionedItem file, String message) throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public VersionedItem update() {
+    public VersionedItem update(String revision, String token) throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -47,7 +47,7 @@ public class Server implements IServer{
         return repHost;
     }
 
-    public String login(String user, String pwd) throws ServerException {
+    public String login(String user, String pwd, String repository)throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

@@ -4,10 +4,9 @@
  */
 package br.uff.ic.labgc.comm.client;
 
+import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ServerException;
 import br.uff.ic.labgc.utils.URL;
-import java.io.File;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.After;
@@ -22,22 +21,22 @@ import static org.junit.Assert.*;
  * @author Cristiano
  */
 public class RMIConnectorTest {
-    
+
     public RMIConnectorTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -45,31 +44,41 @@ public class RMIConnectorTest {
     /**
      * Test of commit method, of class RMIConnector.
      */
-   //@Test
+    //@Test
     public void testCommit() {
-        System.out.println("commit");
-        List<File> file = null;
-        String message = "";
-        RMIConnector instance = null;
-        boolean expResult = false;
-        boolean result = instance.commit(file, message);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        try {
+            System.out.println("commit");
+            VersionedItem item = null;
+            String message = "";
+            RMIConnector instance = null;
+            String expResult = null;
+            String result = instance.commit(item, message);
+            assertEquals(expResult, result);
+            // TODO review the generated test code and remove the default call to fail.
+            fail("The test case is a prototype.");
+        } catch (ServerException ex) {
+            Logger.getLogger(RMIConnectorTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
      * Test of update method, of class RMIConnector.
      */
-   // @Test
+    // @Test
     public void testUpdate() {
-        System.out.println("update");
-        RMIConnector instance = null;
-        List expResult = null;
-        List result = instance.update();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        try {
+            System.out.println("update");
+            String revision = null;
+            String token = null;
+            RMIConnector instance = null;
+            VersionedItem expResult = null;
+            VersionedItem result = instance.update(revision, token);
+            assertEquals(expResult, result);
+            // TODO review the generated test code and remove the default call to fail.
+            fail("The test case is a prototype.");
+        } catch (ServerException ex) {
+            Logger.getLogger(RMIConnectorTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -82,8 +91,8 @@ public class RMIConnectorTest {
             String revision = null;
             String token = null;
             RMIConnector instance = null;
-            List expResult = null;
-            List result = instance.checkout(revision, token);
+            VersionedItem expResult = null;
+            VersionedItem result = instance.checkout(revision, token);
             assertEquals(expResult, result);
             // TODO review the generated test code and remove the default call to fail.
             fail("The test case is a prototype.");
@@ -98,11 +107,11 @@ public class RMIConnectorTest {
     //@Test
     public void testDiff() {
         System.out.println("diff");
-        File file = null;
+        VersionedItem item = null;
         String version = "";
         RMIConnector instance = null;
         String expResult = "";
-        String result = instance.diff(file, version);
+        String result = instance.diff(item, version);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

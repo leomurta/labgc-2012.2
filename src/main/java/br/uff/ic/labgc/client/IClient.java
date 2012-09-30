@@ -55,8 +55,9 @@ public interface IClient {
      * Executa login no servidor
      * @param user usuario cadastrado no sistema
      * @param pwd senha cadastrada no sistema
+     * @param repository repositório no qual se deseja efetuar o login
      */
-    void login(String user, String pwd);
+    void login(String user, String pwd, String repository);
     /**
      * Retorna true, quando o token de login existir no cliente e falso quando nao existir o token.
      * O metodo instancia o servidor e traz o token do arquivo para a memoria. Pode lancar excessoes em caso de falha ao conectar para o servidor

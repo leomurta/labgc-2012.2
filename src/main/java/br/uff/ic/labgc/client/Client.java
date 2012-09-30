@@ -157,9 +157,9 @@ public class Client implements IClient, IObservable, IObserver{
         
     }
    
-    public void login(String user, String pwd) {
+    public void login(String user, String pwd, String repository) {
         try {
-            loginToken = server.login(user, pwd);
+            loginToken = server.login(user, pwd, repository);
             
             if(workspace.isWorkspace())
                 try {
@@ -218,6 +218,5 @@ public class Client implements IClient, IObservable, IObserver{
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
+
 }

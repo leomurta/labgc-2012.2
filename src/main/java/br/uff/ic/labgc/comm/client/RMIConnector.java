@@ -61,11 +61,11 @@ public class RMIConnector implements IServer{
         
     }
 
-    public boolean commit(VersionedItem file, String message) {
+    public String commit(VersionedItem item, String token) throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public VersionedItem update() {
+    public VersionedItem update(String revision, String token) throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -101,11 +101,11 @@ public class RMIConnector implements IServer{
         }
     }
 
-    public VersionedItem checkout(String revision, String token) throws ServerException {
+    public VersionedItem checkout(String revision, String token)throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String login(String user, String pwd) throws ServerException {
+    public String login(String user, String pwd, String repository)throws ServerException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
