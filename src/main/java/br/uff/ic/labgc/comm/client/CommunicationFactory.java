@@ -56,12 +56,7 @@ public class CommunicationFactory {
         }
         if (commClient.get(hostName) == null) {
             try {
-                String commStrategy = IPropertiesConstants.COMM_LOCAL_CONNECTOR;
-                if (!IPropertiesConstants.COMM_LOCAL_HOST.equalsIgnoreCase(hostName)) {
-                    commStrategy = IPropertiesConstants.COMM_REMOTE_CONNECTOR;
-                }
-
-                String serverClass = ApplicationProperties.getPropertyValue(commStrategy);
+                String serverClass = ApplicationProperties.getPropertyValue(getCommunicationStrategy(hostName));
                 Constructor c = Class.forName(serverClass).getConstructor(String.class);
                 commClient.put(hostName, (IServer) c.newInstance(hostName));
             } catch (Exception ex) {
@@ -71,5 +66,21 @@ public class CommunicationFactory {
         }
         return commClient.get(hostName);
 
+    }
+
+    /**
+     * Retorna o identificador da estratégia de comunicação. Caso o hostname seja
+     * localhost ou o mesmo hostname da propriedade localAddressIdentifier, retorna
+     * uma estratégia local. Caso contrário, retorna uma estratégia remota.
+     * @param hostName
+     * @return 
+     */
+    private String getCommunicationStrategy(String hostName) {
+        String commStrategy = IPropertiesConstants.COMM_LOCAL_CONNECTOR;
+        if (!IPropertiesConstants.COMM_LOCAL_HOST.equalsIgnoreCase(hostName) &&
+                !ApplicationProperties.getPropertyValue(IPropertiesConstants.LOCAL_ADDRESS_IDENTIFIER).equalsIgnoreCase(hostName)) {
+            commStrategy = IPropertiesConstants.COMM_REMOTE_CONNECTOR;
+        }
+        return commStrategy;
     }
 }

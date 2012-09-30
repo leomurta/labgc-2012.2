@@ -5,6 +5,7 @@
 package br.uff.ic.labgc.server;
 
 import br.uff.ic.labgc.core.*;
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ServerException;
 
 
@@ -17,32 +18,32 @@ public class Server extends AbstractServer{
         super(hostName);
     }
 
-    public String commit(VersionedItem file, String token) throws ServerException {
+    public String commit(VersionedItem file, String token) throws ApplicationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public VersionedItem update(String revision, String token) throws ServerException {
+    public VersionedItem update(String revision, String token) throws ApplicationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public VersionedItem checkout(String revision, String token)throws ServerException {
+    public VersionedItem checkout(String revision, String token)throws ApplicationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String diff(VersionedItem file, String version) {
+    public String diff(VersionedItem file, String version) throws ApplicationException{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String log() {
+    public String log() throws ApplicationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String login(String user, String pwd, String repository)throws ServerException {
+    public String login(String user, String pwd, String repository)throws ApplicationException {
         setRepPath(repository);
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public byte[] getItemContent(String hash) throws ServerException {
+    public byte[] getItemContent(String hash) throws ApplicationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

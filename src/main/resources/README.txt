@@ -16,3 +16,9 @@ Passos para a inicialização do servidor:
         -Djava.rmi.server.codebase=file:/c:/app/target/evcs.jar
         -Djava.security.policy=evcs.policy
            br.uff.ic.labgc.App
+
+Exemplo servidor:
+java -cp F:\mybackups\Educacao\Mestrado-UFF\Git\labgc-2012.2\target\classes -Djava.rmi.server.codebase=file:/F:/mybackups/Educacao/Mestrado-UFF/Git/labgc-2012.2/target/classes/ -Djava.rmi.server.hostname=localhost -Djava.security.policy=F:\mybackups\Educacao\Mestrado-UFF\Git\labgc-2012.2\target\classes\evcs.policy br.uff.ic.labgc.comm.server.CommunicationServer
+
+Exemplo cliente:
+java -cp F:\mybackups\Educacao\Mestrado-UFF\Git\labgc-2012.2\target\classes -Djava.rmi.server.codebase=file:/F:/mybackups/Educacao/Mestrado-UFF/Git/labgc-2012.2/target/classes/ -Djava.rmi.server.hostname=localhost -Djava.security.policy=F:\mybackups\Educacao\Mestrado-UFF\Git\labgc-2012.2\target\classes\evcs.policy br.uff.ic.labgc.comm.client.RMIConnector

@@ -9,25 +9,30 @@ import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ServerException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
-import java.io.File;
-import java.rmi.RMISecurityManager;
+import br.uff.ic.labgc.server.Server;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Servidor de comunicação que interage com um servidor de repositório.<br/>
+ *
  * @author Cristiano
  */
 public class CommunicationServer implements ICommunicationServer {
 
+    private Server server;
+
+    public CommunicationServer() {
+        server = new Server("localhost");
+    }
+
     public static void main(String args[]) {
         if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());            
+            System.setSecurityManager(new SecurityManager());
         }
         try {
             String name = ApplicationProperties.getPropertyValue(IPropertiesConstants.RMI_REPOSITORY_OBJECT);
@@ -43,23 +48,40 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     public String commit(VersionedItem item, String token) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return server.commit(item, token);
+        } catch (ServerException ex) {
+            throw new RemoteException("Erro ao executar commit.", ex);
+        }
     }
 
-     public VersionedItem update(String revision, String token) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public VersionedItem update(String revision, String token) throws RemoteException {
+        try {
+            return server.update(revision, token);
+        } catch (ServerException ex) {
+            throw new RemoteException("Erro ao executar update.", ex);
+        }
     }
 
-    public VersionedItem checkout(String revision, String token)throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public VersionedItem checkout(String revision, String token) throws RemoteException {
+        try {
+            return server.checkout(revision, token);
+        } catch (ServerException ex) {
+            throw new RemoteException("Erro ao executar checkout.", ex);
+        }
     }
 
     public String log() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return server.log();
+        } catch (ServerException ex) {
+            throw new RemoteException("Erro ao executar log.", ex);
+        }
     }
 
     /**
      * Método verificar se o objeto remoto está atendendo requisições.
+     *
      * @param name
      * @return
      * @throws RemoteException
@@ -73,15 +95,26 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     public String login(String user, String pwd, String repository) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return server.login(user, pwd, repository);
+        } catch (ServerException ex) {
+            throw new RemoteException("Erro ao executar login.", ex);
+        }
     }
 
-    public String diff(VersionedItem file, String version) throws RemoteException{
-        throw new UnsupportedOperationException("Not supported yet.");
+    public String diff(VersionedItem item, String version) throws RemoteException {
+        try {
+            return server.diff(item, version);
+        } catch (ServerException ex) {
+            throw new RemoteException("Erro ao executar diff.", ex);
+        }
     }
 
     public byte[] getItemContent(String hash) throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return server.getItemContent(hash);
+        } catch (ServerException ex) {
+            throw new RemoteException("Erro ao executar getItemContent.", ex);
+        }
     }
-    
 }

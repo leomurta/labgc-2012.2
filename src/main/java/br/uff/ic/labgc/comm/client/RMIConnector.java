@@ -8,10 +8,11 @@ import br.uff.ic.labgc.comm.server.ICommunicationServer;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.CommunicationException;
-import br.uff.ic.labgc.exception.ServerException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.AbstractServer;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -31,6 +32,12 @@ public class RMIConnector extends AbstractServer {
     private int repPort;
     private ICommunicationServer server;
 
+    /**
+     * Inicializa um conector RMI. Em todos os métodos invocados, caso a exceção remota 
+     * seja uma ApplicationException, ela é é extraída e repassada ao chamador.
+     * @param hostName Hostname do servidor remoto com o qual este conector se comunicará.
+     * @throws CommunicationException 
+     */
     public RMIConnector(String hostName) throws CommunicationException {
         super(hostName);
         this.repPort = Integer.parseInt(ApplicationProperties.getPropertyValue(IPropertiesConstants.COMM_REMOTE_PORT));
@@ -44,8 +51,7 @@ public class RMIConnector extends AbstractServer {
             server = (ICommunicationServer) registry.lookup(repositoryServerObject);
         } catch (NotBoundException ex) {
             Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
-            throw new CommunicationException("Não foi possível localizar o servidor no host: "
-                    + getRepHost(), ex);
+            throw new CommunicationException("Não foi possível localizar o servidor no host: " + getRepHost(), ex);
         } catch (AccessException ex) {
             Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
             throw new CommunicationException("Problemas de autorização ao tentar acessar o servidor no host: "
@@ -53,54 +59,173 @@ public class RMIConnector extends AbstractServer {
         } catch (RemoteException ex) {
             Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
             throw new CommunicationException("A comunicação com o host " + getRepHost() + " falhou.",
-                    ex.getCause());
+                    ex);
         }
-
     }
 
-    public String commit(VersionedItem item, String token) throws ServerException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public VersionedItem update(String revision, String token) throws ServerException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String diff(VersionedItem file, String version) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String log() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String hello(String name) throws ApplicationException {
+    /**
+     * Invoca remotamente o comando commit
+     * @param item
+     * @param token
+     * @return
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o commit
+     */
+    public String commit(VersionedItem item, String token) throws ApplicationException {
+        String result = null;
         try {
-            return server.hello(name);
+            result = server.commit(item, token);
         } catch (RemoteException ex) {
-            Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
-            throw new CommunicationException("Ocorreu um erro ao tentar executar a operação, verifique a exceção aninhada para mais detalhes.",
-                    ex.getCause());
+            handleRemoteException(ex);
         }
+        return result;
     }
 
-    public VersionedItem checkout(String revision, String token) throws ServerException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    /**
+     * Invoca remotamente o commando update
+     * @param revision
+     * @param token
+     * @return
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o update
+     */
+    public VersionedItem update(String revision, String token) throws ApplicationException {
+        VersionedItem result = null;
+        try {
+            result = server.update(revision, token);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+        return result;
     }
 
-    public String login(String user, String pwd, String repository) throws ServerException {
+    /**
+     * Executa remotamente o comando diff
+     * @param item
+     * @param version
+     * @return
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o diff
+     */
+    public String diff(VersionedItem item, String version) throws ApplicationException{
+        String result = null;
+        try {
+            result = server.diff(item, version);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+        return result;
+    }
+
+    /**
+     * Executa remotamente o comando log
+     * @return
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o log
+     */
+    public String log() throws ApplicationException{
+        String result = null;
+        try {
+            result = server.log();
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+        return result;
+    }
+
+    /**
+     * Método para testes do servidor remoto
+     *
+     * @param name Nome para o qual se deseja dizer Alô
+     * @return Mensagem de alô retornada pelo servidor remoto
+     * @throws ApplicationException
+     */
+    public String hello(String name) throws ApplicationException {
+        String result = null;
+        try {
+            result = server.hello(name);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+        return result;
+    }
+
+    /**
+     * Executa remotamente o comando checkout
+     * @param revision
+     * @param token
+     * @return
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o checkout
+     */
+    public VersionedItem checkout(String revision, String token) throws ApplicationException {
+        VersionedItem result = null;
+        try {
+            result = server.checkout(revision, token);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+        return result;
+    }
+
+    /**
+     * Executa remotamente o comando login
+     * @param user
+     * @param pwd
+     * @param repository
+     * @return
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o login
+     */
+    public String login(String user, String pwd, String repository) throws ApplicationException {
         setRepPath(repository);
-        throw new UnsupportedOperationException("Not supported yet.");
+        String result = null;
+        try {
+            result = server.login(user, pwd, repository);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+        return result;
     }
 
-    public byte[] getItemContent(String hash) throws ServerException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    /**
+     * Executamente o comando getItemContent
+     * @param hash
+     * @return
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o getItemContent
+     */
+    public byte[] getItemContent(String hash) throws ApplicationException {
+         byte[] result = null;
+        try {
+            result = server.getItemContent(hash);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+        return result;
+   }
+
     public static void main(String args[]) {
         try {
-            new RMIConnector("localhost");
+            RMIConnector rmi = new RMIConnector("localhost");
+            String command = args[0];
+            if ("hello".equals(command)) {
+                System.out.println(rmi.hello(null));
+            }
         } catch (CommunicationException ex) {
             Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ApplicationException ex) {
+            Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Handles a remote exception, throwing the root error cause or creating a new ApplicationException
+     * @param ex remote exception to be handled
+     * @throws ApplicationException Original exception (or a new one, if not an ApplicationException)
+     */
+    private void handleRemoteException(RemoteException ex) throws ApplicationException {
+        //Recupera a exceção original
+        Throwable cause = ex.getCause().getCause();
+        if (cause instanceof ApplicationException) {
+            throw (ApplicationException) cause;
+        } else {
+            Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ApplicationException("Ocorreu um erro ao tentar executar a operação, verifique a exceção aninhada para mais detalhes.",
+                    ex.getCause());
         }
     }
 }
