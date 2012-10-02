@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.uff.ic.labgc.comm.client;
 
 import br.uff.ic.labgc.exception.ApplicationException;
@@ -10,8 +6,8 @@ import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.IServer;
 import java.lang.reflect.Constructor;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,10 +18,10 @@ import java.util.logging.Logger;
 public class CommunicationFactory {
 
     private static CommunicationFactory instance;
-    private HashMap<String, IServer> commClient;
+    private Map<String, IServer> commClient;
 
     private CommunicationFactory() {
-        commClient = new HashMap<String, IServer>(2);
+        commClient = new ConcurrentHashMap<String, IServer>(2);
     }
 
     /**

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.uff.ic.labgc.comm.client;
 
 import br.uff.ic.labgc.comm.server.ICommunicationServer;
@@ -11,8 +7,6 @@ import br.uff.ic.labgc.exception.CommunicationException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.AbstractServer;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -33,10 +27,13 @@ public class RMIConnector extends AbstractServer {
     private ICommunicationServer server;
 
     /**
-     * Inicializa um conector RMI. Em todos os métodos invocados, caso a exceção remota 
-     * seja uma ApplicationException, ela é é extraída e repassada ao chamador.
-     * @param hostName Hostname do servidor remoto com o qual este conector se comunicará.
-     * @throws CommunicationException 
+     * Inicializa um conector RMI. Em todos os métodos invocados, caso a exceção
+     * remota seja uma ApplicationException, ela é é extraída e repassada ao
+     * chamador.
+     *
+     * @param hostName Hostname do servidor remoto com o qual este conector se
+     * comunicará.
+     * @throws CommunicationException
      */
     public RMIConnector(String hostName) throws CommunicationException {
         super(hostName);
@@ -65,15 +62,18 @@ public class RMIConnector extends AbstractServer {
 
     /**
      * Invoca remotamente o comando commit
+     *
      * @param item
      * @param token
      * @return
-     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o commit
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar
+     * efetuar o commit
      */
+    @Override
     public String commit(VersionedItem item, String token) throws ApplicationException {
         String result = null;
         try {
-            result = server.commit(item, token);
+            result = server.commit(item.deflate(), token);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
@@ -82,15 +82,18 @@ public class RMIConnector extends AbstractServer {
 
     /**
      * Invoca remotamente o commando update
+     *
      * @param revision
      * @param token
      * @return
-     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o update
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar
+     * efetuar o update
      */
+    @Override
     public VersionedItem update(String revision, String token) throws ApplicationException {
         VersionedItem result = null;
         try {
-            result = server.update(revision, token);
+            result = server.update(revision, token).inflate();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
@@ -99,15 +102,18 @@ public class RMIConnector extends AbstractServer {
 
     /**
      * Executa remotamente o comando diff
+     *
      * @param item
      * @param version
      * @return
-     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o diff
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar
+     * efetuar o diff
      */
-    public String diff(VersionedItem item, String version) throws ApplicationException{
+    @Override
+    public String diff(VersionedItem item, String version) throws ApplicationException {
         String result = null;
         try {
-            result = server.diff(item, version);
+            result = server.diff(item.deflate(), version);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
@@ -116,10 +122,13 @@ public class RMIConnector extends AbstractServer {
 
     /**
      * Executa remotamente o comando log
+     *
      * @return
-     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o log
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar
+     * efetuar o log
      */
-    public String log() throws ApplicationException{
+    @Override
+    public String log() throws ApplicationException {
         String result = null;
         try {
             result = server.log();
@@ -148,15 +157,18 @@ public class RMIConnector extends AbstractServer {
 
     /**
      * Executa remotamente o comando checkout
+     *
      * @param revision
      * @param token
      * @return
-     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o checkout
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar
+     * efetuar o checkout
      */
+    @Override
     public VersionedItem checkout(String revision, String token) throws ApplicationException {
         VersionedItem result = null;
         try {
-            result = server.checkout(revision, token);
+            result = server.checkout(revision, token).inflate();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
@@ -165,12 +177,15 @@ public class RMIConnector extends AbstractServer {
 
     /**
      * Executa remotamente o comando login
+     *
      * @param user
      * @param pwd
      * @param repository
      * @return
-     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o login
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar
+     * efetuar o login
      */
+    @Override
     public String login(String user, String pwd, String repository) throws ApplicationException {
         setRepPath(repository);
         String result = null;
@@ -184,26 +199,29 @@ public class RMIConnector extends AbstractServer {
 
     /**
      * Executamente o comando getItemContent
+     *
      * @param hash
      * @return
-     * @throws ApplicationException Exceção ocorrida no servidor ao tentar efetuar o getItemContent
+     * @throws ApplicationException Exceção ocorrida no servidor ao tentar
+     * efetuar o getItemContent
      */
+    @Override
     public byte[] getItemContent(String hash) throws ApplicationException {
-         byte[] result = null;
+        byte[] result = null;
         try {
             result = server.getItemContent(hash);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
         return result;
-   }
+    }
 
     public static void main(String args[]) {
         try {
             RMIConnector rmi = new RMIConnector("localhost");
             String command = args[0];
             if ("hello".equals(command)) {
-                System.out.println(rmi.hello(null));
+                System.out.println(rmi.hello("Cristiano"));
             }
         } catch (CommunicationException ex) {
             Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
@@ -213,9 +231,12 @@ public class RMIConnector extends AbstractServer {
     }
 
     /**
-     * Handles a remote exception, throwing the root error cause or creating a new ApplicationException
+     * Handles a remote exception, throwing the root error cause or creating a
+     * new ApplicationException
+     *
      * @param ex remote exception to be handled
-     * @throws ApplicationException Original exception (or a new one, if not an ApplicationException)
+     * @throws ApplicationException Original exception (or a new one, if not an
+     * ApplicationException)
      */
     private void handleRemoteException(RemoteException ex) throws ApplicationException {
         //Recupera a exceção original

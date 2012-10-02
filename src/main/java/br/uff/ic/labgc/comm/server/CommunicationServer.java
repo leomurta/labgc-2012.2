@@ -6,7 +6,6 @@ package br.uff.ic.labgc.comm.server;
 
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
-import br.uff.ic.labgc.exception.ServerException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.Server;
@@ -47,30 +46,34 @@ public class CommunicationServer implements ICommunicationServer {
         }
     }
 
+    @Override
     public String commit(VersionedItem item, String token) throws RemoteException {
         try {
-            return server.commit(item, token);
+            return server.commit(item.inflate(), token);
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar commit.", ex);
         }
     }
 
+    @Override
     public VersionedItem update(String revision, String token) throws RemoteException {
         try {
-            return server.update(revision, token);
+            return server.update(revision, token).deflate();
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar update.", ex);
         }
     }
 
+    @Override
     public VersionedItem checkout(String revision, String token) throws RemoteException {
         try {
-            return server.checkout(revision, token);
+            return server.checkout(revision, token).deflate();
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar checkout.", ex);
         }
     }
 
+    @Override
     public String log() throws RemoteException {
         try {
             return server.log();
@@ -86,6 +89,7 @@ public class CommunicationServer implements ICommunicationServer {
      * @return
      * @throws RemoteException
      */
+    @Override
     public String hello(String name) throws RemoteException {
         if (name == null) {
             ApplicationException ae = new ApplicationException("Nome não pode ser nulo.");
@@ -94,6 +98,7 @@ public class CommunicationServer implements ICommunicationServer {
         return "Hello, " + name + "!";
     }
 
+    @Override
     public String login(String user, String pwd, String repository) throws RemoteException {
         try {
             return server.login(user, pwd, repository);
@@ -102,14 +107,16 @@ public class CommunicationServer implements ICommunicationServer {
         }
     }
 
+    @Override
     public String diff(VersionedItem item, String version) throws RemoteException {
         try {
-            return server.diff(item, version);
+            return server.diff(item.inflate(), version);
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar diff.", ex);
         }
     }
 
+    @Override
     public byte[] getItemContent(String hash) throws RemoteException {
         try {
             return server.getItemContent(hash);

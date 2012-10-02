@@ -5,6 +5,7 @@
 package br.uff.ic.labgc.comm.client;
 
 import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ServerException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,7 +56,7 @@ public class RMIConnectorTest {
             assertEquals(expResult, result);
             // TODO review the generated test code and remove the default call to fail.
             fail("The test case is a prototype.");
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             Logger.getLogger(RMIConnectorTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -75,7 +76,7 @@ public class RMIConnectorTest {
             assertEquals(expResult, result);
             // TODO review the generated test code and remove the default call to fail.
             fail("The test case is a prototype.");
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             Logger.getLogger(RMIConnectorTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -95,7 +96,7 @@ public class RMIConnectorTest {
             assertEquals(expResult, result);
             // TODO review the generated test code and remove the default call to fail.
             fail("The test case is a prototype.");
-        } catch (ServerException ex) {
+        } catch (ApplicationException ex) {
             Logger.getLogger(RMIConnectorTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -105,15 +106,19 @@ public class RMIConnectorTest {
      */
     //@Test
     public void testDiff() {
-        System.out.println("diff");
-        VersionedItem item = null;
-        String version = "";
-        RMIConnector instance = null;
-        String expResult = "";
-        String result = instance.diff(item, version);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        try {
+            System.out.println("diff");
+            VersionedItem item = null;
+            String version = "";
+            RMIConnector instance = null;
+            String expResult = "";
+            String result = instance.diff(item, version);
+            assertEquals(expResult, result);
+            // TODO review the generated test code and remove the default call to fail.
+            fail("The test case is a prototype.");
+        } catch (ApplicationException ex) {
+            Logger.getLogger(RMIConnectorTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -121,13 +126,17 @@ public class RMIConnectorTest {
      */
     //@Test
     public void testLog() {
-        System.out.println("log");
-        RMIConnector instance = null;
-        String expResult = "";
-        String result = instance.log();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        try {
+            System.out.println("log");
+            RMIConnector instance = null;
+            String expResult = "";
+            String result = instance.log();
+            assertEquals(expResult, result);
+            // TODO review the generated test code and remove the default call to fail.
+            fail("The test case is a prototype.");
+        } catch (ApplicationException ex) {
+            Logger.getLogger(RMIConnectorTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

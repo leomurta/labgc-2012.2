@@ -4,6 +4,8 @@
  */
 package br.uff.ic.labgc.core;
 
+import br.uff.ic.labgc.exception.CompressionException;
+import br.uff.ic.labgc.exception.ContentNotAvailableException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
@@ -14,34 +16,28 @@ import java.util.UUID;
  * @author Cristiano
  */
 public abstract class VersionedItem implements Serializable {
-    private static final long serialVersionUID = 8608395561823655106L;
 
+    private static final long serialVersionUID = 8608395561823655106L;
     /**
      * Número da última revisão em que o item foi alterado.
      */
     private int lastChangedRevision;
-    
     /**
      * Data e hora da última alteração no item.
      */
     private Date lastChangedTime;
-    
     /**
      * Nome do item
      */
     private String name;
-    
-    
     /**
      * Nome do autor da última alteração no item.
      */
     private String author;
-    
     /**
      * Mensagem de commit da última alteração no item.
      */
     private String commitMessage;
-
     /**
      * Hash do item versionado
      */
@@ -50,7 +46,20 @@ public abstract class VersionedItem implements Serializable {
      * Tamanho acumulado dos itens contidos neste VersionedItem
      */
     protected long size = 0L;
-    
+    /**
+     * Indica se o item possui conteúdo comprimido. Se for true, utiliza o
+     * conteúdo comprimido para trafegar o conteúdo na rede.
+     */
+    private boolean compressed;
+
+    protected boolean isCompressed() {
+        return compressed;
+    }
+
+    protected void setCompressed(boolean compressed) {
+        this.compressed = compressed;
+    }
+
     public int getLastChangedRevision() {
         return lastChangedRevision;
     }
@@ -98,15 +107,17 @@ public abstract class VersionedItem implements Serializable {
     public void setHash(String hash) {
         this.hash = hash;
     }
-    
+
     public String generateHash() {
         this.hash = UUID.randomUUID().toString();
         return this.hash;
     }
 
     /**
-     * Retorna o tamanho acumulado de todos os itens contidos neste VersionedItem.
-     * @return 
+     * Retorna o tamanho acumulado de todos os itens contidos neste
+     * VersionedItem.
+     *
+     * @return
      */
     public long getSize() {
         return size;
@@ -115,4 +126,24 @@ public abstract class VersionedItem implements Serializable {
     public void setSize(long size) {
         this.size = size;
     }
+
+    /**
+     * Expande o conteúdo deste item.
+     *
+     * @return item descomprimido.
+     *
+     * @throws ContentNotAvailableException
+     * @throws CompressionException
+     */
+    public abstract VersionedItem inflate() throws ContentNotAvailableException, CompressionException;
+
+    /**
+     * Comprime o conteúdo deste item.
+     *
+     * @return item comprimido.
+     *
+     * @throws ContentNotAvailableException
+     * @throws CompressionException
+     */
+    public abstract VersionedItem deflate() throws ContentNotAvailableException, CompressionException;
 }
