@@ -21,7 +21,7 @@ public abstract class VersionedItem implements Serializable {
     /**
      * Número da última revisão em que o item foi alterado.
      */
-    private int lastChangedRevision;
+    private String lastChangedRevision;
     /**
      * Data e hora da última alteração no item.
      */
@@ -60,11 +60,11 @@ public abstract class VersionedItem implements Serializable {
         this.compressed = compressed;
     }
 
-    public int getLastChangedRevision() {
+    public String getLastChangedRevision() {
         return lastChangedRevision;
     }
 
-    public void setLastChangedRevision(int lastChangedRevision) {
+    public void setLastChangedRevision(String lastChangedRevision) {
         this.lastChangedRevision = lastChangedRevision;
     }
 
