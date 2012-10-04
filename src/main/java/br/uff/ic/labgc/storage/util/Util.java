@@ -14,7 +14,7 @@ public class Util
 	private static NumberFormat nf2 = NumberFormat.getInstance(new Locale("pt","BR"));
 
 	static
-	{	nf2.setMaximumFractionDigits (2);	   // O default é 3.
+	{	nf2.setMaximumFractionDigits (2);	   // O default 3.
 		nf2.setMinimumFractionDigits (2);
 		nf2.setGroupingUsed(false);
 	}
