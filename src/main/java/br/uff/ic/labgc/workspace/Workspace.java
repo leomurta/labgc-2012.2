@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -107,8 +109,9 @@ throws FileNotFoundException, IOException {
  
     }
 
-public boolean revert(String diretorio)
+public boolean revert()
 throws IOException, WorkspaceException {
+    String diretorio = getParam("Diretorio");
     
     File diretorio1 = new File(diretorio); 
     if (!diretorio1.exists()) {
@@ -170,8 +173,11 @@ public boolean resolve(File file) {
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
 
-public void createWorkspace(String diretorio, String versao, String repositorio)
+public void createWorkspace()
 throws WorkspaceException, IOException {
+    String diretorio = getParam("Diretorio");
+    String versao = getParam("Versao");
+    String repositorio = getRepository();
     File diretorio1 = new File (diretorio);
     if (!diretorio1.exists()) {
         diretorio1.mkdirs();
@@ -201,6 +207,10 @@ throws WorkspaceException, IOException {
     out.println(repositorio);
     out.close ();
 }
+/**
+     * verifica a possibilidade de criar um  workspace, retorna true ou false
+     * @return 
+     */
 // pode criar diretório - true: pode criar e false: existe diretório
 
     public boolean canCreate(String diretorio)
@@ -217,24 +227,16 @@ throws WorkspaceException, IOException {
     /*
      * setParam - coloca em um arquivo um par chave/valor
      */
-public void setParam(String key, String value) throws IOException {
+public void setParam(String key, String value) 
+throws WorkspaceException,IOException {
     File vcs = new File (LocalRepo, ".labgc");
     File file = new File(vcs,"labgc.properties");
     if (!file.exists()) {
         file.createNewFile();
     }
     Properties properties = new Properties();
-   try {
-        properties.load(new FileInputStream(file));
-    } catch (IOException e) {
-    }
-   
     properties.setProperty(key, value);
-    
-    try {
-        properties.store(new FileOutputStream(file), null);
-    } catch (IOException e) {
-    }
+    properties.store(new FileOutputStream(file), null);
     }
 
 
@@ -246,19 +248,52 @@ public void setParam(String key, String value) throws IOException {
     public void storeLocalData(VersionedItem items){
         throw new UnsupportedOperationException("Not yet implemented");
     }
+    
+     /**
+     * metodo para pegar o valor de um parametro salvo
+     * @param key, chave do parametro salvo
+     * @return 
+     */
+    public String getParam(String key) 
+    throws WorkspaceException, IOException {
+      
+        File vcs = new File (LocalRepo, ".labgc");
+        File file = new File(vcs,"labgc.properties");
+    
+        Properties properties = new Properties();
+        FileInputStream fi = new FileInputStream( file );
+        properties.load( fi );
+        fi.close();
+        return properties.getProperty(key);
+    }
     /**
      * retorna valor do hostname guardado na criacao do workspace
      * @return 
      */
-    public String getHostname() {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public String getHostname() throws WorkspaceException {
+        String chave="";
+        try {
+            chave = getParam( "Hostname" );
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return chave;
     }
+    
     /**
      * retorna o valor do relacionado ao repositorio do projeto no servidor. Valor adicionado na criacao do workspace
      * @return 
      */
-    public String getRepository() {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public String getRepository() throws WorkspaceException {
+        String chave="";
+        
+        //* Felipe depois me explica pq o Beans colocou isto: try e catch
+        try {
+            chave = getParam( "Repository" );
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return chave;
     }
     /**
      * verifica se o localRepo e um workspace valido e inicializado
@@ -267,21 +302,9 @@ public void setParam(String key, String value) throws IOException {
     public boolean isWorkspace() {
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    /**
-     * verifica a possibilidade de criar um  workspace, retorna true ou false
-     * @return 
-     */
-    public boolean canCreate() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-    /**
-     * metodo para pegar o valor de um parametro salvo
-     * @param key, chave do parametro salvo
-     * @return 
-     */
-    public String getParam(String key) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    
+
+
     /**
      * metodo da interface IObservable para adicionar observadores
      * @param obs 
@@ -290,7 +313,10 @@ public void setParam(String key, String value) throws IOException {
         throw new UnsupportedOperationException("Not yet implemented");
     }
     
-    
+    /* Felipe vc tem que sempre colocar as chaves senão vai dar pau
+     * 
+     * 
+     * 
     public boolean revert() {//parametros alterados - corrigir e remover este
         throw new UnsupportedOperationException("Not yet implemented");
     }
@@ -299,7 +325,7 @@ public void setParam(String key, String value) throws IOException {
         throw new UnsupportedOperationException("Not yet implemented");
     }
     
-   
+   */
     
 
 }
