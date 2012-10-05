@@ -236,8 +236,9 @@ public class Client implements IClient, IObservable, IObserver {
      * @throws WorkspaceException 
      */
     private void createWorkspace() throws WorkspaceException {
-
-        workspace.createWorkspace(hostname, repository);
+        
+            workspace.createWorkspace(hostname, repository);
+        
         try {
             workspace.setParam("token", loginToken);
         } catch (IOException ex) {
