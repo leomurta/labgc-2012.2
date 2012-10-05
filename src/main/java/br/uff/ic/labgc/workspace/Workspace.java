@@ -319,7 +319,13 @@ throws WorkspaceException,IOException {
      * @return 
      */
     public boolean isWorkspace() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        File diretorio1 = new File (LocalRepo);
+        if (!diretorio1.exists()) {
+            return false;
+        }
+        else{
+            return true;
+        }
     }
     
 
