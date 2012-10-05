@@ -173,12 +173,9 @@ public boolean resolve(File file) {
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
 
-public void createWorkspace()
+public void createWorkspace(String hostname, String repository)
 throws WorkspaceException, IOException {
-    String diretorio = getParam("Diretorio");
-    String versao = getParam("Versao");
-    String repositorio = getRepository();
-    File diretorio1 = new File (diretorio);
+    File diretorio1 = new File (repository);
     if (!diretorio1.exists()) {
         diretorio1.mkdirs();
     }
@@ -187,12 +184,12 @@ throws WorkspaceException, IOException {
     }
     
     // cria diretorio de controle
-    File vcs = new File (diretorio, ".labgc");
+    File vcs = new File (repository, ".labgc");
     vcs.mkdir();
     
     // cria diretorio espelho da versao atual
-    File espelho = new File (vcs, "espelho.r"+versao);
-    espelho.mkdir();
+   /*  File espelho = new File (vcs, "espelho.r"+versao);
+    espelho.mkdir();*/
     
     // guardando este lixo pq eu entendi melhor assim. Depois eu tiro.
         //File raiz = new File (vcs, "repositorio");
@@ -204,7 +201,7 @@ throws WorkspaceException, IOException {
     
     // cria arquivo repositorio com o caminho do repositorio remoto
     PrintWriter out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
-    out.println(repositorio);
+    out.println(hostname);
     out.close ();
 }
 /**
@@ -287,7 +284,7 @@ throws WorkspaceException,IOException {
     public String getRepository() throws WorkspaceException {
         String chave="";
         
-        //* Felipe depois me explica pq o Beans colocou isto: try e catch
+      
         try {
             chave = getParam( "Repository" );
         } catch (IOException ex) {
