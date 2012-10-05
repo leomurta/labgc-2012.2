@@ -18,10 +18,10 @@ import java.util.logging.Logger;
 public class CommunicationFactory {
 
     private static CommunicationFactory instance;
-    private Map<String, IServer> commClient;
+    private Map<String, IServer> commClientList;
 
     private CommunicationFactory() {
-        commClient = new ConcurrentHashMap<String, IServer>(2);
+        commClientList = new ConcurrentHashMap<String, IServer>(2);
     }
 
     /**
@@ -50,17 +50,17 @@ public class CommunicationFactory {
         if (hostName == null || "".equals(hostName)) {
             throw new ApplicationException("hostName não pode ser nulo ou vazio.");
         }
-        if (commClient.get(hostName) == null) {
+        if (commClientList.get(hostName) == null) {
             try {
                 String serverClass = ApplicationProperties.getPropertyValue(getCommunicationStrategy(hostName));
                 Constructor c = Class.forName(serverClass).getConstructor(String.class);
-                commClient.put(hostName, (IServer) c.newInstance(hostName));
+                commClientList.put(hostName, (IServer) c.newInstance(hostName));
             } catch (Exception ex) {
                 Logger.getLogger(CommunicationFactory.class.getName()).log(Level.SEVERE, null, ex);
                 throw new CommunicationException("Não foi possível instanciar um servidor.", ex);
             }
         }
-        return commClient.get(hostName);
+        return commClientList.get(hostName);
 
     }
 
