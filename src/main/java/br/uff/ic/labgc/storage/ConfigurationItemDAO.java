@@ -9,81 +9,49 @@ import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.util.List;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 /**
  *
  * @author jokerfvd
  */
-public class ConfigurationItemDAO {
-    public int add(ConfigurationItem configItem) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-            sessao.save(configItem);
-            return configItem.getId();
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
+public class ConfigurationItemDAO extends DAO{
+
+    public ConfigurationItem get(int id) {
+        return (ConfigurationItem)super.get(id, ConfigurationItem.class);
     }
-
-    public void update(ConfigurationItem configItem) {
+    
+    public ConfigurationItem getByHash(String hash) {
         try {
             Session sessao = HibernateUtil.getSession();
 
-            sessao.update(configItem);
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
+            ConfigurationItem ci = (ConfigurationItem)sessao
+                    .createQuery("from ConfigurationItem where hash = :hash")
+                    .setString("hash", hash).uniqueResult();
 
-    public void remove(ConfigurationItem configItem) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            sessao.delete(configItem);
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
-
-    public ConfigurationItem getConfigurationItem(int id) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            ConfigurationItem configItem = (ConfigurationItem) sessao.get(ConfigurationItem.class, id);
-
-            if (configItem == null) {
+            if (ci == null) {
                 throw new ObjectNotFoundException();
             }
 
-            return configItem;
+            return ci;
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
     }
-    
-    public List getConfigurationItems()
-	{	
-            try
-            {
-                Session sessao = HibernateUtil.getSession();
 
-                return sessao.createQuery("from T_CONFIGURATION_ITEM order by id").list();
-            } catch (HibernateException e) {
-                throw new InfrastructureException(e);
-            }
-	}
-    
      public List getConfigurationItemsFromRevision(int revisionId)
 	{	
             try
             {
                 Session sessao = HibernateUtil.getSession();
 
-                return sessao.createQuery("from T_CONFIGURATION_ITEM where revision_id = :revisionId")
+                return sessao.createQuery("from ConfigurationItem ci,RevisionConfigurationItem "
+                        + "where ci_id = ci.id AND revision_id = :revisionId")
                         .setInteger("revisionId", revisionId).list();
             } catch (HibernateException e) {
                 throw new InfrastructureException(e);
             }
 	}
+     
 }

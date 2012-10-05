@@ -12,5 +12,6 @@
     <mapping resource="Revision.hbm.xml"/>
     <mapping resource="ConfigurationItem.hbm.xml"/>
     <mapping resource="ProjectUser.hbm.xml"/>
+    <mapping resource="RevisionConfigurationItem.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

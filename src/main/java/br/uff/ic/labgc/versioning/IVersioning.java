@@ -4,6 +4,11 @@
  */
 package br.uff.ic.labgc.versioning;
 
+import br.uff.ic.labgc.core.VersionedFile;
+import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -25,9 +30,14 @@ public interface IVersioning {
     
     //public ConfigurationItemData getConfigurationItemById(String name);
     
-    public String getHeadRevision();
+    /**
+     * Verifica o token de um usuário e pega a revision do projeto associado a
+     * esse token. Os VersionedItem vem sem content
+     * @param revision
+     * @param token
+     * @return 
+     */
+    public List<VersionedItem> getRevision(String revNum, String token) throws ObjectNotFoundException;
     
-    //retorna nova versão corrente ou gera exceção
-    //public String addRevision(List<ConfigurationItemData> configitens);
-    
+    public VersionedFile getVersionedFile(String hash, String token) throws IOException;
 }

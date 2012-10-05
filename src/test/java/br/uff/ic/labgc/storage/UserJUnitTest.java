@@ -58,7 +58,7 @@ public class UserJUnitTest {
     public void testGet() {
         User user = new User("Teste","Teste","teste");
         int id = userDAO.add(user);
-        User user1 = userDAO.getUser(id);
+        User user1 = userDAO.get(id);
         assertTrue("Ids iguais:",id == user1.getId() );
     }
     
@@ -76,7 +76,7 @@ public class UserJUnitTest {
     //O sessao.get em UserDAO era pra retornar null mas não esta retornando
     //no testRemove funciona pq ?????
     public void testUserNotFound() {
-        userDAO.getUser(10);
+        userDAO.get(10);
     }
     
     @Test
@@ -85,7 +85,7 @@ public class UserJUnitTest {
         String name = user.getName();
         user.setName("novo nome");
         userDAO.update(user);
-        User user1 = userDAO.getUser(user.getId());
+        User user1 = userDAO.get(user.getId());
         assertTrue("Nomes diferentes:", !name.equals(user1.getName()));
     }
     
@@ -94,7 +94,7 @@ public class UserJUnitTest {
         User user = new User("Teste","Teste","teste");
         int id = userDAO.add(user);
         userDAO.remove(user);
-        userDAO.getUser(id);
+        userDAO.get(id);
     }
     
 }

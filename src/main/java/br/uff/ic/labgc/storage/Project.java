@@ -11,8 +11,7 @@ import java.util.Set;
  *
  * @author jokerfvd
  */
-public class Project{
-    private int id;
+public class Project extends DBClass{
     private String name;
     private Set projectUsers = new HashSet();
 
@@ -24,16 +23,11 @@ public class Project{
         this.projectUsers = projectUsers;
     }
 
+    public Project() {
+    }
+
     public Project(String name) {
         this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

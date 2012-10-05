@@ -63,5 +63,8 @@ public class ProjectUser {
     public ProjectUser(int projectId, int userId) {
         this.id = new ProjectUserId(projectId, userId);
     }
+
+    public ProjectUser() {
+    }
     
 }

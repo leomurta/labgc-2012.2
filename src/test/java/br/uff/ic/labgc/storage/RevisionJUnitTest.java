@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.storage;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -71,8 +72,8 @@ public class RevisionJUnitTest {
         assertTrue("2 configItens:",2 == configItens.size());
         revisionDAO.add(revision);
         
-        Revision revision1 = revisionDAO.getRevision(revision.getId());
-        assertTrue("Usuário criado:",revision1.getConfigItens().size() == configItens.size());
+        Revision revision1 = revisionDAO.get(revision.getId());
+        assertTrue("Revision criada:",revision1.getConfigItens().size() == configItens.size());
     
          
     }

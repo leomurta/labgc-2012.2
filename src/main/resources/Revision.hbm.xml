@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="br.uff.ic.labgc.storage.Revision" table="T_REVISION">
+    <class name="br.uff.ic.labgc.storage.Revision" table='"LABGC".T_REVISION'>
         <id name="id" column="id" type="int">      
             <generator class="sequence">
                 <param name="sequence">SEQ_REVISION</param>
@@ -12,11 +12,10 @@
         <property name="number" column="number" type="string" not-null="true"/>
         <many-to-one name="user" column="user_id" class="br.uff.ic.labgc.storage.User" not-null="true"/>
         <many-to-one name="project" column="project_id" class="br.uff.ic.labgc.storage.Project" not-null="true"/>
-        <set name="configItens" order-by="ID asc">
-            <key>
-                <column name="REVISION_ID"/>
-            </key>
-            <one-to-many class="br.uff.ic.labgc.storage.ConfigurationItem"/>
-        </set>
+        
+        <set name="configItens" table='"LABGC".T_REVISION_CI' order-by="ci_id asc">
+            <key column="revision_id"/>
+            <many-to-many column="ci_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
+        </set>        
     </class>
 </hibernate-mapping>

@@ -11,9 +11,7 @@ import java.util.Set;
  *
  * @author jokerfvd
  */
-public class User {
-
-    private int id;
+public class User extends DBClass{
 
     public Set getUserProjects() {
         return userProjects;
@@ -36,14 +34,13 @@ public class User {
         this.revisions = revisions;
     }
 
+    public User() {
+    }
+    
     public User(String name, String username, String password) {
         this.name = name;
         this.username = username;
         this.password = password;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setName(String name) {
@@ -59,10 +56,6 @@ public class User {
     }
     //public void setRevisions(Set revisions){ this.revisions = revisions;}
     //public void setProjects(Set projects){ this.projects = projects;}
-
-    public int getId() {
-        return id;
-    }
 
     public String getName() {
         return name;

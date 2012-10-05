@@ -4,21 +4,29 @@
  */
 package br.uff.ic.labgc.storage;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  *
  * @author jokerfvd
  */
-public class ConfigurationItem {
+public class ConfigurationItem extends DBClass{
 
-    private int id;
     private int number;
     private String name;
+    //TODO DUVAL o hash deve ser do caminho do repo mais do conteudo do arquivo 
     private String hash;
     private char type; //diz se foi add, delete, update - "A", "D", "U"
     private ConfigurationItem next;
     private ConfigurationItem previous;
-    private Revision revision;
+    private Set revisions = new HashSet();
 
+    public ConfigurationItem() {
+    }
+    
     public ConfigurationItem(int number, String name, String hash, char type, ConfigurationItem next, ConfigurationItem previous) {
         this.number = number;
         this.name = name;
@@ -26,22 +34,6 @@ public class ConfigurationItem {
         this.type = type;
         this.next = next;
         this.previous = previous;
-    }
-
-    public Revision getRevision() {
-        return revision;
-    }
-
-    public void setRevision(Revision revision) {
-        this.revision = revision;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getNumber() {
@@ -91,4 +83,13 @@ public class ConfigurationItem {
     public void setPrevious(ConfigurationItem previous) {
         this.previous = previous;
     }
+
+    public Set getRevisions() {
+        return revisions;
+    }
+
+    public void setRevisions(Set revisions) {
+        this.revisions = revisions;
+    }
+    
 }

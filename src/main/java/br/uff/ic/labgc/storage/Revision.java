@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.storage;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,9 +15,8 @@ import java.util.Set;
  *
  * @author jokerfvd
  */
-public class Revision {
+public class Revision extends DBClass{
 
-    private int id;
     private Date date;
     private String description;
     private String number;
@@ -24,6 +24,9 @@ public class Revision {
     private Project project;
     //TODO mudar de Set para VersionedItem
     private Set configItens = new HashSet();
+
+    public Revision() {
+    }
 
     public Revision(Date date, String description, String number, User user, Project project) {
         this.date = date;
@@ -39,14 +42,6 @@ public class Revision {
 
     public void setConfigItens(Set configItens) {
         this.configItens = configItens;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public Date getDate() {

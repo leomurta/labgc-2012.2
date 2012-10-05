@@ -15,42 +15,14 @@ import org.hibernate.Session;
  *
  * @author jokerfvd
  */
-public class ProjectDAO {
-    public int add(Project project) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-            sessao.save(project);
-            return project.getId();
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
+public class ProjectDAO extends DAO{
 
-    public void update(Project project) {
+    public Project getName(String name) {
         try {
             Session sessao = HibernateUtil.getSession();
 
-            sessao.update(project);
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
-
-    public void remove(Project project) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            sessao.delete(project);
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
-
-    public Project getProject(int id) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            Project project = (Project) sessao.get(Project.class, id);
+            Project project = (Project) sessao.createQuery("from Project where name = :name")
+                    .setString("name", name).uniqueResult();
 
             if (project == null) {
                 throw new ObjectNotFoundException();
@@ -62,32 +34,8 @@ public class ProjectDAO {
         }
     }
     
-    public Project getProjectByName(String name) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            Project project = (Project) sessao.createQuery("from T_PROJECT where name = :name")
-                    .setEntity("name", name).uniqueResult();
-
-            if (project == null) {
-                throw new ObjectNotFoundException();
-            }
-
-            return project;
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
+    public Project get(int id){
+        return (Project)get(id, Project.class);
     }
-    
-    public List getProjects()
-	{	
-            try
-            {
-                Session sessao = HibernateUtil.getSession();
 
-                return sessao.createQuery("from T_PROJECT order by id").list();
-            } catch (HibernateException e) {
-                throw new InfrastructureException(e);
-            }
-	}
 }

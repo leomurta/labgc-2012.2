@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-  <class name="br.uff.ic.labgc.storage.ProjectUser" table="t_project_user">
+  <class name="br.uff.ic.labgc.storage.ProjectUser" table='"LABGC".t_project_user'>
       <composite-id name="id" class="br.uff.ic.labgc.storage.ProjectUserId"> 
          <key-property    name="projectId"     column="PROJECT_ID"/>
          <key-property    name="userId"   column="USER_ID"/> 

@@ -7,66 +7,27 @@ package br.uff.ic.labgc.storage;
 import br.uff.ic.labgc.storage.util.*;
 import java.util.List;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 
 /**
  *
  * @author jokerfvd
  */
-public class UserDAO {
+public class UserDAO extends DAO{
 
-    public int add(User user) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-            sessao.save(user);
-            return user.getId();
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
-
-    public void update(User user) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            sessao.update(user);
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
-
-    public void remove(User user) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            sessao.delete(user);
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
-
-    public User getUser(int id) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            User user = (User) sessao.get(User.class, id);
-
-            if (user == null) {
-                throw new ObjectNotFoundException();
-            }
-
-            return user;
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
+    public User get(int id) {
+        return (User)get(id, User.class);
     }
     
-    public User getUserByUserName(String username) {
+    public User getByUserName(String username) {
         try {
             Session sessao = HibernateUtil.getSession();
 
-            User user = (User) sessao.createQuery("from T_USER where username = :username")
-                    .setEntity("username", username).uniqueResult();
+            String busca = "from User where username = :username";
+            Query query = sessao.createQuery(busca);
+            query.setString("username", username);
+            User user = (User) query.uniqueResult();
 
             if (user == null) {
                 throw new ObjectNotFoundException();
@@ -84,7 +45,7 @@ public class UserDAO {
             {
                 Session sessao = HibernateUtil.getSession();
 
-                return sessao.createQuery("from T_USER order by id").list();
+                return sessao.createQuery("from User order by id").list();
                 //return sessao.createSQLQuery("select * from t_user order by id").list();
             } catch (HibernateException e) {
                 throw new InfrastructureException(e);

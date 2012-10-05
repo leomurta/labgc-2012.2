@@ -15,42 +15,20 @@ import org.hibernate.Session;
  *
  * @author jokerfvd
  */
-public class RevisionDAO {
-    public int add(Revision revision) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-            sessao.save(revision);
-            return revision.getId();
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
+public class RevisionDAO extends DAO{
+
+    public Revision get(int id) {
+        return (Revision)get(id, Revision.class);
     }
-
-    public void update(Revision revision) {
+    
+    public Revision getByProjectAndNumber(int projId, String number) {
         try {
             Session sessao = HibernateUtil.getSession();
 
-            sessao.update(revision);
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
-
-    public void remove(Revision revision) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            sessao.delete(revision);
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
-
-    public Revision getRevision(int id) {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            Revision revision = (Revision) sessao.get(Revision.class, id);
+            Revision revision = (Revision) sessao.createQuery("from Revision "
+                    + "where project_id = :projId and number = :number")
+                    .setInteger("projId", projId)
+                    .setString("number", number).uniqueResult();
 
             if (revision == null) {
                 throw new ObjectNotFoundException();
@@ -61,17 +39,4 @@ public class RevisionDAO {
             throw new InfrastructureException(e);
         }
     }
-    
-    public List getRevisions()
-	{	
-            //TODO DUVAL verificar a necessidade deste método
-            try
-            {
-                Session sessao = HibernateUtil.getSession();
-
-                return sessao.createQuery("from T_REVISION order by id").list();
-            } catch (HibernateException e) {
-                throw new InfrastructureException(e);
-            }
-	}
 }

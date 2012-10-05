@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-  <class name="br.uff.ic.labgc.storage.ConfigurationItem" table="t_configuration_item">
+  <class name="br.uff.ic.labgc.storage.ConfigurationItem" table='"LABGC".t_configuration_item'>
   <id name="id" column="id" type="int">      
         <generator class="sequence">
             <param name="sequence">SEQ_CONFIGITEM</param>
@@ -9,10 +9,15 @@
     </id>     
     <property name="number" column="number" type="int" not-null="true"/>
     <property name="name" column="name" type="string" not-null="true"/>
-    <property name="hash" column="hasg" type="string"/>
+    <property name="hash" column="hash" type="string"/>
     <property name="type" column="type" type="char" not-null="true"/>
     <many-to-one name="next" column="next_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
     <many-to-one name="previous" column="previous_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
-    <many-to-one name="revision" column="revision_id" class="br.uff.ic.labgc.storage.Revision"/>
+    
+    <set name="revisions" table='"LABGC".T_REVISION_CI' order-by="revision_id asc">
+            <key column="ci_id"/>
+            <many-to-many column="revision_id" class="br.uff.ic.labgc.storage.Revision"/>
+    </set>
+     
   </class>  
 </hibernate-mapping>
