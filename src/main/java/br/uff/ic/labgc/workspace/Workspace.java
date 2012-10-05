@@ -174,8 +174,8 @@ public boolean resolve(File file) {
 // repositorio=caminho do repositorio, login=usuario
 
 public void createWorkspace(String hostname, String repository)
-throws WorkspaceException, IOException {
-    File diretorio1 = new File (repository);
+throws WorkspaceException {
+    File diretorio1 = new File (LocalRepo);
     if (!diretorio1.exists()) {
         diretorio1.mkdirs();
     }
@@ -184,7 +184,7 @@ throws WorkspaceException, IOException {
     }
     
     // cria diretorio de controle
-    File vcs = new File (repository, ".labgc");
+    File vcs = new File (LocalRepo, ".labgc");
     vcs.mkdir();
     
     // cria diretorio espelho da versao atual
@@ -200,9 +200,16 @@ throws WorkspaceException, IOException {
         //out.close ();
     
     // cria arquivo repositorio com o caminho do repositorio remoto
-    PrintWriter out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
-    out.println(hostname);
-    out.close ();
+    PrintWriter out;
+        try {
+            out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
+            out.println(hostname);
+            out.close ();
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException ("ERRO: gravando arquivo repositorio.", ex);
+        }
+    
 }
 /**
      * verifica a possibilidade de criar um  workspace, retorna true ou false
@@ -210,10 +217,10 @@ throws WorkspaceException, IOException {
      */
 // pode criar diretório - true: pode criar e false: existe diretório
 
-    public boolean canCreate(String diretorio)
+    public boolean canCreate()
     throws WorkspaceException, IOException {
         
-        File dirtemp = new File (diretorio);
+        File dirtemp = new File (LocalRepo);
         if (! dirtemp.exists()) {
             return true;
         }
