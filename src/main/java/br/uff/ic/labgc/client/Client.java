@@ -66,9 +66,13 @@ public class Client implements IClient, IObservable, IObserver {
     public Client(String systemDirectory) {
 
         workspace = new Workspace(systemDirectory);
-
-        this.hostname = workspace.getHostname();
-        this.repository = workspace.getRepository();
+        try {
+            this.hostname = workspace.getHostname();
+            this.repository = workspace.getRepository();
+        } catch (WorkspaceException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 
     //comandos para o servidor
@@ -123,8 +127,13 @@ public class Client implements IClient, IObservable, IObserver {
     //implementados
     public boolean revert() throws ClientException {
         boolean revert = false;
-
-        revert = workspace.revert();
+        try {
+            revert = workspace.revert();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (WorkspaceException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         return revert;
     }
@@ -134,9 +143,14 @@ public class Client implements IClient, IObservable, IObserver {
 
         if (workspace.isWorkspace()) 
             throw new ClientWorkspaceUnavailableException();
-
-        if (!workspace.canCreate()) 
-            throw new ClientWorkspaceUnavailableException();
+        try {
+            if (!workspace.canCreate()) 
+                throw new ClientWorkspaceUnavailableException();
+        } catch (WorkspaceException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         if (loginToken == null || loginToken.isEmpty()) 
             throw new ClientLoginRequiredException();
@@ -177,7 +191,13 @@ public class Client implements IClient, IObservable, IObserver {
         this.getServer();
 
         if (loginToken == null && workspace.isWorkspace()) 
+            try {
             loginToken = workspace.getParam("token");
+        } catch (WorkspaceException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         if (loginToken == null || loginToken.isEmpty()) 
             return false;
