@@ -309,23 +309,10 @@ throws WorkspaceException,IOException {
      * metodo da interface IObservable para adicionar observadores
      * @param obs 
      */
+    @Override
     public void registerInterest(IObserver obs) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
     
-    /* Felipe vc tem que sempre colocar as chaves senão vai dar pau
-     * 
-     * 
-     * 
-    public boolean revert() {//parametros alterados - corrigir e remover este
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-    
-    public void createWorkspace(String hostname, String repository) {//parametros alterados - corrigir e remover este
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-    
-   */
-    
-
+   
 }
