@@ -26,17 +26,12 @@ public class CommunicationServer implements ICommunicationServer {
     private Server server;
 
     public CommunicationServer() {
-        server = new Server("localhost");
-    }
-
-    public static void main(String args[]) {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
         try {
             String name = ApplicationProperties.getPropertyValue(IPropertiesConstants.RMI_REPOSITORY_OBJECT);
-            ICommunicationServer server = new CommunicationServer();
-            ICommunicationServer stub = (ICommunicationServer) UnicastRemoteObject.exportObject(server, 0);
+            ICommunicationServer stub = (ICommunicationServer) UnicastRemoteObject.exportObject(this, 0);
             Registry registry = LocateRegistry.getRegistry();
             registry.rebind(name, stub);
             Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "Servidor de repositório pronto para receber requisições.");
@@ -44,10 +39,12 @@ public class CommunicationServer implements ICommunicationServer {
         } catch (RemoteException ex) {
             Logger.getLogger(CommunicationServer.class.getName()).log(Level.SEVERE, "Houve um erro ao inicializar o servidor de repositório.", ex);
         }
+        server = new Server("localhost");
     }
 
     @Override
     public String commit(VersionedItem item, String token) throws RemoteException {
+        Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: commit");
         try {
             return server.commit(item.inflate(), token);
         } catch (ApplicationException ex) {
@@ -57,6 +54,7 @@ public class CommunicationServer implements ICommunicationServer {
 
     @Override
     public VersionedItem update(String revision, String token) throws RemoteException {
+        Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: update");
         try {
             return server.update(revision, token).deflate();
         } catch (ApplicationException ex) {
@@ -66,6 +64,7 @@ public class CommunicationServer implements ICommunicationServer {
 
     @Override
     public VersionedItem checkout(String revision, String token) throws RemoteException {
+        Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: checkout");
         try {
             return server.checkout(revision, token).deflate();
         } catch (ApplicationException ex) {
@@ -75,6 +74,7 @@ public class CommunicationServer implements ICommunicationServer {
 
     @Override
     public String log() throws RemoteException {
+        Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: log");
         try {
             return server.log();
         } catch (ApplicationException ex) {
@@ -100,6 +100,7 @@ public class CommunicationServer implements ICommunicationServer {
 
     @Override
     public String login(String user, String pwd, String repository) throws RemoteException {
+        Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: login");
         try {
             return server.login(user, pwd, repository);
         } catch (ApplicationException ex) {
@@ -109,6 +110,7 @@ public class CommunicationServer implements ICommunicationServer {
 
     @Override
     public String diff(VersionedItem item, String version) throws RemoteException {
+        Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: diff");
         try {
             return server.diff(item.inflate(), version);
         } catch (ApplicationException ex) {
@@ -118,6 +120,7 @@ public class CommunicationServer implements ICommunicationServer {
 
     @Override
     public byte[] getItemContent(String hash) throws RemoteException {
+        Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: getItemContent");
         try {
             return server.getItemContent(hash);
         } catch (ApplicationException ex) {

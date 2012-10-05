@@ -12,6 +12,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.cli.*;
+import org.apache.derby.tools.sysinfo;
 
 /**
  * Hello world!
@@ -44,8 +45,8 @@ public class Cli implements IObserver
         
         m_options.addOption( OptionBuilder.withLongOpt( "checkout" )
                                         .withDescription( "Checkout a branch or paths to the working tree" )
-                                        .hasArgs(2)
-                                        .withArgName("REPOSITORY")
+                                        .hasArgs(3)
+                                        .withArgName("HOST REPOSITORY")
                                         .create("checkout") );
         
         m_options.addOption( OptionBuilder.withLongOpt( "revert" )
@@ -188,31 +189,28 @@ public class Cli implements IObserver
            if(checkArgs.length > 1)
            {
                Messages msg = new Messages();
-               
+               for (int i = 0; i < checkArgs.length; i++) {
+                   System.out.println(i + "==>" + checkArgs[i]);
+                   
+               }
                String strUrl = checkArgs[0];
                // Break URL in repo and host
                //file:/// or http://
-               String [] strArrayUrl = strUrl.split("/");
+               //String [] strArrayUrl = strUrl.split("/");
                
-               String strRepository ="";
-               String strHost ="";
-               
-               for(int i=0;i<strArrayUrl.length-1;i++)
-                   strRepository += strArrayUrl[i];
-               
-               strHost = strArrayUrl[strArrayUrl.length-1];
-               
-               
+               String strHost = checkArgs[0];
+               String strRepository = checkArgs[1];
+
                //TODO: Check Local Path
-               String strPath = checkArgs[1]; 
+               String strPath = checkArgs[2]; 
                //String path = System.getProperty("user.dir");
            
                m_IClient = new Client(strHost, strRepository, strPath) ;
                
                String strRevision = "";
                
-               if(checkArgs.length >2)
-                   strRevision = checkArgs[2];
+               if(checkArgs.length >3)
+                   strRevision = checkArgs[3];
                else
                    strRevision= EVCSConstants.REVISION_HEAD;
                
