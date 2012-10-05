@@ -188,27 +188,42 @@ throws WorkspaceException {
     vcs.mkdir();
     
     // cria diretorio espelho da versao atual
-   /*  File espelho = new File (vcs, "espelho.r"+versao);
-    espelho.mkdir();*/
-    
-    // guardando este lixo pq eu entendi melhor assim. Depois eu tiro.
-        //File raiz = new File (vcs, "repositorio");
-        //raiz.createNewFile();
-        //FileWriter raizarq = new FileWriter(raiz, false);
-        //PrintWriter out = new PrintWriter(raizarq);
-        //out.println(repositorio);
-        //out.close ();
-    
-    // cria arquivo repositorio com o caminho do repositorio remoto
-    PrintWriter out;
+     File espelho;
+     espelho = new File (vcs, "espelho.r");
+     espelho.mkdir();
         try {
-            out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
-            out.println(hostname);
-            out.close ();
+            setParam ("repositorio",repository);
         } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException ("ERRO: gravando arquivo repositorio.", ex);
+            throw new WorkspaceException ("ERRO: gravando chave repositorio.", ex);
         }
+        try {
+            setParam ("hostname",hostname);
+             } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException ("ERRO: gravando chave hostname.", ex);
+        }
+           
+           /* cria arquivo repositorio com o caminho do repositorio remoto
+           PrintWriter out;
+               try {
+                   out = new PrintWriter(new FileWriter(new File (vcs, "repositorio")));
+                   out.println(repository);
+                   out.close ();
+               } catch (IOException ex) {
+                   Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                   throw new WorkspaceException ("ERRO: gravando arquivo repositorio.", ex);
+               }
+               
+               try {
+                   out = new PrintWriter(new FileWriter(new File (vcs, "hostname")));
+                   out.println(hostname);
+                   out.close ();
+               } catch (IOException ex) {
+                   Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                   throw new WorkspaceException ("ERRO: gravando arquivo hostname.", ex);
+               } */
+       
+     
     
 }
 /**
