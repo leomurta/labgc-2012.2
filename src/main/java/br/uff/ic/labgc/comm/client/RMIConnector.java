@@ -1,6 +1,7 @@
 package br.uff.ic.labgc.comm.client;
 
 import br.uff.ic.labgc.comm.server.ICommunicationServer;
+import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.CommunicationException;
@@ -209,7 +210,10 @@ public class RMIConnector extends AbstractServer {
     public byte[] getItemContent(String hash) throws ApplicationException {
         byte[] result = null;
         try {
-            result = server.getItemContent(hash);
+            VersionedFile file = new VersionedFile();
+            file.setContent(server.getItemContent(hash));
+            file.inflate();
+            result = file.getContent();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }

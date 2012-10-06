@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.comm.server;
 
+import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
@@ -122,7 +123,10 @@ public class CommunicationServer implements ICommunicationServer {
     public byte[] getItemContent(String hash) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: getItemContent");
         try {
-            return server.getItemContent(hash);
+            VersionedFile file = new VersionedFile();
+            file.setContent(server.getItemContent(hash));
+            file.deflate();
+            return file.getContent();
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar getItemContent.", ex);
         }
