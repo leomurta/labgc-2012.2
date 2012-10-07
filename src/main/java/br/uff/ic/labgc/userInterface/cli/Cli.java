@@ -22,12 +22,17 @@ public class Cli implements IObserver
 {
     private Options m_options;
     private IClient m_IClient;
-
+    private String invocationPath;
+    
+    public  Cli(String invocationPath)
+    {  
+        this.invocationPath = invocationPath;
+    }
+    
     public void Cli()
     {  
         
     }
-    
     private void addOptions()
     {
          // create Options object
@@ -45,7 +50,7 @@ public class Cli implements IObserver
         
         m_options.addOption( OptionBuilder.withLongOpt( "checkout" )
                                         .withDescription( "Checkout a branch or paths to the working tree" )
-                                        .hasArgs(3)
+                                        .hasArgs(2)
                                         .withArgName("HOST REPOSITORY")
                                         .create("checkout") );
         
@@ -202,15 +207,15 @@ public class Cli implements IObserver
                String strRepository = checkArgs[1];
 
                //TODO: Check Local Path
-               String strPath = checkArgs[2]; 
+               String strPath = this.invocationPath; 
                //String path = System.getProperty("user.dir");
            
                m_IClient = new Client(strHost, strRepository, strPath) ;
                
                String strRevision = "";
                
-               if(checkArgs.length >3)
-                   strRevision = checkArgs[3];
+               if(checkArgs.length >2)
+                   strRevision = checkArgs[2];
                else
                    strRevision= EVCSConstants.REVISION_HEAD;
                

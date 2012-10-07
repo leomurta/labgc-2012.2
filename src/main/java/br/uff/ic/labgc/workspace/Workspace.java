@@ -319,7 +319,7 @@ throws WorkspaceException,IOException {
      * @return 
      */
     public boolean isWorkspace() {
-        File diretorio1 = new File (LocalRepo);
+        File diretorio1 = new File (LocalRepo+".labgc");
         if (!diretorio1.exists()) {
             return false;
         }

@@ -19,7 +19,8 @@ public class App {
             if ("server".equals(mode)) {
                 new CommunicationServer();
             } else {
-                new Cli().run(args);
+                String invocationPath = System.getProperty("br.uff.ic.labgc.invocation");
+                new Cli(invocationPath).run(args);
             }
         } catch (ParseException ex) {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
