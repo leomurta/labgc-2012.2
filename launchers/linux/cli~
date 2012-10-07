@@ -1,0 +1,28 @@
+#! /bin/baslh
+# Levantando o CLI do controle de versao
+
+
+### ENTRAR COM O CAMINHO CORRETO RELATIVO AO USUARIO
+LABCG_PATH="../../target/labgc-2012.2.jar"
+LABCG_RMI_CODEBASE="../../target/classes/"
+LABCG_RMI_HOSTNAME=localhost
+LABCG_POLICITY="../../target/classes/evcs.policy"
+#
+#
+
+
+
+LABCG_OUT="java -cp $(readlink -f $LABCG_PATH) -Djava.rmi.server.codebase=file:$(readlink -f $LABCG_RMI_CODEBASE) -Djava.rmi.server.hostname=$LABCG_RMI_HOSTNAME -Djava.security.policy=$(readlink -f $LABCG_POLICITY) br.uff.ic.labgc.App $*"
+echo $LABCG_OUT
+
+echo "Executando..."
+echo " "
+
+
+$LABCG_OUT
+
+unset LABCG_OUT
+unset LABCG_PATH
+unset LABCG_RMI_CODEBASE
+unset LABCG_RMI_HOSTNAME
+unset LABCG_POLICITY

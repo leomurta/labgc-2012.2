@@ -1,0 +1,24 @@
+#! /bin/baslh
+# Levantando o CLI do controle de versao
+
+
+### ENTRAR COM O CAMINHO CORRETO RELATIVO AO USUARIO
+LABCG_CUSTOMPATH="../../target/labgc-2012.2.jar" #Felipe
+#
+#
+#
+#
+#
+
+
+LABCG_PATH="../../target/labgc-2012.2.jar" #VALOR DEFAULT
+
+if [  ${#LABCG_CUSTOMPATH} -gt 0 ]
+then
+  PATH=$LABCG_CUSTOMPATH
+  unset LABCG_CUSTOMPATH
+fi
+
+java -cp $LABCG_PATH br.uff.ic.labgc.App $1 #CHAMADA
+
+unset LABCG_PATH
