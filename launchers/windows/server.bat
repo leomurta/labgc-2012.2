@@ -24,3 +24,4 @@ echo Executando...
 echo .
 
 "%LABCG_OUT%"
+endlocal

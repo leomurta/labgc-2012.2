@@ -23,3 +23,5 @@ echo .
 
 
 "%LABCG_OUT%"
+
+endlocal
