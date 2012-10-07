@@ -12,7 +12,7 @@ LABCG_POLICITY="../../target/classes/evcs.policy"
 
 
 
-LABCG_OUT="java -cp $(readlink -f $LABCG_PATH) -Djava.rmi.server.codebase=file:$(readlink -f $LABCG_RMI_CODEBASE)/ -Djava.rmi.server.hostname=$LABCG_RMI_HOSTNAME -Djava.security.policy=$(readlink -f $LABCG_POLICITY) br.uff.ic.labgc.App $*"
+LABCG_OUT="java -cp $(readlink -f $LABCG_PATH) -Dbr.uff.ic.labgc.invocation=$PWD/ -Djava.rmi.server.codebase=file:$(readlink -f $LABCG_RMI_CODEBASE)/ -Djava.rmi.server.hostname=$LABCG_RMI_HOSTNAME -Djava.security.policy=$(readlink -f $LABCG_POLICITY) br.uff.ic.labgc.App $*"
 echo $LABCG_OUT
 
 echo "Executando..."
