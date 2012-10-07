@@ -6,5 +6,5 @@
 *.ear
 /target/
 *.bak
-.*~
+*~
 
