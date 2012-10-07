@@ -7,8 +7,6 @@
 set _LABGC_FILE=jdk~path.txt
 set _LABGC_RMI_BIN=\bin\rmiregistry.exe
 
-set _LABGC_JDK_PATH=jdk
-
 call :TXTCHECK %_LABGC_FILE%
 EXIT /B
 
