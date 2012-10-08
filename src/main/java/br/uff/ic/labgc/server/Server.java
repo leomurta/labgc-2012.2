@@ -14,6 +14,9 @@ import br.uff.ic.labgc.exception.ServerException;
  * @author Felipe R
  */
 public class Server extends AbstractServer{
+    
+    String serverTempToken = "zyx";
+    
     public Server(String hostName) {
         super(hostName);
     }
@@ -40,7 +43,7 @@ public class Server extends AbstractServer{
 
     public String login(String user, String pwd, String repository)throws ApplicationException {
         setRepPath(repository);
-        throw new UnsupportedOperationException("Not supported yet.");
+        return serverTempToken;
     }
 
     public byte[] getItemContent(String hash) throws ApplicationException {

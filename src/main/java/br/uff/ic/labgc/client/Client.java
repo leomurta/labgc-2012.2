@@ -143,15 +143,14 @@ public class Client implements IClient, IObservable, IObserver {
 
         if (workspace.isWorkspace()) 
             throw new ClientWorkspaceUnavailableException();
-        try {
-            if (!workspace.canCreate()) 
-                throw new ClientWorkspaceUnavailableException();
-        } catch (WorkspaceException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        
+        System.out.println("checkout: nao eh workspace");
+        
+        if (!workspace.canCreate()) 
+            throw new ClientWorkspaceUnavailableException();
+        
+        System.out.println("checkout: workspace criado");
+        
         if (loginToken == null || loginToken.isEmpty()) 
             throw new ClientLoginRequiredException();
 
@@ -159,11 +158,11 @@ public class Client implements IClient, IObservable, IObserver {
             this.createWorkspace();
             VersionedItem item = server.checkout(revision, loginToken);
             workspace.storeLocalData(item);
-        } catch (WorkspaceException we) {
-        } catch (ServerException se) {
-        } catch (Exception e) {
+        } catch (ApplicationException e) {
+            throw new ClientWorkspaceStoreException();
         }
-
+        
+        System.out.println("checkout finalizado");
     }
 
     public void login(String user, String pwd) throws ClientException {
@@ -171,34 +170,32 @@ public class Client implements IClient, IObservable, IObserver {
         this.getServer();
         
         try {
+            
             loginToken = server.login(user, pwd, this.repository);
-
-            if (workspace.isWorkspace()) {
-                try {
-                    workspace.setParam("token", loginToken);
-                } catch (IOException ex) {
-                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+            
+            if (workspace.isWorkspace())
+                workspace.setParam("token", loginToken);
 
         } catch (ApplicationException ex) {
             throw new ClientServerNotAvailableException();
         }
+        
+        System.out.println("login finalizado");
     }
 
     public boolean isLogged() throws ClientException {
 
         this.getServer();
 
-        if (loginToken == null && workspace.isWorkspace()) 
+        if (loginToken == null && workspace.isWorkspace()){ 
             try {
-            loginToken = workspace.getParam("token");
-        } catch (WorkspaceException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                loginToken = workspace.getParam("token");
+            } catch (WorkspaceException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                throw new ClientWorkspaceNotInitialized();
+            } 
         }
-        
+                
         if (loginToken == null || loginToken.isEmpty()) 
             return false;
 
@@ -237,14 +234,11 @@ public class Client implements IClient, IObservable, IObserver {
      */
     private void createWorkspace() throws WorkspaceException {
         
-            workspace.createWorkspace(hostname, repository);
-        
-        try {
-            workspace.setParam("token", loginToken);
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        workspace.createWorkspace(hostname, repository);
+        workspace.setParam("token", loginToken);       
+    
     }
+    
     /**
      * Recupera uma instancia de IServer;
      * @throws ClientServerNotAvailableException, servidor nao disponivel 
