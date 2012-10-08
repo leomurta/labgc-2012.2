@@ -277,6 +277,23 @@ throws WorkspaceException,IOException {
     throws WorkspaceException, IOException {
       
         File vcs = new File (LocalRepo, ".labgc");
+        File file = new File(vcs,"key.properties");
+    
+        Properties properties = new Properties();
+        FileInputStream fi = new FileInputStream( file );
+        properties.load( fi );
+        fi.close();
+        return properties.getProperty(key);
+    }
+         /**
+     * metodo para pegar o valor de um parametro da WS salvo
+     * @param key, chave do parametro salvo
+     * @return 
+     */
+    public String getParam2(String key) 
+    throws WorkspaceException, IOException {
+      
+        File vcs = new File (LocalRepo, ".labgc");
         File file = new File(vcs,"labgc.properties");
     
         Properties properties = new Properties();
@@ -285,6 +302,7 @@ throws WorkspaceException,IOException {
         fi.close();
         return properties.getProperty(key);
     }
+    
     /**
      * retorna valor do hostname guardado na criacao do workspace
      * @return 
@@ -292,7 +310,7 @@ throws WorkspaceException,IOException {
     public String getHostname() throws WorkspaceException {
         String chave="";
         try {
-            chave = getParam( "Hostname" );
+            chave = getParam2( "Hostname" );
         } catch (IOException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -304,16 +322,15 @@ throws WorkspaceException,IOException {
      * @return 
      */
     public String getRepository() throws WorkspaceException {
-        String chave="";
-        
-      
+        String chave="";     
         try {
-            chave = getParam( "Repository" );
+            chave = getParam2( "Repository" );
         } catch (IOException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
         }
         return chave;
     }
+    
     /**
      * verifica se o localRepo e um workspace valido e inicializado
      * @return 
