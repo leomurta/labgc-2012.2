@@ -76,7 +76,7 @@ public class Server extends AbstractServer {
 
         md = MessageDigest.getInstance("SHA1");
 
-        FileInputStream fis = new FileInputStream(serverTempFile);
+        FileInputStream fis = new FileInputStream("..//..//"+serverTempFile);
         byte[] dataBytes = new byte[1024];
 
         int nread = 0;

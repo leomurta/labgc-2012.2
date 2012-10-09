@@ -263,7 +263,8 @@ public class Workspace implements IObservable {
         } catch (IOException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
+        System.out.println("workspace: "+items.generateHash()); //remover isso
         this.notifyObservers("arquivo gravado");
 
 
