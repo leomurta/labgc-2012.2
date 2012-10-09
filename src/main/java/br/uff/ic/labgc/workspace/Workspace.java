@@ -266,12 +266,22 @@ throws WorkspaceException,IOException {
      */
     public void storeLocalData(VersionedItem items){
         throw new UnsupportedOperationException("Not yet implemented");
+        /* 
+         * items.getName()
+         * items.getContent()
+         * */
+         
     }
     
      /**
      * metodo para pegar o valor de um parametro salvo
      * @param key, chave do parametro salvo
      * @return 
+     *
+     * @param key
+     * @return
+     * @throws WorkspaceException
+     * @throws IOException
      */
     public String getParam(String key) 
     throws WorkspaceException, IOException {
@@ -354,6 +364,15 @@ throws WorkspaceException,IOException {
     @Override
     public void registerInterest(IObserver obs) {
         throw new UnsupportedOperationException("Not yet implemented");
+        /**
+     * Recebe notificações de alguma ação foi realizada em um item versionado.
+     * O path completo do item versionado é enviado como parâmetro, para que possa
+     * ser apresentado ao usuário. Para receber notificações, um objeto observador
+     * deve se registrar junto a objetos observáveis utilizando o método registerInterest.
+     * @param path 
+     * public void sendNotify(String path);
+     */
+    
     }
     
    
