@@ -9,4 +9,5 @@
 *~*
 .gitignore
 /lib/
+/launchers/*/.labgc
 
