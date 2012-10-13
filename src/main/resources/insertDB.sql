@@ -22,3 +22,5 @@ insert into LABGC.T_CONFIGURATION_ITEM (id,name,hash,type,is_dir,size,revision_i
 insert into LABGC.T_CHILDREN (parent_id,child_id) values (1,2);
 insert into LABGC.T_CHILDREN (parent_id,child_id) values (1,3);
 
+
+
