@@ -173,16 +173,19 @@ public class Workspace implements IObservable {
         //pega os items, grava os arquivos no disco e grava a pasta de controle dentro da pasta do projeto
         
         
-        File local = new File(LocalRepo, "..");
+        File local = new File(LocalRepo);
+        File parent = new File(local.getParent());
+        
+        
         try {
-            this.writeVersionedDir((VersionedDir)items,local);
+            this.writeVersionedDir((VersionedDir)items,parent);
         } catch (IOException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
             throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
         }
 
         // cria diretorio de controle
-        File vcs = new File(LocalRepo, ".labgc");
+        File vcs = new File(local, ".labgc");
         vcs.mkdir();
 
         // cria diretorio espelho da versao atual
@@ -276,7 +279,7 @@ public class Workspace implements IObservable {
     }
 
     private void writeVersionedFile(VersionedFile f, File folder) throws IOException {
-
+     
         File file = new File(folder, f.getName());
         file.createNewFile();
 
