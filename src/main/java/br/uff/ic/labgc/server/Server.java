@@ -39,18 +39,7 @@ public class Server extends AbstractServer {
 
     public VersionedItem checkout(String revision, String token) throws ApplicationException {
 
-
-
-        VersionedFile file = new VersionedFile();
-
-        file.setAuthor("lagc");
-        file.setHash(sha1());
-        file.setName(serverTempFile);
-        file.setLastChangedRevision("5");
-        file.setLastChangedTime(new Date(1349792243));
-        file.setSize(tempGetSize());
-
-        return file;
+        return this.createProjectDir();
     }
 
     public String diff(VersionedItem file, String version) throws ApplicationException {
@@ -70,6 +59,10 @@ public class Server extends AbstractServer {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    /*
+     * 
+     * metodos temporarios que serao excluidos
+     */
     private String tempSHA1() throws IOException, NoSuchAlgorithmException {
 
         MessageDigest md;
@@ -110,5 +103,54 @@ public class Server extends AbstractServer {
 
         File file = new File(serverTempFile);
         return file.length();
+    }
+    
+    private VersionedItem createProjectDir(){
+    
+        VersionedDir dir = new VersionedDir();
+        VersionedFile file = this.createFile();
+        VersionedFile file2 = this.createFile2();
+         
+        dir.setName(getRepPath());
+        dir.setSize(file.getSize()+file2.getSize());
+        dir.setAuthor(file.getAuthor());
+        dir.setCommitMessage(file.getCommitMessage());
+        dir.setLastChangedRevision(file.getLastChangedRevision());
+        dir.setLastChangedTime(file.getLastChangedTime());
+        dir.addItem(file);
+         dir.addItem(file2);
+
+        
+        return dir;
+    
+    }
+    
+    private VersionedFile createFile(){
+        
+        VersionedFile file = new VersionedFile();
+
+        file.setAuthor("lagc");
+        file.setHash(sha1());
+        file.setName(serverTempFile);
+        file.setLastChangedRevision("5");
+        file.setLastChangedTime(new Date(1349792243));
+        file.setSize(tempGetSize());
+        file.setCommitMessage("primeiro commit");
+        
+        return file;
+    }
+    private VersionedFile createFile2(){
+        
+        VersionedFile file = new VersionedFile();
+
+        file.setAuthor("lagc");
+        file.setHash(sha1());
+        file.setName("a"+serverTempFile);
+        file.setLastChangedRevision("5");
+        file.setLastChangedTime(new Date(1349792243));
+        file.setSize(tempGetSize());
+        file.setCommitMessage("primeiro commit");
+        
+        return file;
     }
 }
