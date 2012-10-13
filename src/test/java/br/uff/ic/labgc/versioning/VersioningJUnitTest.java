@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.versioning;
 
+import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
@@ -99,8 +100,8 @@ public class VersioningJUnitTest {
 */ 
 
         String token = "senha10";
-        List<VersionedItem> list = versioning.getRevision("1.0", token);
-        assertTrue("Revision criado:",list.size() == 2);
+        VersionedDir vd = versioning.getRevision("1.0", token);
+        assertTrue("Revision criado:",vd.getSize() != 0);
         
     }
     

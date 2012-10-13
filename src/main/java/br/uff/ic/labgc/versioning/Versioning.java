@@ -62,21 +62,16 @@ public class Versioning implements IVersioning{
     public String getRevisionUserName(String number) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    @Override
-    public List<VersionedItem> getRevision(String revNum, String token) throws ObjectNotFoundException{
-        ProjectUser pu = projectUserDAO.getByToken(token);
-        Revision revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), revNum);
-        ArrayList<VersionedItem> list = new ArrayList<VersionedItem>();
-        for (Iterator it = revision.getConfigItens().iterator(); it.hasNext(); )
+    
+    private VersionedDir ConfigItemToVersionedDir(ConfigurationItem ci){
+        VersionedDir vd = new VersionedDir();
+        for (Iterator it = ci.getChildren().iterator(); it.hasNext(); )
         {	
-            ConfigurationItem ci = (ConfigurationItem)it.next();
-            
-            //pegando a primeira revisao na qual o item aparece
-            Revision ciRev = (Revision)ci.getRevisions().iterator().next();
+            ConfigurationItem configItem = (ConfigurationItem)it;
+            Revision ciRev = configItem.getRevision();
             VersionedItem vi;
-            if (ci.getName().endsWith("\\")){//diretorio
-                vi = new VersionedDir();
+            if (configItem.isDir()){
+                vi = ConfigItemToVersionedDir(configItem);
             }
             else{
                 vi = new VersionedFile();
@@ -86,13 +81,27 @@ public class Versioning implements IVersioning{
             vi.setCommitMessage(ciRev.getDescription());
             vi.setLastChangedRevision(ciRev.getNumber());
             vi.setLastChangedTime(ciRev.getDate());
-            vi.setHash(ci.getHash());
-            vi.setName(ci.getName());
-            list.add(vi);
+            vi.setHash(configItem.getHash());
+            vi.setName(configItem.getName());
+            vi.setSize(configItem.getSize());
+            
+            vd.addItem(vi);
         }
-        return list;
+        vd.setSize(ci.getSize());
+      return vd;
+    }
+
+
+    @Override
+    public VersionedDir getRevision(String revNum, String token) throws ObjectNotFoundException{
+        ProjectUser pu = projectUserDAO.getByToken(token);
+        Revision revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), revNum);
+        ConfigurationItem ci = revision.getConfigItem();
+        VersionedDir vd = ConfigItemToVersionedDir(ci);
+        return vd;
     }
     
+    //nao encontrado, senha incorreta, sem permissao
     public String login(String projectName, String userName, String pass) throws ObjectNotFoundException, IncorrectPasswordException{
         User user = userDAO.getByUserName(userName);
         if (!user.getPassword().equals(pass)){
@@ -111,7 +120,7 @@ public class Versioning implements IVersioning{
         ProjectUser pu = projectUserDAO.getByToken(token);
         //TODO DUVAL tem que ser por hash e projeto
         ConfigurationItem ci = configItemDAO.getByHash(hash); 
-        Revision revision = (Revision)ci.getRevisions().iterator().next();
+        Revision revision = ci.getRevision();
         
         VersionedFile vf = new VersionedFile();
         vf.setAuthor(revision.getUser().getName());
@@ -122,12 +131,23 @@ public class Versioning implements IVersioning{
         vf.setName(ci.getName());
         
         String projName = pu.getProject().getName();
-        Path path = Paths.get(dirPath+projName+"\\"+ci.getHash().subSequence(0, 3)+"\\"+ci.getHash());
+        Path path = Paths.get(dirPath+projName+"\\"+hashToPath(ci.getHash()));
         byte bytes[] = Files.readAllBytes(path);
         vf.setContent(bytes);
         vf.setSize(bytes.length);
         
         return vf;
+    }
+    
+    private String hashToPath(String hash){
+        String path;
+        path = hash.substring(0, 3)+"\\"+hash;
+        return path;
+    }
+
+    @Override
+    public void addVersionedFile(VersionedFile vf, String token) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
 }

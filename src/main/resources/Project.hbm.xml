@@ -4,7 +4,7 @@
     <class name="br.uff.ic.labgc.storage.Project" table='"LABGC".t_project'>
         <id name="id" column="id" type="int">      
             <generator class="sequence">
-                <param name="sequence">SEQ_PROJECT</param>
+                <param name="sequence">LABGC.SEQ_PROJECT</param>
             </generator>       
         </id>     
         <property name="name" column="name" type="string" not-null="true"/>

@@ -20,20 +20,57 @@ public class ConfigurationItem extends DBClass{
     //TODO DUVAL o hash deve ser do caminho do repo mais do conteudo do arquivo 
     private String hash;
     private char type; //diz se foi add, delete, update - "A", "D", "U"
+    private boolean dir;
+    private int size;
     private ConfigurationItem next;
     private ConfigurationItem previous;
-    private Set revisions = new HashSet();
+    private Revision revision;
+    private Set children = new HashSet();
 
     public ConfigurationItem() {
     }
     
-    public ConfigurationItem(int number, String name, String hash, char type, ConfigurationItem next, ConfigurationItem previous) {
+    public ConfigurationItem(int number, String name, String hash, char type, boolean dir, int size, ConfigurationItem next, ConfigurationItem previous, Revision revision) {
         this.number = number;
         this.name = name;
         this.hash = hash;
         this.type = type;
+        this.dir = dir;
+        this.size = size;
         this.next = next;
         this.previous = previous;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public Revision getRevision() {
+        return revision;
+    }
+
+    public void setRevision(Revision revision) {
+        this.revision = revision;
+    }
+
+    public Set getChildren() {
+        return children;
+    }
+
+    public void setChildren(Set children) {
+        this.children = children;
+    }
+
+    public boolean isDir() {
+        return dir;
+    }
+
+    public void setDir(boolean dir) {
+        this.dir = dir;
     }
 
     public int getNumber() {
@@ -82,14 +119,6 @@ public class ConfigurationItem extends DBClass{
 
     public void setPrevious(ConfigurationItem previous) {
         this.previous = previous;
-    }
-
-    public Set getRevisions() {
-        return revisions;
-    }
-
-    public void setRevisions(Set revisions) {
-        this.revisions = revisions;
     }
     
 }

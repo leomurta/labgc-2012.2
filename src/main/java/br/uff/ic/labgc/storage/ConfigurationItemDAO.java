@@ -39,19 +39,5 @@ public class ConfigurationItemDAO extends DAO{
             throw new InfrastructureException(e);
         }
     }
-
-     public List getConfigurationItemsFromRevision(int revisionId)
-	{	
-            try
-            {
-                Session sessao = HibernateUtil.getSession();
-
-                return sessao.createQuery("from ConfigurationItem ci,RevisionConfigurationItem "
-                        + "where ci_id = ci.id AND revision_id = :revisionId")
-                        .setInteger("revisionId", revisionId).list();
-            } catch (HibernateException e) {
-                throw new InfrastructureException(e);
-            }
-	}
      
 }

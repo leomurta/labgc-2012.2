@@ -4,8 +4,10 @@
  */
 package br.uff.ic.labgc.versioning;
 
+import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,7 +39,11 @@ public interface IVersioning {
      * @param token
      * @return 
      */
-    public List<VersionedItem> getRevision(String revNum, String token) throws ObjectNotFoundException;
+    public VersionedDir getRevision(String revNum, String token) throws ObjectNotFoundException;
+    
+    public String login(String projectName, String userName, String pass) throws ObjectNotFoundException, IncorrectPasswordException;
     
     public VersionedFile getVersionedFile(String hash, String token) throws IOException;
+    
+    public void addVersionedFile(VersionedFile vf, String token);
 }

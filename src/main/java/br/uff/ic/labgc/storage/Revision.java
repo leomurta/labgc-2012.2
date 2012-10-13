@@ -22,8 +22,7 @@ public class Revision extends DBClass{
     private String number;
     private User user;
     private Project project;
-    //TODO mudar de Set para VersionedItem
-    private Set configItens = new HashSet();
+    private ConfigurationItem configItem;
 
     public Revision() {
     }
@@ -36,13 +35,14 @@ public class Revision extends DBClass{
         this.project = project;
     }
 
-    public Set getConfigItens() {
-        return configItens;
+    public ConfigurationItem getConfigItem() {
+        return configItem;
     }
 
-    public void setConfigItens(Set configItens) {
-        this.configItens = configItens;
+    public void setConfigItem(ConfigurationItem configItem) {
+        this.configItem = configItem;
     }
+
 
     public Date getDate() {
         return date;

@@ -4,7 +4,7 @@
     <class name="br.uff.ic.labgc.storage.User" table='"LABGC".T_USER'>
         <id name="id" column="id" type="int">      
             <generator class="sequence">
-                <param name="sequence">SEQ_USER</param>
+                <param name="sequence">LABGC.SEQ_USER</param>
             </generator>       
         </id>     
         <property name="name" column="name" type="string" not-null="true"/>

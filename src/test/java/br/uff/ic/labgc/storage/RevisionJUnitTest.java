@@ -64,16 +64,18 @@ public class RevisionJUnitTest {
         Date date = new Date();
         Revision revision = new Revision(date,"descricao" , "1.0", user, project);
         Set configItens = new HashSet();
-        ConfigurationItem ci1 = new ConfigurationItem(1, "arquivo1.txt", "FHUIRFGUY", 'A', null, null);
-        ConfigurationItem ci2 = new ConfigurationItem(1, "arquivo2.txt", "vdfjkfkf", 'U', null, null);
+        ConfigurationItem ci1 = new ConfigurationItem(1, "arquivo1.txt", "FHUIRFGUY", 'A', false, 10, null, null,revision);
+        ConfigurationItem ci2 = new ConfigurationItem(1, "arquivo2.txt", "vdfjkfkf", 'U', false, 15, null, null,revision);
+        ConfigurationItem ci3 = new ConfigurationItem(1, "pasta", null, 'U', false, 25, null, null,revision);
         configItens.add(ci1);
         configItens.add(ci2);
-        revision.setConfigItens(configItens);
+        ci3.setChildren(configItens);
+        revision.setConfigItem(ci3);
         assertTrue("2 configItens:",2 == configItens.size());
         revisionDAO.add(revision);
         
         Revision revision1 = revisionDAO.get(revision.getId());
-        assertTrue("Revision criada:",revision1.getConfigItens().size() == configItens.size());
+        assertTrue("Revision criada:",revision1.getConfigItem().getChildren().size() == configItens.size());
     
          
     }
