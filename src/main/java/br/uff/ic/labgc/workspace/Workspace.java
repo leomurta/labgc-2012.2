@@ -30,7 +30,7 @@ public class Workspace implements IObservable {
 
     private String LocalRepo;
     private IObserver observer;
-            
+
     public Workspace(String LocalRepo) {
         this.LocalRepo = LocalRepo;
     }
@@ -166,11 +166,26 @@ public class Workspace implements IObservable {
 // Cria esqueleto da WorkSpace
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
-    public void createWorkspace(String hostname, String repository)
+    public void createWorkspace(String hostname, String repository, VersionedItem items)
             throws WorkspaceException {
 
+        //pega o hostname e repository e grava como parametros
+        //pega os items, grava os arquivos no disco e grava a pasta de controle dentro da pasta do projeto
+        
+        
+        File local = new File(LocalRepo);
+        File parent = new File(local.getParent());
+        
+        
+        try {
+            this.writeVersionedDir((VersionedDir)items,parent);
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
+        }
+
         // cria diretorio de controle
-        File vcs = new File(LocalRepo, ".labgc");
+        File vcs = new File(local, ".labgc");
         vcs.mkdir();
 
         // cria diretorio espelho da versao atual
@@ -192,7 +207,8 @@ public class Workspace implements IObservable {
 // pode criar diretório - true: pode criar e false: existe diretório
     public boolean canCreate() {
         try {
-            this.checkLabgcFolder();
+            File file = new File(this.LocalRepo);
+            this.checkLabgcFolder( file.getAbsolutePath());
         } catch (WorkspaceException ex) {
             return true;
         }
@@ -243,30 +259,36 @@ public class Workspace implements IObservable {
      * arquivos e pastas
      */
     public void storeLocalData(VersionedItem items) {
-
-        File vcs = new File(this.LocalRepo);
-        File file = new File(vcs, "~"+items.getName());
-        try {
-            file.createNewFile();
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        try {
-            FileWriter fileWriter;
-
-            fileWriter = new FileWriter(file, true);
-            fileWriter.write("teste");
-            fileWriter.close();
-
-
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-        }
+       
+    
         
-        System.out.println("workspace: "+items.generateHash()); //remover isso
-        this.notifyObservers("arquivo gravado");
 
+    }
+
+    private void writeVersionedDir(VersionedDir dir, File folder) throws IOException {
+        File directory = new File(folder, dir.getName());
+        directory.mkdir();
+
+        for (VersionedItem item : dir.getContainedItens()) {
+            if (item instanceof VersionedDir) {
+                writeVersionedDir((VersionedDir) item, directory);
+            } else {
+                writeVersionedFile((VersionedFile) item, directory);
+            }
+        }
+    }
+
+    private void writeVersionedFile(VersionedFile f, File folder) throws IOException {
+     
+        File file = new File(folder, f.getName());
+        file.createNewFile();
+
+        FileWriter fileWriter;
+        fileWriter = new FileWriter(file, true);
+        fileWriter.write("teste");
+        fileWriter.close();
+
+        this.notifyObservers(file.getPath());
 
     }
 
@@ -355,35 +377,35 @@ public class Workspace implements IObservable {
      */
     public boolean isWorkspace() {
         try {
-            this.checkLabgcFolder();
-            this.checkLabgcFile();
+            this.checkLabgcFolder(this.LocalRepo);
+            this.checkLabgcFile(this.LocalRepo);
         } catch (WorkspaceException ex) {
             return false;
         }
         return true;
     }
 
-    private void checkLabgcFolder() throws WorkspaceException {
+    private void checkLabgcFolder(String path) throws WorkspaceException {
 
-        File diretorio1 = new File(this.LocalRepo, ".labgc");
+        File diretorio1 = new File(path, ".labgc");
         if (!diretorio1.exists()) {
             throw new WorkspaceEpelhoNaoExisteException(null);
         }
 
     }
 
-    private void checkLabgcFile() throws WorkspaceException {
+    private void checkLabgcFile(String path) throws WorkspaceException {
 
-        File arquivo = new File(this.LocalRepo, ".labgc//labgc.properties");
+        File arquivo = new File(path, ".labgc//labgc.properties");
         if (!arquivo.exists()) {
             throw new WorkspaceEpelhoNaoExisteException(null);
         }
 
     }
 
-    private void checkPropertyFile() throws WorkspaceException {
+    private void checkPropertyFile(String path) throws WorkspaceException {
 
-        File arquivo = new File(this.LocalRepo, ".labgc//key.properties");
+        File arquivo = new File(path, ".labgc//key.properties");
         if (!arquivo.exists()) {
             throw new WorkspaceEpelhoNaoExisteException(null);
         }
@@ -397,11 +419,14 @@ public class Workspace implements IObservable {
      */
     @Override
     public void registerInterest(IObserver obs) {
+
         this.observer = obs;
+
     }
-    
-    private void notifyObservers(String msg){
-        if(this.observer != null)
+
+    private void notifyObservers(String msg) {
+        if (this.observer != null) {
             this.observer.sendNotify(msg);
+        }
     }
 }

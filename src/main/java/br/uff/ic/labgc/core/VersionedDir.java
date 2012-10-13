@@ -7,6 +7,7 @@ package br.uff.ic.labgc.core;
 import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.List;
 public class VersionedDir extends VersionedItem implements Serializable {
     private static final long serialVersionUID = 6077816301367671740L;
     
-    private List<VersionedItem> containedItens = Collections.EMPTY_LIST;
+    private List<VersionedItem> containedItens = new ArrayList<VersionedItem>();
 
     public List<VersionedItem> getContainedItens() {
         return containedItens;

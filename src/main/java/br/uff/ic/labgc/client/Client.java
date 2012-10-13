@@ -56,7 +56,7 @@ public class Client implements IClient, IObservable, IObserver {
         this.hostname = hostname;
         this.repository = repository;
 
-        workspace = new Workspace(systemDirectory);
+        workspace = new Workspace(systemDirectory+"//"+repository);
     }
 
     /**
@@ -149,15 +149,13 @@ public class Client implements IClient, IObservable, IObserver {
         if (!workspace.canCreate()) 
             throw new ClientWorkspaceUnavailableException();
         
-        System.out.println("checkout: workspace criado");
         
         if (loginToken == null || loginToken.isEmpty()) 
             throw new ClientLoginRequiredException();
 
         try {
-            this.createWorkspace();
-            VersionedItem item = server.checkout(revision, loginToken);
-            workspace.storeLocalData(item);
+            VersionedItem items = server.checkout(revision, loginToken);
+            this.createWorkspace(items);
         } catch (ApplicationException e) {
             throw new ClientWorkspaceStoreException();
         }
@@ -232,9 +230,9 @@ public class Client implements IClient, IObservable, IObserver {
      * metodo interno para criar o workspace
      * @throws WorkspaceException 
      */
-    private void createWorkspace() throws WorkspaceException {
+    private void createWorkspace(VersionedItem items) throws WorkspaceException {
         
-        workspace.createWorkspace(hostname, repository);
+        workspace.createWorkspace(hostname, repository,items);
         workspace.setParam("token", loginToken);       
     
     }
