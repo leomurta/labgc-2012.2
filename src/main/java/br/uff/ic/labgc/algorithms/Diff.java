@@ -1,5 +1,10 @@
 package br.uff.ic.labgc.algorithms;
 
+import br.uff.ic.labgc.core.VersionedDir;
+import br.uff.ic.labgc.core.VersionedFile;
+import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.ApplicationException;
+import br.uff.ic.labgc.exception.IncompatibleItensException;
 import java.io.File;
 
 /**
@@ -8,35 +13,45 @@ import java.io.File;
  */
 public class Diff {
     
-    public final static int ARCHIVES    = 0;
-    public final static int DIRECTORIES = 1;
-    
-    public static byte[] run( File file1, File file2, int spec ){
+    public static byte[] run( VersionedItem file1, VersionedItem file2 ){
         
-        switch( spec ){
-            
-            case 0:
-                // DIFF DE ARQUIVOS
-                // converter array de bytes
-                return diff_archives   ( file1, file2 );
-            case 1:
-                // DIFF DE DIRETÓRIOS
-                // converter array de bytes
-                return diff_directories( file1, file2 );
-            
+        if( isFile(file1) && isFile(file2) ){
+            return diff_archives( (VersionedFile)file1, (VersionedFile)file2 );
+        } else {
+            if( !isFile(file1) && !isFile(file2) ){
+                return diff_directories( (VersionedDir)file1, (VersionedDir)file2 );
+            } else {
+                throw new IncompatibleItensException();
+            }
         }
-        return null;
     }
     
-    private static byte[] diff_archives   ( File file1, File file2 ){
+    private static byte[] diff_archives   ( VersionedFile file1, VersionedFile file2 ) throws ApplicationException{
         // Verifica se os Hashes de arquivo são diferentes
         // Chama LCS
         // 
+        
+        byte[] final_file;
+        
+        // Registra informações dos arquivos que estão sendo diferenciados
+        
+        if( file1.getHash() != file2.getHash() ){
+            byte[] lcs_file = Diff.lcs( file1.getContent(), file2.getContent() );
+        }
         return null;
     }
 
-    private static byte[] diff_directories( File file1, File file2 ) {
+    private static byte[] diff_directories( VersionedDir file1, VersionedDir file2 ) {
         return null;
+    }
+    
+    private static boolean isFile( VersionedItem file1 ){
+        try{
+            VersionedFile aux = (VersionedFile) file1;
+        } catch( Exception e ){
+            return false;
+        }
+        return true;
     }
     
     private static byte[] lcs( byte[] seq1, byte[] seq2 ){
