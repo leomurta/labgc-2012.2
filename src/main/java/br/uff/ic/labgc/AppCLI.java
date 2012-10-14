@@ -11,7 +11,7 @@ import org.apache.commons.cli.ParseException;
  * Hello world!
  *
  */
-public class App {
+public class AppCLI {
 
     public static void main(String[] args) {
         try {
@@ -23,9 +23,9 @@ public class App {
                 new Cli(invocationPath).run(args);
             }
         } catch (ParseException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AppCLI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClientWorkspaceUnavailableException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(AppCLI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

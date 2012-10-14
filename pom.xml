@@ -134,7 +134,7 @@
             <configuration>
                 <archive>
                     <manifest>
-                            <mainClass>br.uff.ic.labgc.App</mainClass>
+                            <mainClass>br.uff.ic.labgc.AppCLI</mainClass>
                     </manifest>
                 </archive>
             </configuration>
