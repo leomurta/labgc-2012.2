@@ -4,17 +4,79 @@
  */
 package br.uff.ic.labgc.userInterface.gui;
 
+import br.uff.ic.labgc.client.Client;
+import br.uff.ic.labgc.client.IClient;
+import br.uff.ic.labgc.core.EVCSConstants;
+import br.uff.ic.labgc.core.IObserver;
+import br.uff.ic.labgc.exception.ClientException;
+import java.awt.Cursor;
+import java.awt.Dialog;
+import java.awt.Font;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import sun.font.Font2D;
+
 /**
  *
  * @author Leonardo
  */
-public class CheckOutJFrame extends javax.swing.JFrame {
+public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
 
     /**
      * Creates new form CheckOutJFrame
      */
-    public CheckOutJFrame() {
+    public CheckOutJFrame() 
+    {
         initComponents();
+        //this.removeAll();
+        this.repaint();
+        
+        MakeUnBold(WorkspacejLabel);
+        MakeUnBold(RepositoryjLabel);
+        MakeBold(RepositoryjLabel);
+        
+        CheckOutOutput = new CheckOutOutputJFrame();
+        CheckOutOutput.setVisible(false);
+        
+        initTooltips();
+        FinishjButton.setEnabled(false);
+        NextjButton.setEnabled(true);
+        BackjButton.setEnabled(false);
+        
+        RepoLocationPanel = new RepositoryLocationJPanel();
+        RepoLocationPanel.setLocation(0,0);
+        RepoLocationPanel.setSize(450,216);
+        
+        
+        WorkspaceLocationPanel = new WorkspaceLocationJPanel();
+        WorkspaceLocationPanel.setLocation(0,0);
+        WorkspaceLocationPanel.setSize(450,216);
+       
+          
+        CheckOutChangejPanel.add(RepoLocationPanel);
+        CheckOutChangejPanel.add(WorkspaceLocationPanel);
+
+        
+        WorkspaceLocationPanel.setVisible(false);   
+        WorkspaceLocationPanel.invalidate();
+        WorkspaceLocationPanel.validate();
+        
+        RepoLocationPanel.setVisible(true);   
+        RepoLocationPanel.invalidate();
+        RepoLocationPanel.validate();
+        
+       
+        
+        
+         this.pack();
+        /*MainjPanel.add(WorkspaceLocationPanel);
+        MainjPanel.getComponent(1).setVisible(false);
+        MainjPanel.getComponent(0).setVisible(true);
+        MainjPanel.validate();*/
+        
+        
     }
 
     /**
@@ -29,15 +91,15 @@ public class CheckOutJFrame extends javax.swing.JFrame {
         StepsjPanel = new javax.swing.JPanel();
         RepositoryjLabel = new javax.swing.JLabel();
         WorkspacejLabel = new javax.swing.JLabel();
-        MainjPanel = new javax.swing.JPanel();
-        RepositoryjTextField = new javax.swing.JTextField();
-        RepositoryPaneljLabel = new javax.swing.JLabel();
         BackjButton = new javax.swing.JButton();
         NextjButton = new javax.swing.JButton();
         CanceljButton = new javax.swing.JButton();
         FinishjButton = new javax.swing.JButton();
+        CheckOutChangejPanel = new javax.swing.JPanel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("CheckOut");
+        setType(java.awt.Window.Type.POPUP);
 
         StepsjPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -66,38 +128,44 @@ public class CheckOutJFrame extends javax.swing.JFrame {
                 .addContainerGap(154, Short.MAX_VALUE))
         );
 
-        MainjPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        RepositoryPaneljLabel.setText("Repository location");
-
-        javax.swing.GroupLayout MainjPanelLayout = new javax.swing.GroupLayout(MainjPanel);
-        MainjPanel.setLayout(MainjPanelLayout);
-        MainjPanelLayout.setHorizontalGroup(
-            MainjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(MainjPanelLayout.createSequentialGroup()
-                .addGap(48, 48, 48)
-                .addComponent(RepositoryPaneljLabel)
-                .addGap(18, 18, 18)
-                .addComponent(RepositoryjTextField)
-                .addContainerGap())
-        );
-        MainjPanelLayout.setVerticalGroup(
-            MainjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(MainjPanelLayout.createSequentialGroup()
-                .addGap(27, 27, 27)
-                .addGroup(MainjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(RepositoryjTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(RepositoryPaneljLabel))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
         BackjButton.setText("Back");
+        BackjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BackjButtonActionPerformed(evt);
+            }
+        });
 
         NextjButton.setText("Next");
+        NextjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                NextjButtonActionPerformed(evt);
+            }
+        });
 
         CanceljButton.setText("Cancel");
+        CanceljButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CanceljButtonActionPerformed(evt);
+            }
+        });
 
         FinishjButton.setText("Finish");
+        FinishjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                FinishjButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout CheckOutChangejPanelLayout = new javax.swing.GroupLayout(CheckOutChangejPanel);
+        CheckOutChangejPanel.setLayout(CheckOutChangejPanelLayout);
+        CheckOutChangejPanelLayout.setHorizontalGroup(
+            CheckOutChangejPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 449, Short.MAX_VALUE)
+        );
+        CheckOutChangejPanelLayout.setVerticalGroup(
+            CheckOutChangejPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -106,9 +174,9 @@ public class CheckOutJFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(StepsjPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(33, 33, 33)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(33, 33, 33)
                         .addComponent(BackjButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(NextjButton)
@@ -116,7 +184,10 @@ public class CheckOutJFrame extends javax.swing.JFrame {
                         .addComponent(FinishjButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
                         .addComponent(CanceljButton))
-                    .addComponent(MainjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(CheckOutChangejPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(9, 9, 9)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -125,7 +196,7 @@ public class CheckOutJFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(StepsjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(MainjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(CheckOutChangejPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BackjButton)
@@ -138,6 +209,136 @@ public class CheckOutJFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void CanceljButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CanceljButtonActionPerformed
+        // TODO add your handling code here:
+        this.setVisible(false);
+    }//GEN-LAST:event_CanceljButtonActionPerformed
+
+    private void NextjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NextjButtonActionPerformed
+        // TODO add your handling code here:
+        if(verifyRepository())
+        {
+           
+            BackjButton.setEnabled(true);  
+            NextjButton.setEnabled(false);
+            FinishjButton.setEnabled(true);
+            
+            RepoLocationPanel.setVisible(false);
+            WorkspaceLocationPanel.setVisible(true);
+            MakeBold(WorkspacejLabel);
+            MakeUnBold(RepositoryjLabel);
+            WorkspaceLocationPanel.invalidate();
+            WorkspaceLocationPanel.validate();
+            this.pack();
+        }
+        else
+        {  
+            JOptionPane.showMessageDialog(null,"Fill the repository!");
+        }
+        
+    }//GEN-LAST:event_NextjButtonActionPerformed
+
+    private void BackjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BackjButtonActionPerformed
+        // TODO add your handling code here:
+        
+         FinishjButton.setEnabled(false);
+         NextjButton.setEnabled(true);
+         BackjButton.setEnabled(false);
+        
+         WorkspaceLocationPanel.setVisible(false);
+         RepoLocationPanel.setVisible(true);
+         MakeBold(RepositoryjLabel);
+         MakeUnBold(WorkspacejLabel);
+         RepoLocationPanel.invalidate();
+         RepoLocationPanel.validate();
+         this.pack();
+    }//GEN-LAST:event_BackjButtonActionPerformed
+
+    private void FinishjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FinishjButtonActionPerformed
+        // TODO add your handling code here:
+       Cursor cursor = Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR );  
+       this.setCursor( cursor );
+       
+       String  strWorkspace = WorkspaceLocationPanel.GetWorkspaceLocation();
+       String strRepository  = RepoLocationPanel.GetRepo();
+       
+       String [] strArrayRepo = strRepository.split("/");
+       strRepository ="";
+       for(int i=0;i<strArrayRepo.length-2;i++)
+       {
+          strRepository+=strArrayRepo[i];   
+       }
+       String strHost = strArrayRepo[strArrayRepo.length-1];
+       m_IClient = new Client(strHost, strRepository, strWorkspace) ;
+        try 
+        {
+            if(!(m_IClient.isLogged()))
+            { 
+               LoginJFrame loginFrame = new LoginJFrame(m_IClient);
+               loginFrame.setModalExclusionType(Dialog.ModalExclusionType.NO_EXCLUDE);
+               loginFrame.setVisible(true);
+            }
+        } 
+        catch (ClientException ex) 
+        {
+            cursor = Cursor.getDefaultCursor();  
+            this.setCursor( cursor );
+            JOptionPane.showMessageDialog(null,ex.getMessage() );
+           
+        }
+        try 
+        {
+            CheckOutOutput.setVisible(true);
+            m_IClient.checkout(EVCSConstants.REVISION_HEAD);
+        } catch (ClientException ex) 
+        {
+            cursor = Cursor.getDefaultCursor();  
+            this.setCursor( cursor );
+            JOptionPane.showMessageDialog(null,ex.getMessage() );
+            CheckOutOutput.EnableOK();
+           
+        }
+        CheckOutOutput.EnableOK();
+        
+        cursor = Cursor.getDefaultCursor();  
+        this.setCursor( cursor ); 
+       
+    }//GEN-LAST:event_FinishjButtonActionPerformed
+     
+    private boolean verifyRepository()
+    {
+        
+        if(RepoLocationPanel.isVisible())
+        {
+            return RepoLocationPanel.hasRepo();
+           
+        }
+        
+        return false;
+    }
+    private void initTooltips()
+    {  
+        String strRepositoryToolTip = "Fill the repository that you want to perform a checkout";
+        RepositoryjLabel.setToolTipText(strRepositoryToolTip);  
+        
+        String strWorkspaceToolTip = "Indicate the location of your workspace";
+        WorkspacejLabel.setToolTipText(strWorkspaceToolTip);
+    }
+    
+    private void MakeUnBold(JLabel label)
+    {
+         Font f = label.getFont();	 
+	 label.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+         label.invalidate();
+    }
+    
+    private void MakeBold(JLabel label)
+    {
+         Font f = label.getFont();
+         label.setFont(f.deriveFont(f.getStyle() | Font.BOLD));
+         label.invalidate();
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -182,13 +383,21 @@ public class CheckOutJFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BackjButton;
     private javax.swing.JButton CanceljButton;
+    private javax.swing.JPanel CheckOutChangejPanel;
     private javax.swing.JButton FinishjButton;
-    private javax.swing.JPanel MainjPanel;
     private javax.swing.JButton NextjButton;
-    private javax.swing.JLabel RepositoryPaneljLabel;
     private javax.swing.JLabel RepositoryjLabel;
-    private javax.swing.JTextField RepositoryjTextField;
     private javax.swing.JPanel StepsjPanel;
     private javax.swing.JLabel WorkspacejLabel;
     // End of variables declaration//GEN-END:variables
+    private RepositoryLocationJPanel RepoLocationPanel;
+    private WorkspaceLocationJPanel WorkspaceLocationPanel;
+    private IClient m_IClient;
+    private CheckOutOutputJFrame CheckOutOutput;
+
+    public void sendNotify(String path) 
+    {
+        //throw new UnsupportedOperationException("Not supported yet.");
+        CheckOutOutput.SetText(path, false);
+    }
 }

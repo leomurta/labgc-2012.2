@@ -211,7 +211,6 @@ public class Cli implements IObserver
                //String path = System.getProperty("user.dir");
            
                m_IClient = new Client(strHost, strRepository, strPath) ;
-               
                String strRevision = "";
                
                if(checkArgs.length >2)

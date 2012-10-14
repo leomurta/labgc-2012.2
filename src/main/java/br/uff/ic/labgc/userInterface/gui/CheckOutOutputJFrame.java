@@ -13,8 +13,23 @@ public class CheckOutOutputJFrame extends javax.swing.JFrame {
     /**
      * Creates new form CheckOutOutputJFrame
      */
-    public CheckOutOutputJFrame() {
+    public CheckOutOutputJFrame() 
+    {
         initComponents();
+        OKjButton.setEnabled(false);
+    }
+    
+    public void EnableOK()
+    {
+        OKjButton.setEnabled(true);
+    }
+    
+    public void SetText(String strText,boolean bErase)
+    {
+        if(bErase)
+          jTextAreaOutput.setText(strText);
+        else
+          jTextAreaOutput.setText(jTextAreaOutput.getText()+strText);   
     }
 
     /**
@@ -28,6 +43,8 @@ public class CheckOutOutputJFrame extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextAreaOutput = new javax.swing.JTextArea();
         OKjButton = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -45,18 +62,27 @@ public class CheckOutOutputJFrame extends javax.swing.JFrame {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        jTextAreaOutput.setColumns(20);
+        jTextAreaOutput.setRows(5);
+        jScrollPane1.setViewportView(jTextAreaOutput);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 308, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
         );
 
         OKjButton.setText("OK");
+        OKjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OKjButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -85,6 +111,11 @@ public class CheckOutOutputJFrame extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void OKjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_OKjButtonActionPerformed
+        // TODO add your handling code here:
+        this.setVisible(false);
+    }//GEN-LAST:event_OKjButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -131,5 +162,7 @@ public class CheckOutOutputJFrame extends javax.swing.JFrame {
     private javax.swing.JButton OKjButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jTextAreaOutput;
     // End of variables declaration//GEN-END:variables
 }

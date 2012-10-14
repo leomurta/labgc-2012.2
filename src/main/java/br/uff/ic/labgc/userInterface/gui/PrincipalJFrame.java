@@ -4,6 +4,8 @@
  */
 package br.uff.ic.labgc.userInterface.gui;
 
+import java.awt.Cursor;
+
 /**
  *
  * @author Leonardo
@@ -69,7 +71,7 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         );
         OutputjPanelLayout.setVerticalGroup(
             OutputjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
         );
 
         MainjPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -78,7 +80,7 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         MainjPanel.setLayout(MainjPanelLayout);
         MainjPanelLayout.setHorizontalGroup(
             MainjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 460, Short.MAX_VALUE)
+            .addGap(0, 467, Short.MAX_VALUE)
         );
         MainjPanelLayout.setVerticalGroup(
             MainjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -92,10 +94,16 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 
         LoginMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
         LoginMenuItem.setText("Login");
+        LoginMenuItem.setEnabled(false);
         jMenu2.add(LoginMenuItem);
 
         CheckOutjMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.ALT_MASK));
         CheckOutjMenuItem.setText("Checkout");
+        CheckOutjMenuItem.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                CheckOutjMenuItemMouseClicked(evt);
+            }
+        });
         CheckOutjMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CheckOutjMenuItemActionPerformed(evt);
@@ -117,11 +125,11 @@ public class PrincipalJFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(OutputjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(TreejPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(28, 28, 28)
-                        .addComponent(MainjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(MainjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(OutputjPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -131,8 +139,9 @@ public class PrincipalJFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(MainjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(TreejPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(OutputjPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(OutputjPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(57, Short.MAX_VALUE))
         );
 
         pack();
@@ -140,7 +149,22 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 
     private void CheckOutjMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckOutjMenuItemActionPerformed
         // TODO add your handling code here:
+        Cursor cursor = Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR );  
+        this.setCursor( cursor ); 
+        CheckOutJFrame checkOutScreen = new CheckOutJFrame();
+        checkOutScreen.setVisible(true);
+        checkOutScreen.toFront();
+        cursor = Cursor.getDefaultCursor();  
+        this.setCursor( cursor );
     }//GEN-LAST:event_CheckOutjMenuItemActionPerformed
+
+    private void CheckOutjMenuItemMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CheckOutjMenuItemMouseClicked
+        // TODO add your handling code here:
+        
+        CheckOutJFrame checkOutScreen = new CheckOutJFrame();
+        checkOutScreen.setVisible(true);
+        checkOutScreen.toFront();
+    }//GEN-LAST:event_CheckOutjMenuItemMouseClicked
 
     /**
      * @param args the command line arguments

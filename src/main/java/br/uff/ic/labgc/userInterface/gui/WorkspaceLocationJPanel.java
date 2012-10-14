@@ -4,6 +4,9 @@
  */
 package br.uff.ic.labgc.userInterface.gui;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JFileChooser;
 
 /**
@@ -15,16 +18,34 @@ public class WorkspaceLocationJPanel extends javax.swing.JPanel {
     /**
      * Creates new form WorkspaceLocationJPanel
      */
-    public WorkspaceLocationJPanel() {
+    public WorkspaceLocationJPanel() 
+    {
         initComponents();
         AddFileChooser();
     }
     
+    public String GetWorkspaceLocation()
+    {
+        return strWorkspace;
+    }
+    
     private void AddFileChooser()
     {
-        JFileChooser fileChooser = new JFileChooser();
+        final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY);
-        this.add(fileChooser);
+        this.setLayout(new BorderLayout());
+        this.add(fileChooser, BorderLayout.NORTH);
+        fileChooser.addActionListener(new ActionListener() 
+        {
+         public void actionPerformed(ActionEvent e) 
+         {
+            if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) 
+            {
+               strWorkspace = fileChooser.getSelectedFile().getPath();
+            }
+         }
+      });
+
     }
 
     /**
@@ -37,19 +58,21 @@ public class WorkspaceLocationJPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        setPreferredSize(new java.awt.Dimension(466, 62));
+        setPreferredSize(new java.awt.Dimension(466, 216));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 396, Short.MAX_VALUE)
+            .addGap(0, 462, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 296, Short.MAX_VALUE)
+            .addGap(0, 58, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+private String strWorkspace;
+
 }
