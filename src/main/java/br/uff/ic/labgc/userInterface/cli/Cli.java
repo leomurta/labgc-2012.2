@@ -3,6 +3,7 @@ import br.uff.ic.labgc.client.Client;
 import br.uff.ic.labgc.client.IClient;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.IObserver;
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ClientException;
 import br.uff.ic.labgc.exception.ClientLoginRequiredException;
 import br.uff.ic.labgc.exception.ClientWorkspaceUnavailableException;
@@ -170,7 +171,7 @@ public class Cli implements IObserver
              {
                  m_IClient.login(user, passWord);
              } 
-             catch (ClientException ex) 
+             catch (ApplicationException ex) 
              {
                   Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
                   System.out.println(msg.GetExceptionMessage(ex));
@@ -243,7 +244,7 @@ public class Cli implements IObserver
                    System.out.println(msg.GetExceptionMessage(loginExc));
                    return ;
                }
-               catch(ClientException ex)
+               catch(ApplicationException ex)
                {
                    System.out.println(msg.GetExceptionMessage(ex));
                    return;
@@ -297,7 +298,7 @@ public class Cli implements IObserver
 
             }
         } 
-        catch (ClientException ex) 
+        catch (ApplicationException ex) 
         {
             Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
             ex.printStackTrace();

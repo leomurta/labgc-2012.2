@@ -5,6 +5,7 @@
 package br.uff.ic.labgc.userInterface.gui;
 
 import br.uff.ic.labgc.client.IClient;
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ClientException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +37,7 @@ public class LoginJFrame extends javax.swing.JFrame {
         try 
         {
             m_IClient.login(Login, Pass);
-        } catch (ClientException ex) 
+        } catch (ApplicationException ex) 
         {
            JOptionPane.showMessageDialog(null,ex.getMessage() );
         }

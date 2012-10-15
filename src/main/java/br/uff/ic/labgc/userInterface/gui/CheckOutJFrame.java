@@ -8,6 +8,7 @@ import br.uff.ic.labgc.client.Client;
 import br.uff.ic.labgc.client.IClient;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.IObserver;
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ClientException;
 import java.awt.Cursor;
 import java.awt.Dialog;
@@ -279,7 +280,7 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
                loginFrame.setVisible(true);
             }
         } 
-        catch (ClientException ex) 
+        catch (ApplicationException ex) 
         {
             cursor = Cursor.getDefaultCursor();  
             this.setCursor( cursor );
@@ -290,7 +291,7 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
         {
             CheckOutOutput.setVisible(true);
             m_IClient.checkout(EVCSConstants.REVISION_HEAD);
-        } catch (ClientException ex) 
+        } catch (ApplicationException ex) 
         {
             cursor = Cursor.getDefaultCursor();  
             this.setCursor( cursor );

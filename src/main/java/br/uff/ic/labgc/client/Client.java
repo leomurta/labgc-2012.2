@@ -47,6 +47,7 @@ public class Client implements IClient, IObservable, IObserver {
 
     /**
      * Construtor para acesso sem area de trabalho(workspace)
+     *
      * @param hostname url ou ip do servidor
      * @param repository repositorio do projeto no servidor
      * @param systemDirectory diretorio do sistema que sera criado a workspace
@@ -56,11 +57,12 @@ public class Client implements IClient, IObservable, IObserver {
         this.hostname = hostname;
         this.repository = repository;
 
-        workspace = new Workspace(systemDirectory+"//"+repository);
+        workspace = new Workspace(systemDirectory + "//" + repository);
     }
 
     /**
      * Construtor para acesso com area de trabalho(workspace) ja existente
+     *
      * @param systemDirectory diretorio raiz da area de trabalho
      */
     public Client(String systemDirectory) {
@@ -72,7 +74,7 @@ public class Client implements IClient, IObservable, IObserver {
         } catch (WorkspaceException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
     //comandos para o servidor
@@ -138,46 +140,45 @@ public class Client implements IClient, IObservable, IObserver {
         return revert;
     }
 
-    public void checkout(String revision) throws ClientException {
+    public void checkout(String revision) throws ApplicationException {
 
 
-        if (workspace.isWorkspace()) 
+        if (workspace.isWorkspace()) {
             throw new ClientWorkspaceUnavailableException();
-        
-        System.out.println("checkout: nao eh workspace");
-        
-        if (!workspace.canCreate()) 
-            throw new ClientWorkspaceUnavailableException();
-        
-        
-        if (loginToken == null || loginToken.isEmpty()) 
-            throw new ClientLoginRequiredException();
-
-        try {
-            VersionedItem items = server.checkout(revision, loginToken);
-            this.createWorkspace(items);
-        } catch (ApplicationException e) {
-            throw new ClientWorkspaceStoreException();
         }
-        
+
+        System.out.println("checkout: nao eh workspace");
+
+        if (!workspace.canCreate()) {
+            throw new ClientWorkspaceUnavailableException();
+        }
+
+        if (loginToken == null || loginToken.isEmpty()) {
+            throw new ClientLoginRequiredException();
+        }
+
+        VersionedItem items = server.checkout(revision, loginToken);
+        this.createWorkspace(items);
+
         System.out.println("checkout finalizado");
     }
 
     public void login(String user, String pwd) throws ClientException {
-        
+
         this.getServer();
-        
+
         try {
-            
+
             loginToken = server.login(user, pwd, this.repository);
-            
-            if (workspace.isWorkspace())
+
+            if (workspace.isWorkspace()) {
                 workspace.setParam("token", loginToken);
+            }
 
         } catch (ApplicationException ex) {
             throw new ClientServerNotAvailableException();
         }
-        
+
         System.out.println("login finalizado");
     }
 
@@ -185,17 +186,18 @@ public class Client implements IClient, IObservable, IObserver {
 
         this.getServer();
 
-        if (loginToken == null && workspace.isWorkspace()){ 
+        if (loginToken == null && workspace.isWorkspace()) {
             try {
                 loginToken = workspace.getParam("token");
             } catch (WorkspaceException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 throw new ClientWorkspaceNotInitialized();
-            } 
+            }
         }
-                
-        if (loginToken == null || loginToken.isEmpty()) 
+
+        if (loginToken == null || loginToken.isEmpty()) {
             return false;
+        }
 
         return true;
     }
@@ -205,7 +207,6 @@ public class Client implements IClient, IObservable, IObserver {
         observers.add(obs);
 
         IObserver clientObs = new IObserver() {
-
             public void sendNotify(String msg) {
                 this.sendNotify(msg);
             }
@@ -220,26 +221,29 @@ public class Client implements IClient, IObservable, IObserver {
 
             Iterator<IObserver> iterator = observers.iterator();
 
-            while (iterator.hasNext()) 
+            while (iterator.hasNext()) {
                 iterator.next().sendNotify(msg);
+            }
         }
     }
 
     //private 
     /**
      * metodo interno para criar o workspace
-     * @throws WorkspaceException 
+     *
+     * @throws WorkspaceException
      */
     private void createWorkspace(VersionedItem items) throws ApplicationException {
-        
-        workspace.createWorkspace(hostname, repository,items);
-        workspace.setParam("token", loginToken);       
-    
+
+        workspace.createWorkspace(hostname, repository, items);
+        workspace.setParam("token", loginToken);
+
     }
-    
+
     /**
      * Recupera uma instancia de IServer;
-     * @throws ClientServerNotAvailableException, servidor nao disponivel 
+     *
+     * @throws ClientServerNotAvailableException, servidor nao disponivel
      */
     private void getServer() throws ClientException {
         if (server == null) {

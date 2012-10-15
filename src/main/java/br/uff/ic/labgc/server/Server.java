@@ -198,6 +198,11 @@ public class Server extends AbstractServer {
     
         // Close the input stream and return bytes
         is.close();
+        
+        String value = new String(bytes);
+        
+        System.out.println("\n\n\nConteudo do pom.xml:\n\n"+value);
+        
         return bytes;
     }
 }
