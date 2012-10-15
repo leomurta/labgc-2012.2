@@ -5,7 +5,6 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncompatibleItensException;
-import java.io.File;
 
 /**
  *
@@ -28,6 +27,12 @@ public class Diff {
                 throw new IncompatibleItensException();
             }
         }
+    }
+    
+    public static byte[] patch( VersionedItem file1, byte[] delta ){
+        
+        return null;
+        
     }
     
     private static byte[] diff_archives   ( VersionedFile file1, VersionedFile file2 ) throws ApplicationException{
