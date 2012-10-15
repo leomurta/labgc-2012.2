@@ -16,7 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sun.org.mozilla.javascript.internal.ast.ThrowStatement;
+
 
 /**
  *

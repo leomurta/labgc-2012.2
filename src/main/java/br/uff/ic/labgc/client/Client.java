@@ -230,7 +230,7 @@ public class Client implements IClient, IObservable, IObserver {
      * metodo interno para criar o workspace
      * @throws WorkspaceException 
      */
-    private void createWorkspace(VersionedItem items) throws WorkspaceException {
+    private void createWorkspace(VersionedItem items) throws ApplicationException {
         
         workspace.createWorkspace(hostname, repository,items);
         workspace.setParam("token", loginToken);       
