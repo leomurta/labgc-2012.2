@@ -10,11 +10,13 @@ import br.uff.ic.labgc.exception.ServerException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sun.org.mozilla.javascript.internal.ast.ThrowStatement;
 
 /**
  *
@@ -56,7 +58,17 @@ public class Server extends AbstractServer {
     }
 
     public byte[] getItemContent(String hash) throws ApplicationException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        
+        File file = new File("..//..//" + serverTempFile);
+        
+        try {
+            
+            return getBytesFromFile(file);
+        } catch (IOException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            throw new ServerException("Não foi possivel ler arquivo");
+        }
+        
     }
 
     /*
@@ -69,7 +81,7 @@ public class Server extends AbstractServer {
 
         md = MessageDigest.getInstance("SHA1");
 
-        FileInputStream fis = new FileInputStream("..//..//"+serverTempFile);
+        FileInputStream fis = new FileInputStream("..//..//" + serverTempFile);
         byte[] dataBytes = new byte[1024];
 
         int nread = 0;
@@ -89,7 +101,8 @@ public class Server extends AbstractServer {
         return sb.toString();
 
     }
-    private String sha1(){
+
+    private String sha1() {
         try {
             return tempSHA1();
         } catch (IOException ex) {
@@ -99,34 +112,35 @@ public class Server extends AbstractServer {
         }
         return null;
     }
+
     private long tempGetSize() {
 
         File file = new File(serverTempFile);
         return file.length();
     }
-    
-    private VersionedItem createProjectDir(){
-    
+
+    private VersionedItem createProjectDir() {
+
         VersionedDir dir = new VersionedDir();
         VersionedFile file = this.createFile();
         VersionedFile file2 = this.createFile2();
-         
+
         dir.setName(getRepPath());
-        dir.setSize(file.getSize()+file2.getSize());
+        dir.setSize(file.getSize() + file2.getSize());
         dir.setAuthor(file.getAuthor());
         dir.setCommitMessage(file.getCommitMessage());
         dir.setLastChangedRevision(file.getLastChangedRevision());
         dir.setLastChangedTime(file.getLastChangedTime());
         dir.addItem(file);
-         dir.addItem(file2);
+        dir.addItem(file2);
 
-        
+
         return dir;
-    
+
     }
-    
-    private VersionedFile createFile(){
-        
+
+    private VersionedFile createFile() {
+
         VersionedFile file = new VersionedFile();
 
         file.setAuthor("lagc");
@@ -137,20 +151,53 @@ public class Server extends AbstractServer {
         file.setSize(tempGetSize());
         file.setCommitMessage("primeiro commit");
         
+
         return file;
     }
-    private VersionedFile createFile2(){
-        
+
+    private VersionedFile createFile2() {
+
         VersionedFile file = new VersionedFile();
 
         file.setAuthor("lagc");
         file.setHash(sha1());
-        file.setName("a"+serverTempFile);
+        file.setName("a" + serverTempFile);
         file.setLastChangedRevision("5");
         file.setLastChangedTime(new Date(1349792243));
         file.setSize(tempGetSize());
         file.setCommitMessage("primeiro commit");
-        
+
         return file;
+    }
+
+    public static byte[] getBytesFromFile(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+    
+        // Get the size of the file
+        long length = file.length();
+    
+        if (length > Integer.MAX_VALUE) {
+            // File is too large
+        }
+    
+        // Create the byte array to hold the data
+        byte[] bytes = new byte[(int)length];
+    
+        // Read in the bytes
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+               && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+            offset += numRead;
+        }
+    
+        // Ensure all the bytes have been read in
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file "+file.getName());
+        }
+    
+        // Close the input stream and return bytes
+        is.close();
+        return bytes;
     }
 }

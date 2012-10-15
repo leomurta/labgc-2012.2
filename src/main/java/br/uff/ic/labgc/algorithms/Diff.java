@@ -6,6 +6,8 @@ import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncompatibleItensException;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -13,10 +15,14 @@ import java.io.File;
  */
 public class Diff {
     
-    public static byte[] run( VersionedItem file1, VersionedItem file2 ){
+    public static byte[] run( VersionedItem file1, VersionedItem file2 ) throws IncompatibleItensException{
         
         if( isFile(file1) && isFile(file2) ){
-            return diff_archives( (VersionedFile)file1, (VersionedFile)file2 );
+            try {
+                return diff_archives( (VersionedFile)file1, (VersionedFile)file2 );
+            } catch (ApplicationException ex) {
+                Logger.getLogger(Diff.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
             if( !isFile(file1) && !isFile(file2) ){
                 return diff_directories( (VersionedDir)file1, (VersionedDir)file2 );
@@ -24,6 +30,7 @@ public class Diff {
                 throw new IncompatibleItensException();
             }
         }
+        return null;
     }
     
     private static byte[] diff_archives   ( VersionedFile file1, VersionedFile file2 ) throws ApplicationException{

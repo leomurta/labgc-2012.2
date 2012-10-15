@@ -5,6 +5,7 @@
 package br.uff.ic.labgc.workspace;
 
 import br.uff.ic.labgc.core.*;
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
 import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
@@ -21,6 +22,7 @@ import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.IIOException;
 
 /**
  *
@@ -167,18 +169,18 @@ public class Workspace implements IObservable {
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
     public void createWorkspace(String hostname, String repository, VersionedItem items)
-            throws WorkspaceException {
+            throws ApplicationException {
 
         //pega o hostname e repository e grava como parametros
         //pega os items, grava os arquivos no disco e grava a pasta de controle dentro da pasta do projeto
-        
-        
+
+
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
-        
-        
+
+
         try {
-            this.writeVersionedDir((VersionedDir)items,parent);
+            this.writeVersionedDir((VersionedDir) items, parent);
         } catch (IOException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
             throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
@@ -208,7 +210,7 @@ public class Workspace implements IObservable {
     public boolean canCreate() {
         try {
             File file = new File(this.LocalRepo);
-            this.checkLabgcFolder( file.getAbsolutePath());
+            this.checkLabgcFolder(file.getAbsolutePath());
         } catch (WorkspaceException ex) {
             return true;
         }
@@ -259,13 +261,9 @@ public class Workspace implements IObservable {
      * arquivos e pastas
      */
     public void storeLocalData(VersionedItem items) {
-       
-    
-        
-
     }
 
-    private void writeVersionedDir(VersionedDir dir, File folder) throws IOException {
+    private void writeVersionedDir(VersionedDir dir, File folder) throws IOException, ApplicationException {
         File directory = new File(folder, dir.getName());
         directory.mkdir();
 
@@ -278,18 +276,26 @@ public class Workspace implements IObservable {
         }
     }
 
-    private void writeVersionedFile(VersionedFile f, File folder) throws IOException {
-     
+    private void writeVersionedFile(VersionedFile f, File folder) throws IOException, ApplicationException {
+
         File file = new File(folder, f.getName());
         file.createNewFile();
 
-        FileWriter fileWriter;
-        fileWriter = new FileWriter(file, true);
-        fileWriter.write("teste");
-        fileWriter.close();
 
-        this.notifyObservers(file.getPath());
+        byte[] content;
+       
+            
+            content = f.getContent();
 
+
+
+            FileOutputStream fileWriter = new FileOutputStream(file);
+            fileWriter.write(content);
+            fileWriter.close();
+
+            this.notifyObservers(file.getPath());
+            
+        
     }
 
     /**
