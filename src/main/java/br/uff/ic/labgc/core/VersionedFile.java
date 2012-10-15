@@ -60,10 +60,10 @@ public class VersionedFile extends VersionedItem implements Serializable {
      * @throws ApplicationException
      */
     public byte[] getContent() throws ApplicationException {
-        if (this.getHash() == null || this.getHash().equals("")) {
-            throw new ApplicationException("Não é possível recuperar o conteúdo de um item sem informar seu hash.");
-        }
         if (!loaded) {
+            if (this.getHash() == null || this.getHash().equals("")) {
+                throw new ApplicationException("Não é possível recuperar o conteúdo de um item sem informar seu hash.");
+            }
             setContent(CommunicationFactory.getFactory().getServer(originHost).getItemContent(this.getHash()));
         } else if (isCompressed()) {
             inflate();
