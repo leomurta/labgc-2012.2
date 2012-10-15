@@ -1,5 +1,7 @@
 package br.uff.ic.labgc.algorithms;
 
+// Teste !
+
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
