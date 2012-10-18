@@ -168,16 +168,15 @@ public class Workspace implements IObservable {
 // Cria esqueleto da WorkSpace
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
+    
     public void createWorkspace(String hostname, String repository, VersionedItem items)
             throws ApplicationException {
 
-        //pega o hostname e repository e grava como parametros
-        //pega os items, grava os arquivos no disco e grava a pasta de controle dentro da pasta do projeto
-
+        //pega os items, grava os arquivos no disco e 
+        //grava a pasta de controle dentro da pasta do projeto
 
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
-
 
         try {
             this.writeVersionedDir((VersionedDir) items, parent);
@@ -194,9 +193,18 @@ public class Workspace implements IObservable {
         File espelho;
         espelho = new File(vcs, "espelho.r");
         espelho.mkdir();
+        
+        // copia WS para o espelho
 
+        File[] stDir = local.listFiles();
+
+        // copia os arquivos
+        for (File file : stDir) {
+            String name = file.getName();
+            copy(file, new File(espelho + "\\" + name), true);
+        }
+        
         setParam("repositorio", repository);
-
         setParam("hostname", hostname);
 
     }
@@ -254,6 +262,8 @@ public class Workspace implements IObservable {
     }
 
 //implementar
+    
+    
     /**
      * salva arquivos versionados, do servidor, para o workspace(disco local)
      *
@@ -281,19 +291,13 @@ public class Workspace implements IObservable {
         File file = new File(folder, f.getName());
         file.createNewFile();
 
-
         byte[] content;
-       
             
-            content = f.getContent();
-
-
-
-            FileOutputStream fileWriter = new FileOutputStream(file);
-            fileWriter.write(content);
-            fileWriter.close();
-
-            this.notifyObservers(file.getPath());
+        content = f.getContent();
+        FileOutputStream fileWriter = new FileOutputStream(file);
+        fileWriter.write(content);
+        fileWriter.close();
+        this.notifyObservers(file.getPath());
             
         
     }
@@ -325,31 +329,6 @@ public class Workspace implements IObservable {
     }
 
     /**
-     * metodo para pegar o valor de um parametro da WS salvo
-     *
-     * @param key, chave do parametro salvo
-     * @return
-     */
-    public String getParam2(String key)
-            throws WorkspaceException {
-
-        File vcs = new File(this.LocalRepo, ".labgc");
-        File file = new File(vcs, "key.properties");
-
-        Properties properties = new Properties();
-
-        try {
-            FileInputStream fi = new FileInputStream(file);
-            properties.load(fi);
-            fi.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("Erro ao manipular o arquivo de parametro");
-        }
-        return properties.getProperty(key);
-    }
-
-    /**
      * retorna valor do hostname guardado na criacao do workspace
      *
      * @return
@@ -357,7 +336,7 @@ public class Workspace implements IObservable {
     public String getHostname() throws WorkspaceException {
         String chave = "";
 
-        chave = getParam2("Hostname");
+        chave = getParam("hostname");
 
         return chave;
     }
@@ -371,7 +350,7 @@ public class Workspace implements IObservable {
     public String getRepository() throws WorkspaceException {
         String chave = "";
 
-        chave = getParam2("Repository");
+        chave = getParam("repositorio");
 
         return chave;
     }
