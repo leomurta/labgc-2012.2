@@ -4,6 +4,10 @@
  */
 package br.uff.ic.labgc.storage;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  *
  * @author jokerfvd
@@ -24,8 +28,11 @@ public class ProjectUser {
     }
     
     public void generateToken() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        System.out.println(dateFormat.format(date));
         int h = 0;
-        String aux = project.getName()+user.getPassword()+user.getName();
+        String aux = date.toString()+project.getName()+user.getPassword()+user.getName();
         int len = aux.length();
         for (int i = 0; i < len; i++) {
             h = 31 * h + aux.charAt(i);
