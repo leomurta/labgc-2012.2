@@ -12,6 +12,8 @@ public class ProjectUser {
     private ProjectUserId id;
     private Project project;
     private String token;
+    private int permission;
+    
 
     public String getToken() {
         return token;
@@ -22,10 +24,14 @@ public class ProjectUser {
     }
     
     public void generateToken() {
-        this.token = user.getPassword();
+        int h = 0;
+        String aux = project.getName()+user.getPassword()+user.getName();
+        int len = aux.length();
+        for (int i = 0; i < len; i++) {
+            h = 31 * h + aux.charAt(i);
+        }
+        this.token = Integer.toString(h);
     }
-    int 
-            permission;
 
     public int getPermission() {
         return permission;
