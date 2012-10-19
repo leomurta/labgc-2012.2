@@ -8,9 +8,11 @@ import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.util.List;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -93,9 +95,10 @@ public class ProjectUserDAO {
      public ProjectUser getByToken(String token) {
         try {
             Session sessao = HibernateUtil.getSession();
-
-            ProjectUser pu = (ProjectUser) sessao.createQuery("from ProjectUser where token = :token")
-                    .setString("token", token).uniqueResult();
+            
+            Criteria criteria = sessao.createCriteria(ProjectUser.class)
+                .add(Restrictions.eq("token", token));
+            ProjectUser pu = (ProjectUser) criteria.uniqueResult();
 
             if (pu == null) {
                 throw new ObjectNotFoundException();

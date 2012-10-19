@@ -6,9 +6,11 @@ package br.uff.ic.labgc.storage;
 
 import br.uff.ic.labgc.storage.util.*;
 import java.util.List;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -24,10 +26,10 @@ public class UserDAO extends DAO{
         try {
             Session sessao = HibernateUtil.getSession();
 
-            String busca = "from User where username = :username";
-            Query query = sessao.createQuery(busca);
-            query.setString("username", username);
-            User user = (User) query.uniqueResult();
+            Criteria criteria = sessao.createCriteria(User.class)
+                .add(Restrictions.eq("username", username));
+            User user = (User) criteria.uniqueResult();
+
 
             if (user == null) {
                 throw new ObjectNotFoundException();
@@ -45,7 +47,7 @@ public class UserDAO extends DAO{
             {
                 Session sessao = HibernateUtil.getSession();
 
-                return sessao.createQuery("from User order by id").list();
+                return sessao.createQuery("from LABGC.T_USER order by id").list();
                 //return sessao.createSQLQuery("select * from t_user order by id").list();
             } catch (HibernateException e) {
                 throw new InfrastructureException(e);

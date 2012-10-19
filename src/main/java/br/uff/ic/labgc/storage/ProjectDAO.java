@@ -8,8 +8,10 @@ import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.util.List;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -20,9 +22,10 @@ public class ProjectDAO extends DAO{
     public Project getName(String name) {
         try {
             Session sessao = HibernateUtil.getSession();
-
-            Project project = (Project) sessao.createQuery("from Project where name = :name")
-                    .setString("name", name).uniqueResult();
+            
+            Criteria criteria = sessao.createCriteria(Project.class)
+                .add(Restrictions.eq("name", name));
+            Project project = (Project) criteria.uniqueResult();
 
             if (project == null) {
                 throw new ObjectNotFoundException();

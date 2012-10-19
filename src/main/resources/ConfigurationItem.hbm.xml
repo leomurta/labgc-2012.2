@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-  <class name="br.uff.ic.labgc.storage.ConfigurationItem" table='"LABGC".t_configuration_item'>
+  <class name="br.uff.ic.labgc.storage.ConfigurationItem" table='LABGC.t_configuration_item'>
   <id name="id" column="id" type="int">      
         <generator class="sequence">
             <param name="sequence">LABGC.SEQ_CONFIGITEM</param>
@@ -17,7 +17,7 @@
     <many-to-one name="previous" column="previous_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
     <many-to-one name="revision" column="revision_id" class="br.uff.ic.labgc.storage.Revision" not-null="true"/>
     
-    <set name="children" table='"LABGC".T_CHILDREN'>
+    <set name="children" table='LABGC.T_CHILDREN'>
             <key column="parent_id"/>
             <many-to-many column="child_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
     </set>  

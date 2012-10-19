@@ -62,6 +62,17 @@ public class UserJUnitTest {
         assertTrue("Ids iguais:",id == user1.getId() );
     }
     
+    @Test
+    public void testGetUserByUserName() {
+        User user = userDAO.getByUserName("username1");
+        assertNotNull(user);
+    }
+    
+    @Test(expected=ObjectNotFoundException.class)
+    public void testDontGetUserByUserName() {
+        userDAO.getByUserName("username10");
+    }
+    
     //@Test
     public void testGetUsers() {
         User user = new User("Teste","Teste","teste");

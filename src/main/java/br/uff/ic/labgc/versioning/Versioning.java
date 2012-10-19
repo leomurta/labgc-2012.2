@@ -41,7 +41,7 @@ public class Versioning implements IVersioning{
     private static RevisionDAO revisionDAO = new RevisionDAO();
     private static ConfigurationItemDAO configItemDAO = new ConfigurationItemDAO();
     
-    private String dirPath = "C:\\repositorio\\";
+    private String dirPath = "repositorio/";
 
     public Versioning() {
     }
@@ -67,7 +67,7 @@ public class Versioning implements IVersioning{
         VersionedDir vd = new VersionedDir();
         for (Iterator it = ci.getChildren().iterator(); it.hasNext(); )
         {	
-            ConfigurationItem configItem = (ConfigurationItem)it;
+            ConfigurationItem configItem = (ConfigurationItem)it.next();
             Revision ciRev = configItem.getRevision();
             VersionedItem vi;
             if (configItem.isDir()){
@@ -131,7 +131,7 @@ public class Versioning implements IVersioning{
         vf.setName(ci.getName());
         
         String projName = pu.getProject().getName();
-        Path path = Paths.get(dirPath+projName+"\\"+hashToPath(ci.getHash()));
+        Path path = Paths.get(dirPath+projName+"/"+hashToPath(ci.getHash()));
         byte bytes[] = Files.readAllBytes(path);
         vf.setContent(bytes);
         vf.setSize(bytes.length);
@@ -141,12 +141,12 @@ public class Versioning implements IVersioning{
     
     private String hashToPath(String hash){
         String path;
-        path = hash.substring(0, 3)+"\\"+hash;
+        path = hash.substring(0, 3)+"/"+hash;
         return path;
     }
 
     @Override
-    public void addVersionedFile(VersionedFile vf, String token) {
+    public void addRevision(VersionedDir vd, String token){
         throw new UnsupportedOperationException("Not supported yet.");
     }
     

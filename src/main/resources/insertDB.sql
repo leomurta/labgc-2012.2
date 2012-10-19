@@ -19,6 +19,8 @@ insert into LABGC.T_CONFIGURATION_ITEM (id,name,hash,type,is_dir,size,revision_i
 insert into LABGC.T_CONFIGURATION_ITEM (id,name,hash,type,is_dir,size,revision_id,number) values 
 (3,'raiz/arquivo2.txt','vcdfsniovfbiov','A',0,5,1,1);
 
+update LABGC.T_REVISION set config_item_id = 1 where id = 1;
+
 insert into LABGC.T_CHILDREN (parent_id,child_id) values (1,2);
 insert into LABGC.T_CHILDREN (parent_id,child_id) values (1,3);
 

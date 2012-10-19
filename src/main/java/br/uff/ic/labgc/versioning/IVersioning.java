@@ -45,5 +45,5 @@ public interface IVersioning {
     
     public VersionedFile getVersionedFile(String hash, String token) throws IOException;
     
-    public void addVersionedFile(VersionedFile vf, String token);
+    public void addRevision(VersionedDir vd, String token);
 }

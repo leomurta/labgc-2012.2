@@ -70,8 +70,8 @@ public class VersioningJUnitTest {
     @Test
     public void testLogin() {   
         try {
-            String token = versioning.login("projeto10", "usuario10", "senha10");
-            assertTrue("Token OK:", token.equals("senha10"));
+            String token = versioning.login("projeto1", "username1", "password1");
+            assertTrue("Token OK:", token.equals("nvfdovhfdoivbiofdvf"));
         } catch (ObjectNotFoundException ex) {
             Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
             assertFalse("Erro 1",true);
@@ -83,23 +83,8 @@ public class VersioningJUnitTest {
     }
     
     @Test
-    public void testGetRevision() {
-/*
-        User user = userDAO.getByUserName("usuario10");
-        Project project = projectDAO.getName("usuario10");
-        Date date = new Date();
-        Revision revision = new Revision(date,"descricao" , "1.0", user, project);
-        ArrayList<ConfigurationItem> configItens = new ArrayList();
-        ConfigurationItem ci1 = new ConfigurationItem(1, "arquivo1.txt", "FHUIRFGUY", 'A', null, null);
-        ConfigurationItem ci2 = new ConfigurationItem(1, "arquivo2.txt", "vdfjkfkf", 'U', null, null);
-        configItens.add(ci1);
-        configItens.add(ci2);
-        revision.setConfigItens(configItens);
-        assertTrue("2 configItens:",2 == configItens.size());
-        revisionDAO.add(revision);
-*/ 
-
-        String token = "senha10";
+    public void testGetRevision() { 
+        String token = "nvfdovhfdoivbiofdvf";
         VersionedDir vd = versioning.getRevision("1.0", token);
         assertTrue("Revision criado:",vd.getSize() != 0);
         
@@ -108,9 +93,9 @@ public class VersioningJUnitTest {
     @Test
     public void testgetVersionedFile() {
         try {
-            String token = "senha10";
-            VersionedFile vf = versioning.getVersionedFile("FHUIRFGUY", token);
-            assertTrue(vf.getSize() != 0x0);
+            String token = "nvfdovhfdoivbiofdvf";
+            VersionedFile vf = versioning.getVersionedFile("vnfdovh9e0h0", token);
+            assertTrue(vf.getSize() == 10);
         } catch (IOException ex) {
             assertFalse("Erro 1",true);
             Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
