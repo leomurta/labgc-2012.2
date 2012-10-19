@@ -202,7 +202,13 @@ public class Workspace implements IObservable {
         for (File file : stDir) {
             String name = file.getName();
             // tratar .labgc - não pode copiar
-            copy(file, new File(espelho + "\\" + name), true);
+        try {
+             copy(file, new File(espelho + "\\" + name), true);
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
+        }
+           
         }
         
         setParam("repositorio", repository);
