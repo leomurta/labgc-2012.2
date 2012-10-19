@@ -196,11 +196,12 @@ public class Workspace implements IObservable {
         
         // copia WS para o espelho
 
-        File[] stDir = local.listFiles();
+        File[] stDir = parent.listFiles();
 
         // copia os arquivos
         for (File file : stDir) {
             String name = file.getName();
+            // tratar .labgc - não pode copiar
             copy(file, new File(espelho + "\\" + name), true);
         }
         
