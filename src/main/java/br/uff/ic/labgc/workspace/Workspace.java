@@ -421,4 +421,18 @@ public class Workspace implements IObservable {
             this.observer.sendNotify(msg);
         }
     }
+    private VersionedItem criarItem(String dir1){
+        File raiz = new File(dir1);
+        File[] stDir = raiz.listFiles();
+       
+        // copia os arquivos
+        for (File file : stDir) {
+            String name = file.getName();
+        }
+        return null;
+        }
+    
 }
+
+
+
