@@ -196,12 +196,19 @@ public class Workspace implements IObservable {
         
         // copia WS para o espelho
 
-        File[] stDir = local.listFiles();
+        File[] stDir = parent.listFiles();
 
         // copia os arquivos
         for (File file : stDir) {
             String name = file.getName();
-            copy(file, new File(espelho + "\\" + name), true);
+            // tratar .labgc - não pode copiar
+        try {
+             copy(file, new File(espelho + "\\" + name), true);
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
+        }
+           
         }
         
         setParam("repositorio", repository);
