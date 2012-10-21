@@ -122,7 +122,7 @@ public class Workspace implements IObservable {
             throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
 
         }
-        // procura pelo espelho - não existe um dir padrão pq extensão é a versão
+        // procura pelo espelho 
         File[] stDir = diretorio1.listFiles();
         boolean achou = false;
         for (File file : stDir) {
@@ -194,10 +194,18 @@ public class Workspace implements IObservable {
         espelho = new File(vcs, "espelho.r");
         espelho.mkdir();
         
-        // copia WS para o espelho
-
-        File[] stDir = parent.listFiles();
-
+        // cria filtro para excluir .labgc
+        
+        FilenameFilter excluiLabgc = new FilenameFilter() {
+            public boolean accept(File parent, String name){
+                   return !name.endsWith(".labgc");
+            }
+        };
+        
+        // copia WS para o espelho e exclui .labgc
+        
+        File[] stDir = parent.listFiles(excluiLabgc);
+        
         // copia os arquivos
         for (File file : stDir) {
             String name = file.getName();
