@@ -195,29 +195,12 @@ public class Workspace implements IObservable {
         espelho = new File(vcs, "espelho.r");
         espelho.mkdir();
         
-        // cria filtro para excluir .labgc
-        
-        FilenameFilter excluiLabgc = new FilenameFilter() {
-            public boolean accept(File parent, String name){
-                   return !name.endsWith(".labgc");
-            }
-        };
-        
-        // copia WS para o espelho e exclui .labgc
-        
-        File[] stDir = parent.listFiles(excluiLabgc);
-        
-        // copia os arquivos
-        for (File file : stDir) {
-            String name = file.getName();
-            // tratar .labgc - não pode copiar
+        // Escreve arquivos no diretorio espelho
         try {
-             copy(file, new File(espelho + "\\" + name), true);
+            this.writeVersionedDir((VersionedDir) items, espelho);
         } catch (IOException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
             throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
-        }
-           
         }
         
         setParam("repositorio", repository);
@@ -225,6 +208,8 @@ public class Workspace implements IObservable {
 
     }
 
+* 
+* 
     /**
      * verifica a possibilidade de criar um workspace, retorna true ou false
      *
