@@ -66,6 +66,41 @@ public class Workspace implements IObservable {
         throw new UnsupportedOperationException("Not supported yet.");
 
     }
+    
+    // Primitiva de cópia de diretórios
+    
+    void copyDir(File src, File dest)
+    	throws IOException{
+     	if(src.isDirectory()){
+            //cria se diretório não existe
+            if(!dest.exists()){
+                dest.mkdir();
+            }
+           //pega conteúdo do diretório
+           String files[] = src.list();
+           for (String file : files) {
+                File srcFile = new File(src, file);
+    		File destFile = new File(dest, file);
+    		//cópia recursiva
+    		copyFolder(srcFile,destFile);
+            }
+ 
+        }else{
+            //copia arquivos
+            FileInputStream fisOrigem = new FileInputStream(src);
+            FileOutputStream fisDestino = new FileOutputStream(dest);
+    	    FileChannel fcOrigem = fisOrigem.getChannel();
+            FileChannel fcDestino = fisDestino.getChannel();
+            // Transfere todo o volume para o arquivo de cópia com o número de bytes do arquivo original
+            fcOrigem.transferTo(0, fcOrigem.size(), fcDestino);
+            // Fecha
+            fisOrigem.close();
+            fisDestino.close();
+    	    
+        }
+    }
+
+    
 
     boolean copy(File origem, File destino, boolean overwrite)
             throws FileNotFoundException, IOException {
@@ -109,14 +144,16 @@ public class Workspace implements IObservable {
 
     public boolean revert()
             throws IOException, WorkspaceException {
-        String diretorio = getParam("Diretorio");
+        File local = new File(LocalRepo);
+        File parent = new File(local.getParent());
+        
 
-        File diretorio1 = new File(diretorio);
-        if (!diretorio1.exists()) {
+        
+        if (!parent.exists()) {
             throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
 
         }
-        diretorio1 = new File(diretorio + File.separator + ".labgc");
+        File diretorio1 = new File(local + File.separator + ".labgc");
 
         // testa se existe o diretorio de versionamento
         if (!diretorio1.exists()) {
@@ -141,12 +178,14 @@ public class Workspace implements IObservable {
         if (!achou) {
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
         }
-        stDir = diretorio1.listFiles();
+        copyDir (diretorio1, parent);
+/*        stDir = diretorio1.listFiles();
         // copia os arquivos
         for (File file : stDir) {
             String name = file.getName();
             copy(file, new File(diretorio + "\\" + name), true);
-        }
+        }*/
+                
         // se tudo deu certo    
         return true;
     }
