@@ -23,9 +23,12 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -109,34 +112,20 @@ public class Versioning implements IVersioning{
         }
         Project project = projectDAO.getName(projectName);
         ProjectUser pu = projectUserDAO.get(user.getId(), project.getId());
-        if (pu.getToken().equals("")){
+        if (pu.getToken().isEmpty()){
             pu.generateToken();
         }
         return pu.getToken();
     }
 
     @Override
-    public VersionedFile getVersionedFile(String hash, String token) throws IOException{
+    public byte[] getVersionedFileContent(String hash, String token) throws IOException{
         ProjectUser pu = projectUserDAO.getByToken(token);
-        //TODO DUVAL tem que ser por hash e projeto
-        ConfigurationItem ci = configItemDAO.getByHash(hash); 
-        Revision revision = ci.getRevision();
-        
-        VersionedFile vf = new VersionedFile();
-        vf.setAuthor(revision.getUser().getName());
-        vf.setCommitMessage(revision.getDescription());
-        vf.setLastChangedRevision(revision.getNumber());
-        vf.setLastChangedTime(revision.getDate());
-        vf.setHash(ci.getHash());
-        vf.setName(ci.getName());
-        
         String projName = pu.getProject().getName();
-        Path path = Paths.get(dirPath+projName+"/"+hashToPath(ci.getHash()));
+        Path path = Paths.get(dirPath+projName+"/"+hashToPath(hash));
         byte bytes[] = Files.readAllBytes(path);
-        vf.setContent(bytes);
-        vf.setSize(bytes.length);
         
-        return vf;
+        return bytes;
     }
     
     private String hashToPath(String hash){
@@ -149,5 +138,31 @@ public class Versioning implements IVersioning{
     public void addRevision(VersionedDir vd, String token){
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
+    /**
+     * gera um hash com 32 chars
+     * @param bytes
+     * @return
+     * @throws NoSuchAlgorithmException 
+     */
+    public String generatehash(byte bytes[]) throws NoSuchAlgorithmException{
+        MessageDigest m = MessageDigest.getInstance("MD5");
+        m.reset();
+        m.update(bytes);
+        byte[] digest = m.digest();
+        BigInteger bigInt = new BigInteger(1,digest);
+        String hashtext = bigInt.toString(16);
+        // Now we need to zero pad it if you actually want the full 32 chars.
+        while(hashtext.length() < 32 ){
+          hashtext = "0"+hashtext;
+        }     
+        return hashtext;
+    }
+
+    public void addProject(VersionedDir vd, String user) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
+    
     
 }

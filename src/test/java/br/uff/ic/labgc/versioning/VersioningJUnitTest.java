@@ -20,6 +20,7 @@ import br.uff.ic.labgc.storage.User;
 import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,10 +95,34 @@ public class VersioningJUnitTest {
     public void testgetVersionedFile() {
         try {
             String token = "nvfdovhfdoivbiofdvf";
-            VersionedFile vf = versioning.getVersionedFile("vnfdovh9e0h0", token);
-            assertTrue(vf.getSize() == 10);
+            byte content[] = versioning.getVersionedFileContent("vnfdovh9e0h0", token);
+            assertTrue(content.length == 10);
         } catch (IOException ex) {
             assertFalse("Erro 1",true);
+            Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    @Test
+    public void testGenerateHash() {
+        String plaintext = "your text here";
+        try {
+            String hash = versioning.generatehash(plaintext.getBytes());
+            assertTrue("assert 1", hash.length() == 32);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        plaintext = "ABIUBIUDBCIBDIUBIUBIUCDIUCVIUGCIUVCIVSCIVCUVCUICVSIUCVSIUC"
+                + "CVUYfh489fy45hf858g9489fhriefeiovb4398fh89hf589fh45f89r5hf8f"
+                + "h498g45f9gr4f8r0fvhrfvj9rtgjrt09gj9045gg09fu509fy4509fj45f09"
+                + "vj094jvdfiohv984y4f845h5frekojhoifhrtiotgiotrhgiorthgf094f59"
+                + "h4f5h8045y845fh45hf5h89yf94hff94hf48fhg89f5h9g5094hf4gf4h0h0"
+                + "hv45f8480fg8945gf8945gf8945gf894g5f89h45f8945hfhf9h4f94fhf9h";
+        try {
+            String hash = versioning.generatehash(plaintext.getBytes());
+            assertTrue("assert 2", hash.equals("7d61195bbf636134f074399f5982727a"));
+        } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
