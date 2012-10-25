@@ -7,6 +7,9 @@ package br.uff.ic.labgc.core;
 import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -45,7 +48,7 @@ public abstract class VersionedItem implements Serializable {
     /**
      * Tamanho acumulado dos itens contidos neste VersionedItem
      */
-    protected long size = 0L;
+    protected int size = 0;
     /**
      * Indica se o item possui conteúdo comprimido. Se for true, utiliza o
      * conteúdo comprimido para trafegar o conteúdo na rede.
@@ -108,9 +111,23 @@ public abstract class VersionedItem implements Serializable {
         this.hash = hash;
     }
 
-    public String generateHash() {
-        this.hash = UUID.randomUUID().toString();
-        return this.hash;
+    /**
+     * gera um hash com 32 chars
+     * @param bytes
+     * @throws NoSuchAlgorithmException 
+     */
+    public void generateHash(byte bytes[]) throws NoSuchAlgorithmException{
+        MessageDigest m = MessageDigest.getInstance("MD5");
+        m.reset();
+        m.update(bytes);
+        byte[] digest = m.digest();
+        BigInteger bigInt = new BigInteger(1,digest);
+        String hashtext = bigInt.toString(16);
+        // Now we need to zero pad it if you actually want the full 32 chars.
+        while(hashtext.length() < 32 ){
+          hashtext = "0"+hashtext;
+        }     
+        setHash(hashtext);
     }
 
     /**
@@ -119,11 +136,11 @@ public abstract class VersionedItem implements Serializable {
      *
      * @return
      */
-    public long getSize() {
+    public int getSize() {
         return size;
     }
 
-    public void setSize(long size) {
+    public void setSize(int size) {
         this.size = size;
     }
 
