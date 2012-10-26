@@ -73,8 +73,7 @@ public class CommunicationFactory {
      */
     private String getCommunicationStrategy(String hostName) {
         String commStrategy = IPropertiesConstants.COMM_LOCAL_CONNECTOR;
-        if (!IPropertiesConstants.COMM_LOCAL_HOST.equalsIgnoreCase(hostName) &&
-                !ApplicationProperties.getPropertyValue(IPropertiesConstants.LOCAL_ADDRESS_IDENTIFIER).equalsIgnoreCase(hostName)) {
+        if (!IPropertiesConstants.COMM_LOCAL_HOST.equalsIgnoreCase(hostName)) {
             commStrategy = IPropertiesConstants.COMM_REMOTE_CONNECTOR;
         }
         return commStrategy;
