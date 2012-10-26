@@ -8,7 +8,6 @@ import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Representa um item versionado do sistema de controle de versões.
@@ -39,10 +38,6 @@ public abstract class VersionedItem implements Serializable {
      */
     private String commitMessage;
     /**
-     * Hash do item versionado
-     */
-    private String hash;
-    /**
      * Tamanho acumulado dos itens contidos neste VersionedItem
      */
     protected long size = 0L;
@@ -51,6 +46,19 @@ public abstract class VersionedItem implements Serializable {
      * conteúdo comprimido para trafegar o conteúdo na rede.
      */
     private boolean compressed;
+    
+    /**
+     * Indica se o conteudo do item é um diff.
+     */
+    private boolean diff;
+    
+    public boolean isDiff() {
+        return diff;
+    }
+
+    public void setDiff(boolean diff) {
+        this.diff = diff;
+    }
 
     protected boolean isCompressed() {
         return compressed;
@@ -100,18 +108,6 @@ public abstract class VersionedItem implements Serializable {
         this.commitMessage = commitMessage;
     }
 
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
-
-    public String generateHash() {
-        this.hash = UUID.randomUUID().toString();
-        return this.hash;
-    }
 
     /**
      * Retorna o tamanho acumulado de todos os itens contidos neste
