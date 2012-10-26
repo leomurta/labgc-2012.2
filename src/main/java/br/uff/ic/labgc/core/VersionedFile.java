@@ -10,8 +10,11 @@ import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
 import br.uff.ic.labgc.util.CompressUtils;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Representa um arquivo versionado.
@@ -35,6 +38,10 @@ public class VersionedFile extends VersionedItem implements Serializable {
      * carregado, o primeiro get no conteúdo o buscará no repositório.
      */
     private boolean loaded;
+    /**
+     * Hash do item versionado
+     */
+    private String hash;
 
     /**
      * Cria um item versionável, marcando seu atributo loaded como falso e
@@ -49,6 +56,15 @@ public class VersionedFile extends VersionedItem implements Serializable {
             this.originHost = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
         }
+    }
+    
+    /**
+     * Faz o mesmo que o construtor padrao so que seta o hash tambem
+     * @param hash 
+     */
+    public VersionedFile(String hash) {
+        this();
+        this.hash = hash;
     }
 
     /**
@@ -74,7 +90,43 @@ public class VersionedFile extends VersionedItem implements Serializable {
     public void setContent(byte[] content) {
         this.content = content;
         this.loaded = true;
+        setDiff(false);
         setCompressed(false);
+    }
+    
+    //TODO passar a versão na qual o diff deve ser aplicado
+    public void setDiffContent(byte[] content) {
+        this.content = content;
+        this.loaded = true;
+        setDiff(true);
+        setCompressed(false);
+    }
+    
+    public String getHash() {
+        return this.hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    /**
+     * gera um hash com 32 chars
+     * @param bytes
+     * @throws NoSuchAlgorithmException 
+     */
+    public void generateHash() throws NoSuchAlgorithmException{
+        MessageDigest m = MessageDigest.getInstance("MD5");
+        m.reset();
+        m.update(this.content);
+        byte[] digest = m.digest();
+        BigInteger bigInt = new BigInteger(1,digest);
+        String hashtext = bigInt.toString(16);
+        // Now we need to zero pad it if you actually want the full 32 chars.
+        while(hashtext.length() < 32 ){
+          hashtext = "0"+hashtext;
+        }     
+        this.hash = hashtext;
     }
 
     /**

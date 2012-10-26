@@ -7,11 +7,7 @@ package br.uff.ic.labgc.core;
 import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Representa um item versionado do sistema de controle de versões.
@@ -42,18 +38,27 @@ public abstract class VersionedItem implements Serializable {
      */
     private String commitMessage;
     /**
-     * Hash do item versionado
-     */
-    private String hash;
-    /**
      * Tamanho acumulado dos itens contidos neste VersionedItem
      */
-    protected int size = 0;
+    protected long size = 0L;
     /**
      * Indica se o item possui conteúdo comprimido. Se for true, utiliza o
      * conteúdo comprimido para trafegar o conteúdo na rede.
      */
     private boolean compressed;
+    
+    /**
+     * Indica se o conteudo do item é um diff.
+     */
+    private boolean diff;
+    
+    public boolean isDiff() {
+        return diff;
+    }
+
+    public void setDiff(boolean diff) {
+        this.diff = diff;
+    }
 
     protected boolean isCompressed() {
         return compressed;
@@ -103,32 +108,6 @@ public abstract class VersionedItem implements Serializable {
         this.commitMessage = commitMessage;
     }
 
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
-
-    /**
-     * gera um hash com 32 chars
-     * @param bytes
-     * @throws NoSuchAlgorithmException 
-     */
-    public void generateHash(byte bytes[]) throws NoSuchAlgorithmException{
-        MessageDigest m = MessageDigest.getInstance("MD5");
-        m.reset();
-        m.update(bytes);
-        byte[] digest = m.digest();
-        BigInteger bigInt = new BigInteger(1,digest);
-        String hashtext = bigInt.toString(16);
-        // Now we need to zero pad it if you actually want the full 32 chars.
-        while(hashtext.length() < 32 ){
-          hashtext = "0"+hashtext;
-        }     
-        setHash(hashtext);
-    }
 
     /**
      * Retorna o tamanho acumulado de todos os itens contidos neste
@@ -136,11 +115,11 @@ public abstract class VersionedItem implements Serializable {
      *
      * @return
      */
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(long size) {
         this.size = size;
     }
 
