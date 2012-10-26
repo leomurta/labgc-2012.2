@@ -6,7 +6,6 @@ package br.uff.ic.labgc.workspace;
 
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ApplicationException;
-import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
 import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
@@ -15,15 +14,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.IIOException;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -76,13 +72,27 @@ public class Workspace implements IObservable {
             if(!dest.exists()){
                 dest.mkdir();
             }
+            /* Filtro de diretório
+             * 
+             * FilenameFilter filter = new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    if (!name.endsWith("CVS")) {
+                        // if (name.endsWith(".txt")) {
+                        return true;
+                    }       
+                        return false;
+                    }
+                };
+             * 
+             */
+            
            //pega conteúdo do diretório
            String files[] = src.list();
            for (String file : files) {
                 File srcFile = new File(src, file);
     		File destFile = new File(dest, file);
     		//cópia recursiva
-    		copyFolder(srcFile,destFile);
+    		copydir(srcFile,destFile);
             }
  
         }else{
@@ -146,9 +156,7 @@ public class Workspace implements IObservable {
             throws IOException, WorkspaceException {
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
-        
-
-        
+       
         if (!parent.exists()) {
             throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
 
@@ -178,6 +186,7 @@ public class Workspace implements IObservable {
         if (!achou) {
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
         }
+        FileUtils.deleteDirectory(parent);
         copyDir (diretorio1, parent);
 /*        stDir = diretorio1.listFiles();
         // copia os arquivos
@@ -217,6 +226,7 @@ public class Workspace implements IObservable {
 
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
+        String revision = items.getLastChangedRevision();
 
         try {
             this.writeVersionedDir((VersionedDir) items, parent);
@@ -244,11 +254,11 @@ public class Workspace implements IObservable {
         
         setParam("repositorio", repository);
         setParam("hostname", hostname);
-
+        setParam("revision", revision);
     }
 
-* 
-* 
+
+
     /**
      * verifica a possibilidade de criar um workspace, retorna true ou false
      *
@@ -264,6 +274,48 @@ public class Workspace implements IObservable {
         }
         return false;
     }
+    
+    
+    /**
+     * salva arquivos versionados, do servidor, para o workspace(disco local)
+     *
+     * @param items, arquivo de itens versionados, sendo que o conjunto contem
+     * arquivos e pastas
+     */
+    public void storeLocalData(VersionedItem items) {
+    }
+
+    private void writeVersionedDir(VersionedDir dir, File folder) throws IOException, ApplicationException {
+        File directory = new File(folder, dir.getName());
+        directory.mkdir();
+
+        for (VersionedItem item : dir.getContainedItens()) {
+            if (item instanceof VersionedDir) {
+                writeVersionedDir((VersionedDir) item, directory);
+            } else {
+                writeVersionedFile((VersionedFile) item, directory);
+            }
+        }
+        directory.setLastModified(dir.getLastChangedTime().getTime());
+    }
+
+    private void writeVersionedFile(VersionedFile f, File folder) throws IOException, ApplicationException {
+
+        File file = new File(folder, f.getName());
+        file.createNewFile();
+
+        byte[] content;
+            
+        content = f.getContent();
+        FileOutputStream fileWriter = new FileOutputStream(file);
+        fileWriter.write(content);
+        fileWriter.close();
+        file.setLastModified(f.getLastChangedTime().getTime());
+        this.notifyObservers(file.getPath());
+            
+        
+    }
+    
     /*
      * setParam - coloca em um arquivo um par chave/valor
      */
@@ -301,47 +353,6 @@ public class Workspace implements IObservable {
         }
     }
 
-//implementar
-    
-    
-    /**
-     * salva arquivos versionados, do servidor, para o workspace(disco local)
-     *
-     * @param items, arquivo de itens versionados, sendo que o conjunto contem
-     * arquivos e pastas
-     */
-    public void storeLocalData(VersionedItem items) {
-    }
-
-    private void writeVersionedDir(VersionedDir dir, File folder) throws IOException, ApplicationException {
-        File directory = new File(folder, dir.getName());
-        directory.mkdir();
-
-        for (VersionedItem item : dir.getContainedItens()) {
-            if (item instanceof VersionedDir) {
-                writeVersionedDir((VersionedDir) item, directory);
-            } else {
-                writeVersionedFile((VersionedFile) item, directory);
-            }
-        }
-    }
-
-    private void writeVersionedFile(VersionedFile f, File folder) throws IOException, ApplicationException {
-
-        File file = new File(folder, f.getName());
-        file.createNewFile();
-
-        byte[] content;
-            
-        content = f.getContent();
-        FileOutputStream fileWriter = new FileOutputStream(file);
-        fileWriter.write(content);
-        fileWriter.close();
-        this.notifyObservers(file.getPath());
-            
-        
-    }
-
     /**
      * metodo para pegar o valor de um parametro salvo
      *
@@ -374,11 +385,7 @@ public class Workspace implements IObservable {
      * @return
      */
     public String getHostname() throws WorkspaceException {
-        String chave = "";
-
-        chave = getParam("hostname");
-
-        return chave;
+        return getParam("hostname");
     }
 
     /**
@@ -388,11 +395,16 @@ public class Workspace implements IObservable {
      * @return
      */
     public String getRepository() throws WorkspaceException {
-        String chave = "";
-
-        chave = getParam("repositorio");
-
-        return chave;
+        return getParam("repositorio");
+    }
+    /**
+     * retorna o valor do relacionado ao repositorio do projeto no servidor.
+     * Valor adicionado na criacao do workspace
+     *
+     * @return
+     */
+    public String getRevision() throws WorkspaceException {
+        return getParam("revision");
     }
 
     /**
@@ -412,7 +424,7 @@ public class Workspace implements IObservable {
 
     private void checkLabgcFolder(String path) throws WorkspaceException {
 
-        File diretorio1 = new File(path, ".labgc");
+        final File diretorio1 = new File(path, ".labgc");
         if (!diretorio1.exists()) {
             throw new WorkspaceEpelhoNaoExisteException(null);
         }
@@ -454,18 +466,24 @@ public class Workspace implements IObservable {
             this.observer.sendNotify(msg);
         }
     }
-    private VersionedItem criarItem(String dir1){
-        File raiz = new File(dir1);
-        File[] stDir = raiz.listFiles();
-       
-        // copia os arquivos
-        for (File file : stDir) {
-            String name = file.getName();
-        }
-        return null;
-        }
     
-}
-
-
-
+    private VersionedItem fileToVersionedItem(File file){
+        VersionedItem result = null;
+        
+        if (file.isDirectory()){
+            File[] stDir = file.listFiles();
+            result = new VersionedDir();
+            for (File files : stdir) { //for (int i = 0; i < stdir.length; i++){File files = stdir[i];
+                result.addItem(fileToVersionedItem(files));
+            }
+        }else{
+            result = new VersionedFile();
+            result.setLastChangedTime(new Date(file.lastModified()));
+            result.setName(file.getName());
+            result.setSize(file.length());
+            result.setContent(FileUtils.readFileToByteArray(file));
+        }
+        return result;
+    }
+    
+} //End
