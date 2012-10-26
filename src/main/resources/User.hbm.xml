@@ -8,7 +8,7 @@
             </generator>       
         </id>     
         <property name="name" column="name" type="string" not-null="true"/>
-        <property name="username" column="username" type="string" not-null="true"/>
+        <property name="username" column="username" type="string" not-null="true" unique="true"/>
         <property name="password" column="password" type="string" not-null="true"/>
         <set name="userProjects" order-by="project_id asc" cascade="delete" inverse="true">
 <!--       
