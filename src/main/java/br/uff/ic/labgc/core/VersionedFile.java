@@ -132,34 +132,28 @@ public class VersionedFile extends VersionedItem implements Serializable {
     /**
      * Expande o conteúdo deste item.
      *
-     * @return item descomprimido.
-     *
      * @throws ContentNotAvailableException
      * @throws CompressionException
      */
     @Override
-    public VersionedItem inflate() throws ContentNotAvailableException, CompressionException {
+    public void inflate() throws ContentNotAvailableException, CompressionException {
         if (loaded) {
             setContent(CompressUtils.inflateBytes(this.content));
             setCompressed(false);
         }
-        return this;
     }
 
     /**
      * Comprime o conteúdo deste item.
      *
-     * @return item comprimido.
-     *
      * @throws ContentNotAvailableException
      * @throws CompressionException
      */
     @Override
-    public VersionedItem deflate() throws ContentNotAvailableException, CompressionException {
+    public void deflate() throws ContentNotAvailableException, CompressionException {
         if (loaded) {
-            setContent(CompressUtils.deflateBytes(this.content));
+            content = CompressUtils.deflateBytes(this.content);
             setCompressed(true);
         }
-        return this;
     }
 }

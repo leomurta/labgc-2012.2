@@ -6,7 +6,6 @@ package br.uff.ic.labgc.workspace;
 
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ApplicationException;
-import br.uff.ic.labgc.exception.WorkspaceDirExisteException;
 import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
@@ -15,14 +14,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.IIOException;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -65,6 +62,55 @@ public class Workspace implements IObservable {
         throw new UnsupportedOperationException("Not supported yet.");
 
     }
+    
+    // Primitiva de cópia de diretórios
+    
+    void copyDir(File src, File dest)
+    	throws IOException{
+     	if(src.isDirectory()){
+            //cria se diretório não existe
+            if(!dest.exists()){
+                dest.mkdir();
+            }
+            /* Filtro de diretório
+             * 
+             * FilenameFilter filter = new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    if (!name.endsWith("CVS")) {
+                        // if (name.endsWith(".txt")) {
+                        return true;
+                    }       
+                        return false;
+                    }
+                };
+             * 
+             */
+            
+           //pega conteúdo do diretório
+           String files[] = src.list();
+           for (String file : files) {
+                File srcFile = new File(src, file);
+    		File destFile = new File(dest, file);
+    		//cópia recursiva
+//    		copydir(srcFile,destFile);
+            }
+ 
+        }else{
+            //copia arquivos
+            FileInputStream fisOrigem = new FileInputStream(src);
+            FileOutputStream fisDestino = new FileOutputStream(dest);
+    	    FileChannel fcOrigem = fisOrigem.getChannel();
+            FileChannel fcDestino = fisDestino.getChannel();
+            // Transfere todo o volume para o arquivo de cópia com o número de bytes do arquivo original
+            fcOrigem.transferTo(0, fcOrigem.size(), fcDestino);
+            // Fecha
+            fisOrigem.close();
+            fisDestino.close();
+    	    
+        }
+    }
+
+    
 
     boolean copy(File origem, File destino, boolean overwrite)
             throws FileNotFoundException, IOException {
@@ -108,21 +154,21 @@ public class Workspace implements IObservable {
 
     public boolean revert()
             throws IOException, WorkspaceException {
-        String diretorio = getParam("Diretorio");
-
-        File diretorio1 = new File(diretorio);
-        if (!diretorio1.exists()) {
+        File local = new File(LocalRepo);
+        File parent = new File(local.getParent());
+       
+        if (!parent.exists()) {
             throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
 
         }
-        diretorio1 = new File(diretorio + File.separator + ".labgc");
+        File diretorio1 = new File(local + File.separator + ".labgc");
 
         // testa se existe o diretorio de versionamento
         if (!diretorio1.exists()) {
             throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
 
         }
-        // procura pelo espelho - não existe um dir padrão pq extensão é a versão
+        // procura pelo espelho 
         File[] stDir = diretorio1.listFiles();
         boolean achou = false;
         for (File file : stDir) {
@@ -133,19 +179,22 @@ public class Workspace implements IObservable {
                 name = name.substring(0, pos);
             }
             if (name == "espelho") {
-                diretorio1 = new File(diretorio + File.separator + name + extensao);
+//                diretorio1 = new File(diretorio + File.separator + name + extensao);
                 achou = true;
             }
         }
         if (!achou) {
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
         }
-        stDir = diretorio1.listFiles();
+        FileUtils.deleteDirectory(parent);
+        copyDir (diretorio1, parent);
+/*        stDir = diretorio1.listFiles();
         // copia os arquivos
         for (File file : stDir) {
             String name = file.getName();
             copy(file, new File(diretorio + "\\" + name), true);
-        }
+        }*/
+                
         // se tudo deu certo    
         return true;
     }
@@ -177,6 +226,7 @@ public class Workspace implements IObservable {
 
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
+        String revision = items.getLastChangedRevision();
 
         try {
             this.writeVersionedDir((VersionedDir) items, parent);
@@ -194,27 +244,20 @@ public class Workspace implements IObservable {
         espelho = new File(vcs, "espelho.r");
         espelho.mkdir();
         
-        // copia WS para o espelho
-
-        File[] stDir = parent.listFiles();
-
-        // copia os arquivos
-        for (File file : stDir) {
-            String name = file.getName();
-            // tratar .labgc - não pode copiar
+        // Escreve arquivos no diretorio espelho
         try {
-             copy(file, new File(espelho + "\\" + name), true);
+            this.writeVersionedDir((VersionedDir) items, espelho);
         } catch (IOException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
             throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
         }
-           
-        }
         
         setParam("repositorio", repository);
         setParam("hostname", hostname);
-
+        setParam("revision", revision);
     }
+
+
 
     /**
      * verifica a possibilidade de criar um workspace, retorna true ou false
@@ -231,6 +274,48 @@ public class Workspace implements IObservable {
         }
         return false;
     }
+    
+    
+    /**
+     * salva arquivos versionados, do servidor, para o workspace(disco local)
+     *
+     * @param items, arquivo de itens versionados, sendo que o conjunto contem
+     * arquivos e pastas
+     */
+    public void storeLocalData(VersionedItem items) {
+    }
+
+    private void writeVersionedDir(VersionedDir dir, File folder) throws IOException, ApplicationException {
+        File directory = new File(folder, dir.getName());
+        directory.mkdir();
+
+        for (VersionedItem item : dir.getContainedItens()) {
+            if (item instanceof VersionedDir) {
+                writeVersionedDir((VersionedDir) item, directory);
+            } else {
+                writeVersionedFile((VersionedFile) item, directory);
+            }
+        }
+        directory.setLastModified(dir.getLastChangedTime().getTime());
+    }
+
+    private void writeVersionedFile(VersionedFile f, File folder) throws IOException, ApplicationException {
+
+        File file = new File(folder, f.getName());
+        file.createNewFile();
+
+        byte[] content;
+            
+        content = f.getContent();
+        FileOutputStream fileWriter = new FileOutputStream(file);
+        fileWriter.write(content);
+        fileWriter.close();
+        file.setLastModified(f.getLastChangedTime().getTime());
+        this.notifyObservers(file.getPath());
+            
+        
+    }
+    
     /*
      * setParam - coloca em um arquivo um par chave/valor
      */
@@ -268,47 +353,6 @@ public class Workspace implements IObservable {
         }
     }
 
-//implementar
-    
-    
-    /**
-     * salva arquivos versionados, do servidor, para o workspace(disco local)
-     *
-     * @param items, arquivo de itens versionados, sendo que o conjunto contem
-     * arquivos e pastas
-     */
-    public void storeLocalData(VersionedItem items) {
-    }
-
-    private void writeVersionedDir(VersionedDir dir, File folder) throws IOException, ApplicationException {
-        File directory = new File(folder, dir.getName());
-        directory.mkdir();
-
-        for (VersionedItem item : dir.getContainedItens()) {
-            if (item instanceof VersionedDir) {
-                writeVersionedDir((VersionedDir) item, directory);
-            } else {
-                writeVersionedFile((VersionedFile) item, directory);
-            }
-        }
-    }
-
-    private void writeVersionedFile(VersionedFile f, File folder) throws IOException, ApplicationException {
-
-        File file = new File(folder, f.getName());
-        file.createNewFile();
-
-        byte[] content;
-            
-        content = f.getContent();
-        FileOutputStream fileWriter = new FileOutputStream(file);
-        fileWriter.write(content);
-        fileWriter.close();
-        this.notifyObservers(file.getPath());
-            
-        
-    }
-
     /**
      * metodo para pegar o valor de um parametro salvo
      *
@@ -341,11 +385,7 @@ public class Workspace implements IObservable {
      * @return
      */
     public String getHostname() throws WorkspaceException {
-        String chave = "";
-
-        chave = getParam("hostname");
-
-        return chave;
+        return getParam("hostname");
     }
 
     /**
@@ -355,11 +395,16 @@ public class Workspace implements IObservable {
      * @return
      */
     public String getRepository() throws WorkspaceException {
-        String chave = "";
-
-        chave = getParam("repositorio");
-
-        return chave;
+        return getParam("repositorio");
+    }
+    /**
+     * retorna o valor do relacionado ao repositorio do projeto no servidor.
+     * Valor adicionado na criacao do workspace
+     *
+     * @return
+     */
+    public String getRevision() throws WorkspaceException {
+        return getParam("revision");
     }
 
     /**
@@ -379,7 +424,7 @@ public class Workspace implements IObservable {
 
     private void checkLabgcFolder(String path) throws WorkspaceException {
 
-        File diretorio1 = new File(path, ".labgc");
+        final File diretorio1 = new File(path, ".labgc");
         if (!diretorio1.exists()) {
             throw new WorkspaceEpelhoNaoExisteException(null);
         }
@@ -421,4 +466,24 @@ public class Workspace implements IObservable {
             this.observer.sendNotify(msg);
         }
     }
-}
+    
+    private VersionedItem fileToVersionedItem(File file){
+        VersionedItem result = null;
+        
+        if (file.isDirectory()){
+            File[] stDir = file.listFiles();
+            result = new VersionedDir();
+//            for (File files : stdir) { //for (int i = 0; i < stdir.length; i++){File files = stdir[i];
+//                result.addItem(fileToVersionedItem(files));
+//            }
+        }else{
+            result = new VersionedFile();
+            result.setLastChangedTime(new Date(file.lastModified()));
+            result.setName(file.getName());
+            result.setSize(file.length());
+//            result.setContent(FileUtils.readFileToByteArray(file));
+        }
+        return result;
+    }
+    
+} //End
