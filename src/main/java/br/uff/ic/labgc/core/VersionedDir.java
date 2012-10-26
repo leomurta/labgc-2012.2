@@ -42,12 +42,11 @@ public class VersionedDir extends VersionedItem implements Serializable {
      * @throws CompressionException 
      */
     @Override
-    public VersionedItem inflate() throws ContentNotAvailableException, CompressionException {
+    public void inflate() throws ContentNotAvailableException, CompressionException {
         for (Iterator<VersionedItem> it = containedItens.iterator(); it.hasNext();) {
             VersionedItem versionedItem = it.next();
             versionedItem.inflate();
         }
-        return this;
     }
 
     /**
@@ -58,11 +57,10 @@ public class VersionedDir extends VersionedItem implements Serializable {
      * @throws CompressionException 
      */
     @Override
-    public VersionedItem deflate() throws ContentNotAvailableException, CompressionException {
+    public void deflate() throws ContentNotAvailableException, CompressionException {
         for (Iterator<VersionedItem> it = containedItens.iterator(); it.hasNext();) {
             VersionedItem versionedItem = it.next();
             versionedItem.deflate();
         }
-        return this;
     }
 }

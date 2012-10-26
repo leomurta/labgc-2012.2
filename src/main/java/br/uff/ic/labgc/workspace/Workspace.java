@@ -82,7 +82,7 @@ public class Workspace implements IObservable {
                 File srcFile = new File(src, file);
     		File destFile = new File(dest, file);
     		//cópia recursiva
-    		copyFolder(srcFile,destFile);
+//    		copyFolder(srcFile,destFile);
             }
  
         }else{
@@ -170,10 +170,10 @@ public class Workspace implements IObservable {
             if (pos > 0) {
                 name = name.substring(0, pos);
             }
-            if (name == "espelho") {
-                diretorio1 = new File(diretorio + File.separator + name + extensao);
-                achou = true;
-            }
+//            if (name == "espelho") {
+//                diretorio1 = new File(diretorio + File.separator + name + extensao);
+//                achou = true;
+//            }
         }
         if (!achou) {
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
@@ -246,9 +246,7 @@ public class Workspace implements IObservable {
         setParam("hostname", hostname);
 
     }
-
-* 
-* 
+ 
     /**
      * verifica a possibilidade de criar um workspace, retorna true ou false
      *

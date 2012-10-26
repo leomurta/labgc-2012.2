@@ -1,5 +1,6 @@
 package br.uff.ic.labgc.comm.client;
 
+import br.uff.ic.labgc.comm.server.CommunicationServer;
 import br.uff.ic.labgc.comm.server.ICommunicationServer;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
@@ -74,7 +75,8 @@ public class RMIConnector extends AbstractServer {
     public String commit(VersionedItem item, String token) throws ApplicationException {
         String result = null;
         try {
-            result = server.commit(item.deflate(), token);
+            item.deflate();
+            result = server.commit(item, token);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
@@ -94,7 +96,8 @@ public class RMIConnector extends AbstractServer {
     public VersionedItem update(String revision, String token) throws ApplicationException {
         VersionedItem result = null;
         try {
-            result = server.update(revision, token).inflate();
+            result = server.update(revision, token);
+            result.inflate();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
@@ -114,7 +117,8 @@ public class RMIConnector extends AbstractServer {
     public String diff(VersionedItem item, String version) throws ApplicationException {
         String result = null;
         try {
-            result = server.diff(item.deflate(), version);
+            item.deflate();
+            result = server.diff(item, version);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
@@ -169,7 +173,8 @@ public class RMIConnector extends AbstractServer {
     public VersionedItem checkout(String revision, String token) throws ApplicationException {
         VersionedItem result = null;
         try {
-            result = server.checkout(revision, token).inflate();
+            result = server.checkout(revision, token);
+            result.inflate();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }

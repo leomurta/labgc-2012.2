@@ -135,7 +135,7 @@ public abstract class VersionedItem implements Serializable {
      * @throws ContentNotAvailableException
      * @throws CompressionException
      */
-    public abstract VersionedItem inflate() throws ContentNotAvailableException, CompressionException;
+    public abstract void inflate() throws ContentNotAvailableException, CompressionException;
 
     /**
      * Comprime o conteúdo deste item.
@@ -145,5 +145,5 @@ public abstract class VersionedItem implements Serializable {
      * @throws ContentNotAvailableException
      * @throws CompressionException
      */
-    public abstract VersionedItem deflate() throws ContentNotAvailableException, CompressionException;
+    public abstract void deflate() throws ContentNotAvailableException, CompressionException;
 }
