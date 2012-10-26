@@ -8,8 +8,10 @@ import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.util.List;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -62,6 +64,21 @@ public class DAO implements IDAO{
             }
 
             return obj;
+        } catch (HibernateException e) {
+            throw new InfrastructureException(e);
+        }
+    }
+    
+    public boolean exist(Class objClass, String searchBy, String searchValue) 
+            throws ObjectNotFoundException{
+        try {
+            Session sessao = HibernateUtil.getSession();
+
+            Criteria criteria = sessao.createCriteria(objClass)
+                .add(Restrictions.eq(searchBy, searchValue));
+            Object obj = criteria.uniqueResult();
+
+            return (obj != null);
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }

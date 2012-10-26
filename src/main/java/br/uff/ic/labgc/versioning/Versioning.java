@@ -8,6 +8,9 @@ import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
+import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
+import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
+import br.uff.ic.labgc.exception.VersioningUserNotFoundException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
 import br.uff.ic.labgc.storage.ConfigurationItemDAO;
 import br.uff.ic.labgc.storage.Project;
@@ -20,6 +23,7 @@ import br.uff.ic.labgc.storage.User;
 import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -29,9 +33,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import javassist.bytecode.Descriptor;
 
 /**
  *
@@ -77,14 +85,13 @@ public class Versioning implements IVersioning{
                 vi = ConfigItemToVersionedDir(configItem);
             }
             else{
-                vi = new VersionedFile();
+                vi = new VersionedFile(configItem.getHash());
             }
             
             vi.setAuthor(ciRev.getUser().getName());
             vi.setCommitMessage(ciRev.getDescription());
             vi.setLastChangedRevision(ciRev.getNumber());
             vi.setLastChangedTime(ciRev.getDate());
-            vi.setHash(configItem.getHash());
             vi.setName(configItem.getName());
             vi.setSize(configItem.getSize());
             
@@ -110,7 +117,7 @@ public class Versioning implements IVersioning{
         if (!user.getPassword().equals(pass)){
             throw new IncorrectPasswordException();
         }
-        Project project = projectDAO.getName(projectName);
+        Project project = projectDAO.getByName(projectName);
         ProjectUser pu = projectUserDAO.get(user.getId(), project.getId());
         if (pu.getToken().isEmpty()){
             pu.generateToken();
@@ -119,7 +126,7 @@ public class Versioning implements IVersioning{
     }
 
     @Override
-    public byte[] getVersionedFileContent(String hash, String token) throws IOException{
+    public byte[] getVersionedFileContent (String hash, String token) throws IOException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         String projName = pu.getProject().getName();
         Path path = Paths.get(dirPath+projName+"/"+hashToPath(hash));
@@ -139,30 +146,78 @@ public class Versioning implements IVersioning{
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    /**
-     * gera um hash com 32 chars
-     * @param bytes
-     * @return
-     * @throws NoSuchAlgorithmException 
-     */
-    public String generatehash(byte bytes[]) throws NoSuchAlgorithmException{
-        MessageDigest m = MessageDigest.getInstance("MD5");
-        m.reset();
-        m.update(bytes);
-        byte[] digest = m.digest();
-        BigInteger bigInt = new BigInteger(1,digest);
-        String hashtext = bigInt.toString(16);
-        // Now we need to zero pad it if you actually want the full 32 chars.
-        while(hashtext.length() < 32 ){
-          hashtext = "0"+hashtext;
-        }     
-        return hashtext;
-    }
 
-    public void addProject(VersionedDir vd, String user) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    /**
+     * mesmo que um import, checkin
+     * a primeira revisão é a 1.0
+     * a primeira versão de um item é a 1
+     * o nome da raiz sera o nome do projeto
+     * @param vd
+     * @param user 
+     */
+    public void addProject(VersionedDir vd, String userName) throws 
+            VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
+            VersioningCanNotCreateDirException{
+        String projectName = vd.getName();
+        if (projectDAO.exist(projectName))
+            throw new VersioningProjectAlreadyExistException();
+        
+        Project project = new Project(projectName);
+        try{
+            User user = userDAO.getByUserName(userName);
+            project.addUser(user);
+            projectDAO.add(project);
+            boolean success = (new File(dirPath+projectName)).mkdirs();
+            if (!success) {
+                throw new VersioningCanNotCreateDirException();
+            }
+            
+            //criar revisão 0
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+            Date date = new Date();
+            System.out.println(dateFormat.format(date));
+            Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
+            revisionDAO.add(revision);
+            ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',true,0,null,null,revision);
+            configItemDAO.add(ci);
+            
+            //verificar se vai ser atualizado no banco automaticamente
+            //e se precisa mesmo fazer isso
+            revision.setConfigItem(ci);
+            
+            VersionedDirToConfigItem(vd,ci,true);
+            
+        }catch (ObjectNotFoundException e) {
+             throw new VersioningUserNotFoundException();   
+        }
+       
     }
     
+    private void VersionedDirToConfigItem(VersionedDir vd, ConfigurationItem father, boolean first){
+        for (Iterator<VersionedItem> it = vd.getContainedItens().iterator(); it.hasNext(); ){
+            VersionedItem vi = it.next();
+            ConfigurationItem ci;
+            boolean isDir = (vi instanceof VersionedDir );
+            String hash = "";
+            if (isDir){
+                hash = ((VersionedFile)vi).getHash();
+            }
+            
+            if (first){
+                ci = new ConfigurationItem(1, vi.getName(), hash, 'A', isDir, vi.getSize(), null, null, father.getRevision());
+            }
+            else{//NAO EH PRIMEIRA REVISAO
+                ci = new ConfigurationItem();
+            }
+            
+            if (isDir){
+                    VersionedDirToConfigItem((VersionedDir)vi,ci,first);
+            }
+            father.addChild(ci);
+                
+        }
+            
+    }
     
     
 }

@@ -22,7 +22,7 @@ public class UserDAO extends DAO{
         return (User)get(id, User.class);
     }
     
-    public User getByUserName(String username) {
+    public User getByUserName(String username) throws ObjectNotFoundException{
         try {
             Session sessao = HibernateUtil.getSession();
 
@@ -39,6 +39,10 @@ public class UserDAO extends DAO{
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
+    }
+    
+    public boolean exist(String userName) throws InfrastructureException{
+        return exist(User.class,"username",userName);
     }
     
     public List getUsers()

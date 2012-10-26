@@ -21,7 +21,7 @@ public class ConfigurationItem extends DBClass{
     private String hash;
     private char type; //diz se foi add, delete, update - "A", "D", "U"
     private boolean dir;
-    private int size;
+    private long size;
     private ConfigurationItem next;
     private ConfigurationItem previous;
     private Revision revision;
@@ -30,7 +30,7 @@ public class ConfigurationItem extends DBClass{
     public ConfigurationItem() {
     }
     
-    public ConfigurationItem(int number, String name, String hash, char type, boolean dir, int size, ConfigurationItem next, ConfigurationItem previous, Revision revision) {
+    public ConfigurationItem(int number, String name, String hash, char type, boolean dir, long size, ConfigurationItem next, ConfigurationItem previous, Revision revision) {
         this.number = number;
         this.name = name;
         this.hash = hash;
@@ -41,11 +41,11 @@ public class ConfigurationItem extends DBClass{
         this.previous = previous;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(long size) {
         this.size = size;
     }
 
@@ -63,6 +63,10 @@ public class ConfigurationItem extends DBClass{
 
     public void setChildren(Set children) {
         this.children = children;
+    }
+    
+    public void addChild(ConfigurationItem child) {
+        this.children.add(child);
     }
 
     public boolean isDir() {

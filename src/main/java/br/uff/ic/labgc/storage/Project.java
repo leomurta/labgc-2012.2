@@ -22,6 +22,10 @@ public class Project extends DBClass{
     public void setProjectUsers(Set projectUsers) {
         this.projectUsers = projectUsers;
     }
+    
+    public void addUser(User user) {
+        this.projectUsers.add(user);
+    }
 
     public Project() {
     }
