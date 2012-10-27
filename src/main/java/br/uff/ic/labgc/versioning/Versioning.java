@@ -159,8 +159,9 @@ public class Versioning implements IVersioning{
             VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
             VersioningCanNotCreateDirException{
         String projectName = vd.getName();
-        if (projectDAO.exist(projectName))
+        if (projectDAO.exist(projectName)){
             throw new VersioningProjectAlreadyExistException();
+        }
         
         Project project = new Project(projectName);
         try{
