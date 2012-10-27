@@ -94,6 +94,7 @@ public class VersionedFile extends VersionedItem implements Serializable {
         this.loaded = true;
         setDiff(false);
         setCompressed(false);
+        setSize(content.length);
         try {
             generateHash();
         } catch (NoSuchAlgorithmException ex) {
@@ -107,6 +108,7 @@ public class VersionedFile extends VersionedItem implements Serializable {
         this.loaded = true;
         setDiff(true);
         setCompressed(false);
+        setSize(content.length);
         try {
             generateHash();
         } catch (NoSuchAlgorithmException ex) {
