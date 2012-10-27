@@ -13,7 +13,7 @@ public interface IPropertiesConstants {
     public static String COMM_LOCAL_CONNECTOR = "localConnector";
     public static String COMM_REMOTE_CONNECTOR = "remoteConnector";
     public static String COMM_REMOTE_PROTOCOL = "remoteProtocol";
-    public static String COMM_LOCAL_HOST = "localHost";
+    public static String COMM_LOCAL_HOST = "localhost";
     public static String COMM_REMOTE_PORT = "remotePort";
     public static String RMI_REPOSITORY_OBJECT = "repositoryRMIObject";
     
