@@ -107,6 +107,11 @@ public class VersionedFile extends VersionedItem implements Serializable {
         this.loaded = true;
         setDiff(true);
         setCompressed(false);
+        try {
+            generateHash();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(VersionedFile.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public String getHash() {
