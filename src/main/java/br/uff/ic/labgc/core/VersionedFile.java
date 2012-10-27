@@ -15,6 +15,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Representa um arquivo versionado.
@@ -92,6 +94,11 @@ public class VersionedFile extends VersionedItem implements Serializable {
         this.loaded = true;
         setDiff(false);
         setCompressed(false);
+        try {
+            generateHash();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(VersionedFile.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     //TODO passar a versão na qual o diff deve ser aplicado
@@ -115,7 +122,7 @@ public class VersionedFile extends VersionedItem implements Serializable {
      * @param bytes
      * @throws NoSuchAlgorithmException 
      */
-    public void generateHash() throws NoSuchAlgorithmException{
+    private void generateHash() throws NoSuchAlgorithmException{
         MessageDigest m = MessageDigest.getInstance("MD5");
         m.reset();
         m.update(this.content);

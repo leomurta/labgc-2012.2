@@ -109,13 +109,10 @@ public class VersioningJUnitTest {
         String plaintext = "your text here";
         VersionedFile vf = new VersionedFile();
         vf.setContent(plaintext.getBytes());
-        try {
-            vf.generateHash();
+
             String hash = vf.getHash() ;
             assertTrue("assert 1", hash.length() == 32);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
         
         plaintext = "ABIUBIUDBCIBDIUBIUBIUCDIUCVIUGCIUVCIVSCIVCUVCUICVSIUCVSIUC"
                 + "CVUYfh489fy45hf858g9489fhriefeiovb4398fh89hf589fh45f89r5hf8f"
@@ -123,13 +120,9 @@ public class VersioningJUnitTest {
                 + "vj094jvdfiohv984y4f845h5frekojhoifhrtiotgiotrhgiorthgf094f59"
                 + "h4f5h8045y845fh45hf5h89yf94hff94hf48fhg89f5h9g5094hf4gf4h0h0"
                 + "hv45f8480fg8945gf8945gf8945gf894g5f89h45f8945hfhf9h4f94fhf9h";
-        try {
             vf.setContent(plaintext.getBytes());
-            vf.generateHash();
-            String hash = vf.getHash();
+            hash = vf.getHash();
             assertTrue("assert 2", hash.equals("7d61195bbf636134f074399f5982727a"));
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
     }
 }
