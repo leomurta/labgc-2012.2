@@ -53,7 +53,7 @@ public class VersionedFile extends VersionedItem implements Serializable {
         this.loaded = false;
         setCompressed(false);
         try {
-            this.originHost = InetAddress.getLocalHost().getHostName();
+            this.originHost = InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException e) {
         }
     }
