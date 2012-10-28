@@ -235,7 +235,7 @@ public class Client implements IClient {
      */
     private void createWorkspace(VersionedItem items) throws ApplicationException {
 
-        workspace.createWorkspace(hostname, repository, items, server);
+        workspace.createWorkspace(hostname, repository, items);
         workspace.setParam("token", loginToken);
 
     }
