@@ -10,6 +10,7 @@ import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
+import br.uff.ic.labgc.server.IServer;
 import br.uff.ic.labgc.util.CompressUtils;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -17,6 +18,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 
 /**
  * Representa um arquivo versionado.
@@ -85,7 +87,19 @@ public class VersionedFile extends VersionedItem implements Serializable {
         }
         return content;
     }
-
+    
+    public byte[] getContent(Object server) throws ApplicationException {
+        if (!loaded) {
+            if (this.getHash() == null || this.getHash().equals("")) {
+                throw new ApplicationException("Não é possível recuperar o conteúdo de um item sem informar seu hash.");
+            }
+            setContent(((IServer)server).getItemContent(this.getHash()));
+        } else if (isCompressed()) {
+            inflate();
+        }
+        return content;
+    }
+    
     public void setContent(byte[] content) {
         this.content = content;
         this.loaded = true;

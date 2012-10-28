@@ -218,7 +218,7 @@ public class Workspace implements IObservable {
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
     
-    public void createWorkspace(String hostname, String repository, VersionedItem items)
+    public void createWorkspace(String hostname, String repository, VersionedItem items, Object server)
             throws ApplicationException {
 
         //pega os items, grava os arquivos no disco e 
@@ -229,7 +229,7 @@ public class Workspace implements IObservable {
         String revision = items.getLastChangedRevision();
 
         try {
-            this.writeVersionedDir((VersionedDir) items, parent);
+            this.writeVersionedDir((VersionedDir) items, parent, server);
         } catch (IOException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
             throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
@@ -246,7 +246,7 @@ public class Workspace implements IObservable {
         
         // Escreve arquivos no diretorio espelho
         try {
-            this.writeVersionedDir((VersionedDir) items, espelho);
+            this.writeVersionedDir((VersionedDir) items, espelho, server);
         } catch (IOException ex) {
             Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
             throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
@@ -285,28 +285,28 @@ public class Workspace implements IObservable {
     public void storeLocalData(VersionedItem items) {
     }
 
-    private void writeVersionedDir(VersionedDir dir, File folder) throws IOException, ApplicationException {
+    private void writeVersionedDir(VersionedDir dir, File folder , Object server) throws IOException, ApplicationException {
         File directory = new File(folder, dir.getName());
         directory.mkdir();
 
         for (VersionedItem item : dir.getContainedItens()) {
             if (item instanceof VersionedDir) {
-                writeVersionedDir((VersionedDir) item, directory);
+                writeVersionedDir((VersionedDir) item, directory, server);
             } else {
-                writeVersionedFile((VersionedFile) item, directory);
+                writeVersionedFile((VersionedFile) item, directory, server);
             }
         }
         directory.setLastModified(dir.getLastChangedTime().getTime());
     }
 
-    private void writeVersionedFile(VersionedFile f, File folder) throws IOException, ApplicationException {
+    private void writeVersionedFile(VersionedFile f, File folder, Object server) throws IOException, ApplicationException {
 
         File file = new File(folder, f.getName());
         file.createNewFile();
 
         byte[] content;
             
-        content = f.getContent();
+        content = f.getContent(server);
         FileOutputStream fileWriter = new FileOutputStream(file);
         fileWriter.write(content);
         fileWriter.close();
