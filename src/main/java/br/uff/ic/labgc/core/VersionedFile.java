@@ -8,6 +8,8 @@ import br.uff.ic.labgc.comm.client.CommunicationFactory;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
+import br.uff.ic.labgc.properties.ApplicationProperties;
+import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.util.CompressUtils;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -52,10 +54,7 @@ public class VersionedFile extends VersionedItem implements Serializable {
         super();
         this.loaded = false;
         setCompressed(false);
-        try {
-            this.originHost = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-        }
+        this.originHost = ApplicationProperties.getPropertyValue(IPropertiesConstants.HOSTNAME);
     }
     
     /**

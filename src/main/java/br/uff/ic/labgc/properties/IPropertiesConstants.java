@@ -17,6 +17,7 @@ public interface IPropertiesConstants {
     public static String COMM_LOCAL_IP = "127.0.0.1";
     public static String COMM_REMOTE_PORT = "remotePort";
     public static String RMI_REPOSITORY_OBJECT = "repositoryRMIObject";
+    public static String HOSTNAME = "hostname";
     
     /**
      * Identifica a revisão HEAD
