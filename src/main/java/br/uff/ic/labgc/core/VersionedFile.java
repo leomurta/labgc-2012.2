@@ -78,8 +78,8 @@ public class VersionedFile extends VersionedItem implements Serializable {
             if (this.getHash() == null || this.getHash().equals("")) {
                 throw new ApplicationException("Não é possível recuperar o conteúdo de um item sem informar seu hash.");
             }
-            //setContent(CommunicationFactory.getFactory().getServer(originHost).getItemContent(this.getHash()));
-            setContent(CommunicationFactory.getFactory().getServer().getItemContent(this.getHash()));
+            setContent(CommunicationFactory.getFactory().getServer(originHost).getItemContent(this.getHash()));
+            //setContent(CommunicationFactory.getFactory().getServer().getItemContent(this.getHash()));
         } else if (isCompressed()) {
             inflate();
         }

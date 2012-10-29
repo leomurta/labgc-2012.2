@@ -1,4 +1,4 @@
-package br.uff.ic.labgc.comm.client;
+    package br.uff.ic.labgc.comm.client;
 
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.CommunicationException;
@@ -19,7 +19,7 @@ public class CommunicationFactory {
 
     private static CommunicationFactory instance;
     private Map<String, IServer> commClientList;
-    private IServer server;
+    //private IServer server;
 
     private CommunicationFactory() {
         commClientList = new ConcurrentHashMap<String, IServer>(2);
@@ -55,8 +55,8 @@ public class CommunicationFactory {
             try {
                 String serverClass = ApplicationProperties.getPropertyValue(getCommunicationStrategy(hostName));
                 Constructor c = Class.forName(serverClass).getConstructor(String.class);
-                server = (IServer)c.newInstance(hostName);
-                commClientList.put(hostName,  server);
+//                server = (IServer)c.newInstance(hostName);
+                commClientList.put(hostName,  (IServer)c.newInstance(hostName));
             } catch (Exception ex) {
                 Logger.getLogger(CommunicationFactory.class.getName()).log(Level.SEVERE, null, ex);
                 throw new CommunicationException("Não foi possível instanciar um servidor.", ex);
@@ -66,11 +66,11 @@ public class CommunicationFactory {
 
     }
     
-     public IServer getServer() throws ApplicationException {
-        return server;
-
-    }
-    
+//     public IServer getServer() throws ApplicationException {
+//        return server;
+//
+//    }
+//    
     /**
      * Retorna o identificador da estratégia de comunicação. Caso o hostname seja
      * localhost ou o mesmo hostname da propriedade localAddressIdentifier, retorna
