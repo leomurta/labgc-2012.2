@@ -53,7 +53,9 @@ public class VersionedFile extends VersionedItem implements Serializable {
         super();
         this.loaded = false;
         setCompressed(false);
-        this.originHost = ApplicationProperties.getPropertyValue(IPropertiesConstants.HOSTNAME);
+        this.originHost = System.getProperty("java.rmi.server.hostname");
+        if(this.originHost == null || this.originHost.isEmpty())
+            this.originHost = ApplicationProperties.getPropertyValue(IPropertiesConstants.HOSTNAME);
     }
     
     /**
