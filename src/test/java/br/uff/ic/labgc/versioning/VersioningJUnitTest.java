@@ -101,7 +101,7 @@ public class VersioningJUnitTest {
             String token = "nvfdovhfdoivbiofdvf";
             byte content[] = versioning.getVersionedFileContent("vnfdovh9e0h0", token);
             assertTrue(content.length == 10);
-        } catch (IOException ex) {
+        } catch (ApplicationException ex) {
             assertFalse("Erro 1",true);
             Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
         }

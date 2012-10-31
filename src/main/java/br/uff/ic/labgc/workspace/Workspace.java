@@ -151,7 +151,9 @@ public class Workspace implements IObservable {
         throw new UnsupportedOperationException("Not supported yet.");
 
     }
-
+    public boolean revert(String file){
+        return true;
+    }
     public boolean revert()
             throws IOException, WorkspaceException {
         File local = new File(LocalRepo);
@@ -198,6 +200,7 @@ public class Workspace implements IObservable {
         // se tudo deu certo    
         return true;
     }
+    
 
     public String status() {
         throw new UnsupportedOperationException("Not supported yet.");
