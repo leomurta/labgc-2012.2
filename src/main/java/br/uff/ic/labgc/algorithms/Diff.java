@@ -7,7 +7,6 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncompatibleItensException;
-import java.util.ArrayList;
 
 /**
  *
@@ -20,19 +19,20 @@ public class Diff {
     //
     
     private final static byte EOL = (new String("\n")).getBytes()[0];
+    private final static byte EOF = (new String("\n")).getBytes()[0];
     
     public static void main( String args[] ){
         byte[] testeA;
         byte[] testeB;
         String teste2 = "A" + '\n' + "B" + '\n' + "C" + '\n' + "D" + '\n';
-        String teste3 = "A" + '\n' + "C" + '\n' + "E" + '\n';
+        String teste3 = "A" + '\n' + "F" + '\n' + "C" + '\n';
         
         testeA = teste2.getBytes();
         testeB = teste3.getBytes();
         
         //teste = getFline(teste);
         
-        System.out.println("-->" + new String(lcs(testeA, testeB)));
+        System.out.println("-->\n" + new String(lcs(testeA, testeB)));
     }
     
     public static byte[] run( VersionedItem file1, VersionedItem file2 ) throws ApplicationException, IncompatibleItensException{
@@ -92,7 +92,7 @@ public class Diff {
     // Finalizado
     private static byte[] lcs( byte[] seq1, byte[] seq2 ){
         
-        if( !(isNull( seq1 ) && isNull( seq2 )) ){
+        if( !isNull( seq1 ) && !isNull( seq2 ) ){
             byte[] fline_seq1 = getFline(seq1); // Identifica primeira linha seq1
             byte[] fline_seq2 = getFline(seq2); // Identifica segunda  linha seq2
 
@@ -112,7 +112,6 @@ public class Diff {
                     return lcs2;
                 }
             } else {
-                System.out.println(new String(addFline(fline_seq1, lcs( new_seq1, new_seq2 ))));
                 return addFline( fline_seq1, lcs( new_seq1, new_seq2 ) );
             }
 
