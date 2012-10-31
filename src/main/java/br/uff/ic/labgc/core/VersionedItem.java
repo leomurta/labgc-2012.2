@@ -119,7 +119,7 @@ public abstract class VersionedItem implements Serializable {
         return size;
     }
 
-    public void setSize(long size) {
+    protected void setSize(long size) {
         this.size = size;
     }
 

@@ -61,13 +61,15 @@ public class VersionedFile extends VersionedItem implements Serializable {
     }
     
     /**
-     * Faz o mesmo que o construtor padrao so que seta o hash tambem
+     * Faz o mesmo que o construtor padrao so que seta o hash e size tambem
      * @param hash 
      */
-    public VersionedFile(String hash) {
+    public VersionedFile(String hash, long size) {
         this();
         this.hash = hash;
+        this.size = size;
     }
+    
 
     /**
      * Retorna o conteúdo do arquivo representado por este arquivo versionado.
@@ -120,7 +122,7 @@ public class VersionedFile extends VersionedItem implements Serializable {
         return this.hash;
     }
 
-    public void setHash(String hash) {
+    private void setHash(String hash) {
         this.hash = hash;
     }
 

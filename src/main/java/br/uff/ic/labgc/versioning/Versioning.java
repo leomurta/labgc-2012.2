@@ -85,7 +85,7 @@ public class Versioning implements IVersioning{
                 vi = ConfigItemToVersionedDir(configItem);
             }
             else{
-                vi = new VersionedFile(configItem.getHash());
+                vi = new VersionedFile(configItem.getHash(),configItem.getSize());
             }
             
             vi.setAuthor(ciRev.getUser().getName());
@@ -93,11 +93,9 @@ public class Versioning implements IVersioning{
             vi.setLastChangedRevision(ciRev.getNumber());
             vi.setLastChangedTime(ciRev.getDate());
             vi.setName(configItem.getName());
-            vi.setSize(configItem.getSize());
             
             vd.addItem(vi);
         }
-        vd.setSize(ci.getSize());
       return vd;
     }
 
@@ -180,13 +178,14 @@ public class Versioning implements IVersioning{
             Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
             revisionDAO.add(revision);
             ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',true,0,null,null,revision);
+            
+            VersionedDirToConfigItem(vd,ci,true);
+            
             configItemDAO.add(ci);
             
             //verificar se vai ser atualizado no banco automaticamente
             //e se precisa mesmo fazer isso
             revision.setConfigItem(ci);
-            
-            VersionedDirToConfigItem(vd,ci,true);
             
         }catch (ObjectNotFoundException e) {
              throw new VersioningUserNotFoundException();   

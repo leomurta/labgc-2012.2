@@ -25,6 +25,16 @@ public class VersionedDir extends VersionedItem implements Serializable {
     public List<VersionedItem> getContainedItens() {
         return containedItens;
     }
+    
+    public VersionedDir() {
+        super();
+    }
+
+    public VersionedDir(long size) {
+        super();
+        this.size = size;
+        
+    }
 
     public void setContainedItens(List<VersionedItem> containedItens) {
         this.containedItens = containedItens;
@@ -32,6 +42,8 @@ public class VersionedDir extends VersionedItem implements Serializable {
     
     public void addItem(VersionedItem item) {
         this.containedItens.add(item);
+        setSize(this.size+item.getSize());
+        
     }
     
     /**

@@ -15,7 +15,7 @@
     <property name="size" column="size" type="int" not-null="true"/>
     <many-to-one name="next" column="next_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
     <many-to-one name="previous" column="previous_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
-    <many-to-one name="revision" column="revision_id" class="br.uff.ic.labgc.storage.Revision" not-null="true"/>
+    <many-to-one name="revision" column="revision_id" class="br.uff.ic.labgc.storage.Revision"/>
     
     <set name="children" table='LABGC.T_CHILDREN'>
             <key column="parent_id"/>
