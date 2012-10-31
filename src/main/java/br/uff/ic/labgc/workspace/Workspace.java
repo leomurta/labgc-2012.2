@@ -285,7 +285,7 @@ public class Workspace implements IObservable {
     public void storeLocalData(VersionedItem items) {
     }
 
-    private void writeVersionedDir(VersionedDir dir, File folder) throws IOException, ApplicationException {
+    private void writeVersionedDir(VersionedDir dir, File folder ) throws IOException, ApplicationException {
         File directory = new File(folder, dir.getName());
         directory.mkdir();
 

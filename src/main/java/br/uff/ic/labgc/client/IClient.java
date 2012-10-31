@@ -12,7 +12,7 @@ import br.uff.ic.labgc.core.*;
  *
  * @author Felipe R
  */
-public interface IClient {
+public interface IClient extends IObservable{
     
     //comandos server
     

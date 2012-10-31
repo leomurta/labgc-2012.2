@@ -33,8 +33,9 @@ public class CommunicationServer implements ICommunicationServer {
         }
         try {
             String name = ApplicationProperties.getPropertyValue(IPropertiesConstants.RMI_REPOSITORY_OBJECT);
+            int port = Integer.parseInt(ApplicationProperties.getPropertyValue(IPropertiesConstants.COMM_REMOTE_PORT));
             ICommunicationServer stub = (ICommunicationServer) UnicastRemoteObject.exportObject(this, 0);
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind(name, stub);
             Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "Servidor de repositório pronto para receber requisições.");
 

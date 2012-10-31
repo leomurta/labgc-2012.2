@@ -217,7 +217,7 @@ public class RMIConnector extends AbstractServer {
         try {
             VersionedFile file = new VersionedFile();
             file.setContent(server.getItemContent(hash));
-            file.inflate();
+            //file.inflate();
             result = file.getContent();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
