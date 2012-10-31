@@ -9,6 +9,7 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
+import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
 import br.uff.ic.labgc.exception.VersioningUserNotFoundException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
@@ -46,7 +47,7 @@ public interface IVersioning {
     
     public String login(String projectName, String userName, String pass) throws ObjectNotFoundException, IncorrectPasswordException;
     
-    public byte[] getVersionedFileContent(String hash, String token) throws IOException;
+    public byte[] getVersionedFileContent(String hash, String token) throws VersioningIOException;
     
     public void addRevision(VersionedDir vd, String token);
     

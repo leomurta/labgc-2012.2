@@ -59,7 +59,7 @@ public class Server extends AbstractServer {
     }
     
     public byte[] getItemContent(String hash) throws ApplicationException {
-        return versioning.getVersionedFileContent(hash);
+        return versioning.getVersionedFileContent(hash,"nvfdovhfdoivbiofdvf");
     }
     
 

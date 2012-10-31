@@ -9,6 +9,7 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
+import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
 import br.uff.ic.labgc.exception.VersioningUserNotFoundException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
@@ -39,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javassist.bytecode.Descriptor;
 
 /**
@@ -124,11 +127,16 @@ public class Versioning implements IVersioning{
     }
 
     @Override
-    public byte[] getVersionedFileContent (String hash, String token) throws IOException{
+    public byte[] getVersionedFileContent (String hash, String token) throws VersioningIOException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         String projName = pu.getProject().getName();
         Path path = Paths.get(dirPath+projName+"/"+hashToPath(hash));
-        byte bytes[] = Files.readAllBytes(path);
+        byte bytes[];
+        try {
+            bytes = Files.readAllBytes(path);
+        } catch (IOException ex) {
+            throw new VersioningIOException(ex.getMessage());
+        }
         
         return bytes;
     }
