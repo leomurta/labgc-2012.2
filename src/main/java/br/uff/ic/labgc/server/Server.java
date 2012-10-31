@@ -7,6 +7,7 @@ package br.uff.ic.labgc.server;
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ServerException;
+import br.uff.ic.labgc.versioning.Versioning;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -23,10 +24,11 @@ import java.util.logging.Logger;
  * @author Felipe R
  */
 public class Server extends AbstractServer {
-
-    String serverTempToken = "zyx";
-    String serverTempFile = "pom.xml";
-
+    
+    
+    Versioning versioning = new Versioning();
+   
+    
     public Server(String hostName) {
         super(hostName);
     }
@@ -41,7 +43,7 @@ public class Server extends AbstractServer {
 
     public VersionedItem checkout(String revision, String token) throws ApplicationException {
 
-        return this.createProjectDir();
+        return versioning.getRevision(revision, token);
     }
 
     public String diff(VersionedItem file, String version) throws ApplicationException {
@@ -53,28 +55,35 @@ public class Server extends AbstractServer {
     }
 
     public String login(String user, String pwd, String repository) throws ApplicationException {
-        setRepPath(repository);
-        return serverTempToken;
+        return versioning.login(repository, user, pwd);
     }
-
+    
     public byte[] getItemContent(String hash) throws ApplicationException {
-        
-        File file = new File("..//..//" + serverTempFile);
-        
-        try {
-            
-            return getBytesFromFile(file);
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-            throw new ServerException("Não foi possivel ler arquivo");
-        }
-        
+        return versioning.getVersionedFileContent(hash);
     }
+    
+
+//    public byte[] getItemContent(String hash) throws ApplicationException {
+//        
+//        File file = new File("..//..//" + serverTempFile);
+//        
+//        try {
+//            
+//            return getBytesFromFile(file);
+//        } catch (IOException ex) {
+//            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+//            throw new ServerException("Não foi possivel ler arquivo");
+//        }
+//        
+//    }
 
     /*
      * 
      * metodos temporarios que serao excluidos
      */
+    //items para a exclusao
+    String serverTempToken = "zyx";
+    String serverTempFile = "pom.xml";
     private String tempSHA1() throws IOException, NoSuchAlgorithmException {
 
         MessageDigest md;
