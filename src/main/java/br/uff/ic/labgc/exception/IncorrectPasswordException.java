@@ -8,7 +8,7 @@ package br.uff.ic.labgc.exception;
  *
  * @author jokerfvd
  */
-public class IncorrectPasswordException extends Exception {
+public class IncorrectPasswordException extends VersioningException {
 
     /**
      * Creates a new instance of

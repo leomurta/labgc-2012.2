@@ -9,6 +9,9 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
+import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
+import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
+import br.uff.ic.labgc.exception.VersioningUserNotFoundException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
 import br.uff.ic.labgc.storage.Project;
 import br.uff.ic.labgc.storage.ProjectDAO;
@@ -109,13 +112,10 @@ public class VersioningJUnitTest {
         String plaintext = "your text here";
         VersionedFile vf = new VersionedFile();
         vf.setContent(plaintext.getBytes());
-        try {
-            vf.generateHash();
+
             String hash = vf.getHash() ;
             assertTrue("assert 1", hash.length() == 32);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+
         
         plaintext = "ABIUBIUDBCIBDIUBIUBIUCDIUCVIUGCIUVCIVSCIVCUVCUICVSIUCVSIUC"
                 + "CVUYfh489fy45hf858g9489fhriefeiovb4398fh89hf589fh45f89r5hf8f"
@@ -123,13 +123,46 @@ public class VersioningJUnitTest {
                 + "vj094jvdfiohv984y4f845h5frekojhoifhrtiotgiotrhgiorthgf094f59"
                 + "h4f5h8045y845fh45hf5h89yf94hff94hf48fhg89f5h9g5094hf4gf4h0h0"
                 + "hv45f8480fg8945gf8945gf8945gf894g5f89h45f8945hfhf9h4f94fhf9h";
-        try {
             vf.setContent(plaintext.getBytes());
-            vf.generateHash();
-            String hash = vf.getHash();
+            hash = vf.getHash();
             assertTrue("assert 2", hash.equals("7d61195bbf636134f074399f5982727a"));
-        } catch (NoSuchAlgorithmException ex) {
+
+    }
+    
+    /**
+     * testando adicionar um projeto com 1 arquivo
+     */
+    @Test
+    public void testAddProject() { 
+        VersionedDir vd = new VersionedDir();
+        vd.setAuthor("Autor10");
+        vd.setCommitMessage("msg10");
+        vd.setName("projeto10");
+        
+        VersionedFile vf = new VersionedFile();
+        vf.setAuthor(vd.getAuthor());
+        vf.setCommitMessage(vd.getCommitMessage());
+        vf.setName("arquivo10.txt");
+        vf.setContent("iabadabadu".getBytes());
+        
+        vd.addItem(vf);
+        try {
+            versioning.addProject(vd, "username1");
+            
+            Project project = projectDAO.getByName("projeto10");
+            assertNotNull(project);
+        } catch (VersioningProjectAlreadyExistException ex) {
+            fail("VersioningProjectAlreadyExistException");
+            Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (VersioningUserNotFoundException ex) {
+            fail("VersioningUserNotFoundException");
+            Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (VersioningCanNotCreateDirException ex) {
+            fail("VersioningCanNotCreateDirException");
             Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        
+        
     }
 }

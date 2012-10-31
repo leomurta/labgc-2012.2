@@ -8,14 +8,15 @@ import br.uff.ic.labgc.comm.client.CommunicationFactory;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
-import br.uff.ic.labgc.properties.ApplicationProperties;
-import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.util.CompressUtils;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Representa um arquivo versionado.
@@ -53,19 +54,22 @@ public class VersionedFile extends VersionedItem implements Serializable {
         super();
         this.loaded = false;
         setCompressed(false);
-        this.originHost = System.getProperty("java.rmi.server.hostname");
-        if(this.originHost == null || this.originHost.isEmpty())
-            this.originHost = ApplicationProperties.getPropertyValue(IPropertiesConstants.HOSTNAME);
+        try {
+            this.originHost = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+        }
     }
     
     /**
-     * Faz o mesmo que o construtor padrao so que seta o hash tambem
+     * Faz o mesmo que o construtor padrao so que seta o hash e size tambem
      * @param hash 
      */
-    public VersionedFile(String hash) {
+    public VersionedFile(String hash, long size) {
         this();
         this.hash = hash;
+        this.size = size;
     }
+    
 
     /**
      * Retorna o conteúdo do arquivo representado por este arquivo versionado.
@@ -81,18 +85,23 @@ public class VersionedFile extends VersionedItem implements Serializable {
                 throw new ApplicationException("Não é possível recuperar o conteúdo de um item sem informar seu hash.");
             }
             setContent(CommunicationFactory.getFactory().getServer(originHost).getItemContent(this.getHash()));
-            //setContent(CommunicationFactory.getFactory().getServer().getItemContent(this.getHash()));
         } else if (isCompressed()) {
             inflate();
         }
         return content;
     }
-    
+
     public void setContent(byte[] content) {
         this.content = content;
         this.loaded = true;
         setDiff(false);
         setCompressed(false);
+        setSize(content.length);
+        try {
+            generateHash();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(VersionedFile.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     //TODO passar a versão na qual o diff deve ser aplicado
@@ -101,13 +110,19 @@ public class VersionedFile extends VersionedItem implements Serializable {
         this.loaded = true;
         setDiff(true);
         setCompressed(false);
+        setSize(content.length);
+        try {
+            generateHash();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(VersionedFile.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public String getHash() {
         return this.hash;
     }
 
-    public void setHash(String hash) {
+    private void setHash(String hash) {
         this.hash = hash;
     }
 
@@ -116,7 +131,7 @@ public class VersionedFile extends VersionedItem implements Serializable {
      * @param bytes
      * @throws NoSuchAlgorithmException 
      */
-    public void generateHash() throws NoSuchAlgorithmException{
+    private void generateHash() throws NoSuchAlgorithmException{
         MessageDigest m = MessageDigest.getInstance("MD5");
         m.reset();
         m.update(this.content);

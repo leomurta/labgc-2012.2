@@ -135,7 +135,6 @@ public class Server extends AbstractServer {
         VersionedFile file2 = this.createFile2();
 
         dir.setName(getRepPath());
-        dir.setSize(file.getSize() + file2.getSize());
         dir.setAuthor(file.getAuthor());
         dir.setCommitMessage(file.getCommitMessage());
         dir.setLastChangedRevision(file.getLastChangedRevision());
@@ -153,11 +152,9 @@ public class Server extends AbstractServer {
         VersionedFile file = new VersionedFile();
 
         file.setAuthor("lagc");
-        file.setHash(sha1());
         file.setName(serverTempFile);
         file.setLastChangedRevision("5");
         file.setLastChangedTime(new Date(1349792243));
-        file.setSize(tempGetSize());
         file.setCommitMessage("primeiro commit");
         
 
@@ -169,11 +166,9 @@ public class Server extends AbstractServer {
         VersionedFile file = new VersionedFile();
 
         file.setAuthor("lagc");
-        file.setHash(sha1());
         file.setName("a" + serverTempFile);
         file.setLastChangedRevision("5");
         file.setLastChangedTime(new Date(1349792243));
-        file.setSize(tempGetSize());
         file.setCommitMessage("primeiro commit");
 
         return file;

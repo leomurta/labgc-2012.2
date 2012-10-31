@@ -480,7 +480,6 @@ public class Workspace implements IObservable {
             result = new VersionedFile();
             result.setLastChangedTime(new Date(file.lastModified()));
             result.setName(file.getName());
-            result.setSize(file.length());
 //            result.setContent(FileUtils.readFileToByteArray(file));
         }
         return result;
