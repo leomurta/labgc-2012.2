@@ -476,9 +476,9 @@ public class Workspace implements IObservable {
         if (file.isDirectory()){
             File[] stDir = file.listFiles();
             result = new VersionedDir();
-//            for (File files : stdir) { //for (int i = 0; i < stdir.length; i++){File files = stdir[i];
-//                result.addItem(fileToVersionedItem(files));
-//            }
+            for (File files : stDir) { //for (int i = 0; i < stdir.length; i++){File files = stdir[i];
+                ((VersionedDir)result).addItem(fileToVersionedItem(files));
+            }
         }else{
             result = new VersionedFile();
             result.setLastChangedTime(new Date(file.lastModified()));
