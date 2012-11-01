@@ -103,7 +103,8 @@ public class VersioningJUnitTest {
         try {
             content = versioning.getVersionedFileContent("vnfdovh9e0h0", token);
             assertTrue(content.length == 10);
-        } catch (VersioningIOException ex) {
+        } catch (ApplicationException ex) {
+            assertFalse("Erro 1",true);
             Logger.getLogger(VersioningJUnitTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
