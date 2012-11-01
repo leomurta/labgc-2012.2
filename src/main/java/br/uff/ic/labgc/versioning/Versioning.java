@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.versioning;
 
+import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
@@ -106,6 +107,9 @@ public class Versioning implements IVersioning{
     @Override
     public VersionedDir getRevision(String revNum, String token) throws ObjectNotFoundException{
         ProjectUser pu = projectUserDAO.getByToken(token);
+        if (revNum.equals(EVCSConstants.REVISION_HEAD)) {
+            revNum = revisionDAO.getHeadRevisionNumber(pu.getProject());
+        }
         Revision revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), revNum);
         ConfigurationItem ci = revision.getConfigItem();
         VersionedDir vd = ConfigItemToVersionedDir(ci);
@@ -226,6 +230,5 @@ public class Versioning implements IVersioning{
         }
             
     }
-    
     
 }

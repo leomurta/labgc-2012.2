@@ -8,8 +8,13 @@ import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.util.List;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 /**
  *
@@ -38,5 +43,24 @@ public class RevisionDAO extends DAO{
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
+    }
+    
+    public String getHeadRevisionNumber(Project project){    
+        try {
+            Session sessao = HibernateUtil.getSession();
+            
+            Criteria crit = sessao.createCriteria(Revision.class)
+                .add(Restrictions.eq("project", project))
+                .addOrder(Order.desc("id")).setMaxResults(1);
+            String revNum = ((Revision)crit.uniqueResult()).getNumber();
+
+            if (revNum == null) {
+                throw new ObjectNotFoundException();
+            }
+
+            return revNum;
+        } catch (HibernateException e) {
+            throw new InfrastructureException(e);
+        }      
     }
 }
