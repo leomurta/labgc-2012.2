@@ -19,7 +19,7 @@ import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
+
 
 /**
  *
@@ -146,12 +146,32 @@ public class Workspace implements IObservable {
     }
 
     //comandos de diretorio
+    
+    // Apagar diretório e subdiretórios
+    
+    public static boolean deleteDir(File dir) {
+    if (dir.isDirectory()) {
+      String[] children = dir.list();
+      for (int i = 0; i < children.length; i++) {
+        boolean success = deleteDir(new File(dir, children[i]));
+        if (!success) {
+          return false;
+        }
+      }
+    }
+    return dir.delete();
+  }
+
     boolean add(File file)
             throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
 
     }
-
+    public boolean revert(String file)
+    throws IOException, WorkspaceException {
+        return true;
+    }
+    
     public boolean revert()
             throws IOException, WorkspaceException {
         File local = new File(LocalRepo);
@@ -186,7 +206,9 @@ public class Workspace implements IObservable {
         if (!achou) {
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
         }
-        FileUtils.deleteDirectory(parent);
+        if (!deleteDir(parent)){
+            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não foi possível limpar WorkSpace.");
+        }
         copyDir (diretorio1, parent);
 /*        stDir = diretorio1.listFiles();
         // copia os arquivos
@@ -198,6 +220,7 @@ public class Workspace implements IObservable {
         // se tudo deu certo    
         return true;
     }
+    
 
     public String status() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -473,14 +496,14 @@ public class Workspace implements IObservable {
         if (file.isDirectory()){
             File[] stDir = file.listFiles();
             result = new VersionedDir();
-//            for (File files : stdir) { //for (int i = 0; i < stdir.length; i++){File files = stdir[i];
-//                result.addItem(fileToVersionedItem(files));
-//            }
+           for (File files : stDir) { //for (int i = 0; i < stdir.length; i++){File files = stdir[i];
+                ((VersionedDir)result).addItem(fileToVersionedItem(files));
+            }
         }else{
             result = new VersionedFile();
             result.setLastChangedTime(new Date(file.lastModified()));
             result.setName(file.getName());
-//            result.setContent(FileUtils.readFileToByteArray(file));
+            ((VersionedFile)result).setContent(Files.readAllBytes(file));
         }
         return result;
     }
