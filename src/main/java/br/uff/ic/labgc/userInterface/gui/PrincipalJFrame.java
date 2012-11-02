@@ -4,7 +4,18 @@
  */
 package br.uff.ic.labgc.userInterface.gui;
 
+import br.uff.ic.labgc.client.Client;
+import br.uff.ic.labgc.client.IClient;
+import java.awt.BorderLayout;
 import java.awt.Cursor;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -17,6 +28,10 @@ public class PrincipalJFrame extends javax.swing.JFrame {
      */
     public PrincipalJFrame() {
         initComponents();
+        //AddFileChooser();
+         Image im = null;
+        im = Toolkit.getDefaultToolkit().createImage("Images//Logo.jpg");
+        this.setIconImage(im);
     }
 
     /**
@@ -30,7 +45,7 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 
         TreejPanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        MainjTree = new javax.swing.JTree();
+        jTree1 = new javax.swing.JTree();
         OutputjPanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
@@ -43,20 +58,21 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         AboutjMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("LabGC 2012 -2");
 
         TreejPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jScrollPane1.setViewportView(MainjTree);
+        jScrollPane1.setViewportView(jTree1);
 
         javax.swing.GroupLayout TreejPanelLayout = new javax.swing.GroupLayout(TreejPanel);
         TreejPanel.setLayout(TreejPanelLayout);
         TreejPanelLayout.setHorizontalGroup(
             TreejPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
         );
         TreejPanelLayout.setVerticalGroup(
             TreejPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
         );
 
         OutputjPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -80,12 +96,14 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         MainjPanel.setLayout(MainjPanelLayout);
         MainjPanelLayout.setHorizontalGroup(
             MainjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 467, Short.MAX_VALUE)
+            .addGap(0, 492, Short.MAX_VALUE)
         );
         MainjPanelLayout.setVerticalGroup(
             MainjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
+
+        MainjMenuBar.setName("LabGC-2012/2");
 
         jMenu1.setText("File");
         MainjMenuBar.add(jMenu1);
@@ -114,6 +132,25 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         MainjMenuBar.add(jMenu2);
 
         AboutjMenu.setText("About");
+        AboutjMenu.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                AboutjMenuMenuSelected(evt);
+            }
+        });
+        AboutjMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AboutjMenuActionPerformed(evt);
+            }
+        });
+        AboutjMenu.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                AboutjMenuKeyPressed(evt);
+            }
+        });
         MainjMenuBar.add(AboutjMenu);
 
         setJMenuBar(MainjMenuBar);
@@ -137,11 +174,11 @@ public class PrincipalJFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(34, 34, 34)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(MainjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(TreejPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(TreejPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(MainjPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addComponent(OutputjPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(57, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -166,6 +203,77 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         checkOutScreen.toFront();
     }//GEN-LAST:event_CheckOutjMenuItemMouseClicked
 
+    private void AboutjMenuKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_AboutjMenuKeyPressed
+        // TODO add your handling code here:
+        Cursor cursor = Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR );  
+        this.setCursor( cursor ); 
+        AboutJFrame about=null;
+        try {
+            about = new AboutJFrame();
+        } catch (IOException ex) {
+            Logger.getLogger(PrincipalJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        about.setVisible(true);
+        about.toFront();
+        cursor = Cursor.getDefaultCursor();  
+        this.setCursor( cursor );
+    }//GEN-LAST:event_AboutjMenuKeyPressed
+
+    private void AboutjMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AboutjMenuActionPerformed
+        // TODO add your handling code here:
+        Cursor cursor = Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR );  
+        this.setCursor( cursor ); 
+        AboutJFrame about=null;
+        try {
+            about = new AboutJFrame();
+        } catch (IOException ex) {
+            Logger.getLogger(PrincipalJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        about.setVisible(true);
+        about.toFront();
+        cursor = Cursor.getDefaultCursor();  
+        this.setCursor( cursor );
+    }//GEN-LAST:event_AboutjMenuActionPerformed
+
+    private void AboutjMenuMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_AboutjMenuMenuSelected
+        // TODO add your handling code here:
+        Cursor cursor = Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR );  
+        this.setCursor( cursor ); 
+        AboutJFrame about=null;
+        try {
+            about = new AboutJFrame();
+        } catch (IOException ex) {
+            Logger.getLogger(PrincipalJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        about.setVisible(true);
+        about.toFront();
+        cursor = Cursor.getDefaultCursor();  
+        this.setCursor( cursor );
+    }//GEN-LAST:event_AboutjMenuMenuSelected
+    
+     private void AddFileChooser()
+    {
+        fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new java.io.File("."));
+        fileChooser.setDialogTitle("choosertitle");
+        fileChooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        fileChooser.setControlButtonsAreShown(false);
+        fileChooser.setSize(163, 337);
+        TreejPanel.setLayout(new BorderLayout());
+        TreejPanel.add(fileChooser, BorderLayout.EAST);
+        fileChooser.addActionListener(new ActionListener() 
+        {
+         public void actionPerformed(ActionEvent e) 
+         {
+            if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) 
+            {
+               strLocation = fileChooser.getSelectedFile().getPath();
+            }
+         }
+      });
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -213,7 +321,6 @@ public class PrincipalJFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem LoginMenuItem;
     private javax.swing.JMenuBar MainjMenuBar;
     private javax.swing.JPanel MainjPanel;
-    private javax.swing.JTree MainjTree;
     private javax.swing.JPanel OutputjPanel;
     private javax.swing.JPanel TreejPanel;
     private javax.swing.JMenu jMenu1;
@@ -221,5 +328,8 @@ public class PrincipalJFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextPane jTextPane1;
+    private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
+    private JFileChooser fileChooser;
+    private String strLocation;
 }

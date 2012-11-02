@@ -10,9 +10,7 @@ import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.IObserver;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ClientException;
-import java.awt.Cursor;
-import java.awt.Dialog;
-import java.awt.Font;
+import java.awt.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -23,7 +21,8 @@ import sun.font.Font2D;
  *
  * @author Leonardo
  */
-public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
+public class CheckOutJFrame extends javax.swing.JFrame
+{
 
     /**
      * Creates new form CheckOutJFrame
@@ -36,6 +35,7 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
         
         MakeUnBold(WorkspacejLabel);
         MakeUnBold(RepositoryjLabel);
+        MakeUnBold(RevisionNumberjLabel);
         MakeBold(RepositoryjLabel);
         
         CheckOutOutput = new CheckOutOutputJFrame();
@@ -50,6 +50,10 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
         RepoLocationPanel.setLocation(0,0);
         RepoLocationPanel.setSize(450,216);
         
+        RevisionNumberPanel = new RevisionNumberJPanel();
+        RevisionNumberPanel.setLocation(0,0);
+        RevisionNumberPanel.setSize(450,216);
+        
         
         WorkspaceLocationPanel = new WorkspaceLocationJPanel();
         WorkspaceLocationPanel.setLocation(0,0);
@@ -58,11 +62,17 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
           
         CheckOutChangejPanel.add(RepoLocationPanel);
         CheckOutChangejPanel.add(WorkspaceLocationPanel);
+        CheckOutChangejPanel.add(RevisionNumberPanel);
+        
 
         
         WorkspaceLocationPanel.setVisible(false);   
         WorkspaceLocationPanel.invalidate();
         WorkspaceLocationPanel.validate();
+        
+        RevisionNumberPanel.setVisible(false);   
+        RevisionNumberPanel.invalidate();
+        RevisionNumberPanel.validate();
         
         RepoLocationPanel.setVisible(true);   
         RepoLocationPanel.invalidate();
@@ -76,6 +86,10 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
         MainjPanel.getComponent(1).setVisible(false);
         MainjPanel.getComponent(0).setVisible(true);
         MainjPanel.validate();*/
+         
+        Image im = null;
+        im = Toolkit.getDefaultToolkit().createImage("Images//Logo.jpg");
+        this.setIconImage(im);
         
         
     }
@@ -92,6 +106,7 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
         StepsjPanel = new javax.swing.JPanel();
         RepositoryjLabel = new javax.swing.JLabel();
         WorkspacejLabel = new javax.swing.JLabel();
+        RevisionNumberjLabel = new javax.swing.JLabel();
         BackjButton = new javax.swing.JButton();
         NextjButton = new javax.swing.JButton();
         CanceljButton = new javax.swing.JButton();
@@ -108,6 +123,8 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
 
         WorkspacejLabel.setText("Workspace location");
 
+        RevisionNumberjLabel.setText("Revision number");
+
         javax.swing.GroupLayout StepsjPanelLayout = new javax.swing.GroupLayout(StepsjPanel);
         StepsjPanel.setLayout(StepsjPanelLayout);
         StepsjPanelLayout.setHorizontalGroup(
@@ -116,7 +133,8 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
                 .addContainerGap()
                 .addGroup(StepsjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(WorkspacejLabel)
-                    .addComponent(RepositoryjLabel))
+                    .addComponent(RepositoryjLabel)
+                    .addComponent(RevisionNumberjLabel))
                 .addContainerGap(17, Short.MAX_VALUE))
         );
         StepsjPanelLayout.setVerticalGroup(
@@ -126,7 +144,9 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
                 .addComponent(RepositoryjLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(WorkspacejLabel)
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(RevisionNumberjLabel)
+                .addContainerGap(134, Short.MAX_VALUE))
         );
 
         BackjButton.setText("Back");
@@ -219,17 +239,48 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
         // TODO add your handling code here:
         if(verifyRepository())
         {
-           
-            BackjButton.setEnabled(true);  
-            NextjButton.setEnabled(false);
-            FinishjButton.setEnabled(true);
-            
-            RepoLocationPanel.setVisible(false);
-            WorkspaceLocationPanel.setVisible(true);
-            MakeBold(WorkspacejLabel);
-            MakeUnBold(RepositoryjLabel);
-            WorkspaceLocationPanel.invalidate();
-            WorkspaceLocationPanel.validate();
+           BackjButton.setEnabled(true);
+           if(WorkspaceLocationPanel.isVisible())
+           {
+               if(!(WorkspaceLocationPanel.GetWorkspaceLocation().isEmpty()))
+               {
+                 NextjButton.setEnabled(false);
+                 FinishjButton.setEnabled(true);
+                 
+                 RepoLocationPanel.setVisible(false);
+                 WorkspaceLocationPanel.setVisible(false);
+                 
+                 RevisionNumberPanel.setVisible(true);
+                 
+                 MakeUnBold(WorkspacejLabel);
+                 MakeUnBold(RepositoryjLabel);
+                 MakeUnBold(RevisionNumberjLabel);
+                 
+                 MakeBold(RevisionNumberjLabel);
+                 RevisionNumberPanel.invalidate();
+                 RevisionNumberPanel.validate();
+                 
+                 
+               }
+               else
+               {
+                   JOptionPane.showMessageDialog(null,"Fill the workspace location!");
+               }
+           }
+           else
+           {
+                RepoLocationPanel.setVisible(false);
+                RevisionNumberPanel.setVisible(false);
+                WorkspaceLocationPanel.setVisible(true);
+                
+                MakeUnBold(RepositoryjLabel);
+                MakeUnBold(WorkspacejLabel);
+                MakeUnBold(RevisionNumberjLabel);
+                
+                MakeBold(WorkspacejLabel);
+                WorkspaceLocationPanel.invalidate();
+                WorkspaceLocationPanel.validate();
+           }
             this.pack();
         }
         else
@@ -245,13 +296,38 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
          FinishjButton.setEnabled(false);
          NextjButton.setEnabled(true);
          BackjButton.setEnabled(false);
-        
-         WorkspaceLocationPanel.setVisible(false);
-         RepoLocationPanel.setVisible(true);
-         MakeBold(RepositoryjLabel);
-         MakeUnBold(WorkspacejLabel);
-         RepoLocationPanel.invalidate();
-         RepoLocationPanel.validate();
+         
+         if(RevisionNumberPanel.isVisible())
+         {
+             BackjButton.setEnabled(true);
+             RepoLocationPanel.setVisible(false);
+             RevisionNumberPanel.setVisible(false);
+             WorkspaceLocationPanel.setVisible(true);
+            
+             MakeUnBold(RepositoryjLabel);
+             MakeUnBold(RevisionNumberjLabel);
+             MakeUnBold(WorkspacejLabel);
+             
+             MakeBold(WorkspacejLabel);
+             WorkspaceLocationPanel.invalidate();
+             WorkspaceLocationPanel.validate();
+         }
+         else
+         {
+            BackjButton.setEnabled(false);
+
+            WorkspaceLocationPanel.setVisible(false);
+            RevisionNumberPanel.setVisible(false);
+            RepoLocationPanel.setVisible(true);
+            
+            MakeUnBold(WorkspacejLabel);
+            MakeUnBold(RevisionNumberjLabel);
+            MakeUnBold(RepositoryjLabel);
+            
+            MakeBold(RepositoryjLabel);
+            RepoLocationPanel.invalidate();
+            RepoLocationPanel.validate();
+         }
          this.pack();
     }//GEN-LAST:event_BackjButtonActionPerformed
 
@@ -262,6 +338,13 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
        
        String  strWorkspace = WorkspaceLocationPanel.GetWorkspaceLocation();
        String strRepository  = RepoLocationPanel.GetRepo();
+       String strRevision = RevisionNumberPanel.GetRevision();
+       
+       if(strWorkspace.isEmpty())
+       {
+           JOptionPane.showMessageDialog(null,"Fill the workspace location!");
+           return;
+       }
        
        String [] strArrayRepo = strRepository.split("/");
        strRepository ="";
@@ -290,7 +373,10 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
         try 
         {
             CheckOutOutput.setVisible(true);
-            m_IClient.checkout(EVCSConstants.REVISION_HEAD);
+            if(strRevision.isEmpty())
+                strRevision= EVCSConstants.REVISION_HEAD;
+            
+            m_IClient.checkout(strRevision);
         } catch (ApplicationException ex) 
         {
             cursor = Cursor.getDefaultCursor();  
@@ -309,9 +395,9 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
     private boolean verifyRepository()
     {
         
-        if(RepoLocationPanel.isVisible())
+        if(RepoLocationPanel.hasRepo())
         {
-            return RepoLocationPanel.hasRepo();
+            return true;
            
         }
         
@@ -328,16 +414,24 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
     
     private void MakeUnBold(JLabel label)
     {
-         Font f = label.getFont();	 
-	 label.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+         Font f = label.getFont();
+         f = new Font (label.getFont().getName(),Font.PLAIN,label.getFont().getSize());
+         label.setFont(f);
+	 //label.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
          label.invalidate();
+         label.validate();
+         StepsjPanel.invalidate();
     }
     
     private void MakeBold(JLabel label)
     {
          Font f = label.getFont();
-         label.setFont(f.deriveFont(f.getStyle() | Font.BOLD));
+         f = new Font (label.getFont().getName(),Font.BOLD,label.getFont().getSize());
+         label.setFont(f);
+         //label.setFont(f.deriveFont(f.getStyle() | Font.BOLD));
          label.invalidate();
+         label.validate();
+         StepsjPanel.invalidate();
     }
     
     /**
@@ -388,11 +482,13 @@ public class CheckOutJFrame extends javax.swing.JFrame implements IObserver{
     private javax.swing.JButton FinishjButton;
     private javax.swing.JButton NextjButton;
     private javax.swing.JLabel RepositoryjLabel;
+    private javax.swing.JLabel RevisionNumberjLabel;
     private javax.swing.JPanel StepsjPanel;
     private javax.swing.JLabel WorkspacejLabel;
     // End of variables declaration//GEN-END:variables
     private RepositoryLocationJPanel RepoLocationPanel;
     private WorkspaceLocationJPanel WorkspaceLocationPanel;
+    private RevisionNumberJPanel    RevisionNumberPanel;
     private IClient m_IClient;
     private CheckOutOutputJFrame CheckOutOutput;
 
