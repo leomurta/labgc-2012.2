@@ -10,8 +10,13 @@ import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
 import br.uff.ic.labgc.util.CompressUtils;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Representa um arquivo versionado.
@@ -35,6 +40,10 @@ public class VersionedFile extends VersionedItem implements Serializable {
      * carregado, o primeiro get no conteúdo o buscará no repositório.
      */
     private boolean loaded;
+    /**
+     * Hash do item versionado
+     */
+    private String hash;
 
     /**
      * Cria um item versionável, marcando seu atributo loaded como falso e
@@ -50,6 +59,17 @@ public class VersionedFile extends VersionedItem implements Serializable {
         } catch (UnknownHostException e) {
         }
     }
+    
+    /**
+     * Faz o mesmo que o construtor padrao so que seta o hash e size tambem
+     * @param hash 
+     */
+    public VersionedFile(String hash, long size) {
+        this();
+        this.hash = hash;
+        this.size = size;
+    }
+    
 
     /**
      * Retorna o conteúdo do arquivo representado por este arquivo versionado.
@@ -74,40 +94,82 @@ public class VersionedFile extends VersionedItem implements Serializable {
     public void setContent(byte[] content) {
         this.content = content;
         this.loaded = true;
+        setDiff(false);
         setCompressed(false);
+        setSize(content.length);
+        try {
+            generateHash();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(VersionedFile.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    //TODO passar a versão na qual o diff deve ser aplicado
+    public void setDiffContent(byte[] content) {
+        this.content = content;
+        this.loaded = true;
+        setDiff(true);
+        setCompressed(false);
+        setSize(content.length);
+        try {
+            generateHash();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(VersionedFile.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public String getHash() {
+        return this.hash;
+    }
+
+    private void setHash(String hash) {
+        this.hash = hash;
+    }
+
+    /**
+     * gera um hash com 32 chars
+     * @param bytes
+     * @throws NoSuchAlgorithmException 
+     */
+    private void generateHash() throws NoSuchAlgorithmException{
+        MessageDigest m = MessageDigest.getInstance("MD5");
+        m.reset();
+        m.update(this.content);
+        byte[] digest = m.digest();
+        BigInteger bigInt = new BigInteger(1,digest);
+        String hashtext = bigInt.toString(16);
+        // Now we need to zero pad it if you actually want the full 32 chars.
+        while(hashtext.length() < 32 ){
+          hashtext = "0"+hashtext;
+        }     
+        this.hash = hashtext;
     }
 
     /**
      * Expande o conteúdo deste item.
      *
-     * @return item descomprimido.
-     *
      * @throws ContentNotAvailableException
      * @throws CompressionException
      */
     @Override
-    public VersionedItem inflate() throws ContentNotAvailableException, CompressionException {
+    public void inflate() throws ContentNotAvailableException, CompressionException {
         if (loaded) {
             setContent(CompressUtils.inflateBytes(this.content));
             setCompressed(false);
         }
-        return this;
     }
 
     /**
      * Comprime o conteúdo deste item.
      *
-     * @return item comprimido.
-     *
      * @throws ContentNotAvailableException
      * @throws CompressionException
      */
     @Override
-    public VersionedItem deflate() throws ContentNotAvailableException, CompressionException {
+    public void deflate() throws ContentNotAvailableException, CompressionException {
         if (loaded) {
-            setContent(CompressUtils.deflateBytes(this.content));
+            content = CompressUtils.deflateBytes(this.content);
             setCompressed(true);
         }
-        return this;
     }
 }

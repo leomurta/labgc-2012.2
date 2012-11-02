@@ -18,7 +18,7 @@ import java.util.logging.Logger;
  *
  * @author Felipe R
  */
-public class Client implements IClient, IObservable, IObserver {
+public class Client implements IClient {
 
     /**
      * instancia do server

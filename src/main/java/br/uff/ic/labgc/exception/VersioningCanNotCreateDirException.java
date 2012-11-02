@@ -8,23 +8,23 @@ package br.uff.ic.labgc.exception;
  *
  * @author jokerfvd
  */
-public class IncorrectPasswordException extends VersioningException {
+public class VersioningCanNotCreateDirException extends VersioningException {
 
     /**
      * Creates a new instance of
-     * <code>IncorrectPasswordException</code> without detail message.
+     * <code>VersioningCanNotCreateDirException</code> without detail message.
      */
-    public IncorrectPasswordException() {
+    public VersioningCanNotCreateDirException() {
     }
 
     /**
      * Constructs an instance of
-     * <code>IncorrectPasswordException</code> with the specified detail
+     * <code>VersioningCanNotCreateDirException</code> with the specified detail
      * message.
      *
      * @param msg the detail message.
      */
-    public IncorrectPasswordException(String msg) {
+    public VersioningCanNotCreateDirException(String msg) {
         super(msg);
     }
 }

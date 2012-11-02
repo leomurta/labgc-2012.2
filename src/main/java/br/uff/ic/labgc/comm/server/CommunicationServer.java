@@ -10,6 +10,7 @@ import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.Server;
+import br.uff.ic.labgc.util.CompressUtils;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -32,8 +33,9 @@ public class CommunicationServer implements ICommunicationServer {
         }
         try {
             String name = ApplicationProperties.getPropertyValue(IPropertiesConstants.RMI_REPOSITORY_OBJECT);
+            int port = Integer.parseInt(ApplicationProperties.getPropertyValue(IPropertiesConstants.COMM_REMOTE_PORT));
             ICommunicationServer stub = (ICommunicationServer) UnicastRemoteObject.exportObject(this, 0);
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind(name, stub);
             Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "Servidor de repositório pronto para receber requisições.");
 
@@ -47,7 +49,8 @@ public class CommunicationServer implements ICommunicationServer {
     public String commit(VersionedItem item, String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: commit");
         try {
-            return server.commit(item.inflate(), token);
+            item.inflate();
+            return server.commit(item, token);
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar commit.", ex);
         }
@@ -57,7 +60,9 @@ public class CommunicationServer implements ICommunicationServer {
     public VersionedItem update(String revision, String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: update");
         try {
-            return server.update(revision, token).deflate();
+            VersionedItem result = server.update(revision, token);
+            result.deflate();
+            return result;
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar update.", ex);
         }
@@ -67,7 +72,9 @@ public class CommunicationServer implements ICommunicationServer {
     public VersionedItem checkout(String revision, String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: checkout");
         try {
-            return server.checkout(revision, token).deflate();
+            VersionedItem result = server.checkout(revision, token);
+            result.deflate();
+            return result;
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar checkout.", ex);
         }
@@ -113,7 +120,8 @@ public class CommunicationServer implements ICommunicationServer {
     public String diff(VersionedItem item, String version) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: diff");
         try {
-            return server.diff(item.inflate(), version);
+            item.inflate();
+            return server.diff(item, version);
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar diff.", ex);
         }

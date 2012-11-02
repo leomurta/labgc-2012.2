@@ -8,23 +8,22 @@ package br.uff.ic.labgc.exception;
  *
  * @author jokerfvd
  */
-public class IncorrectPasswordException extends VersioningException {
+public class VersioningIOException extends VersioningException {
 
     /**
      * Creates a new instance of
-     * <code>IncorrectPasswordException</code> without detail message.
+     * <code>VersioningIOException</code> without detail message.
      */
-    public IncorrectPasswordException() {
+    public VersioningIOException() {
     }
 
     /**
      * Constructs an instance of
-     * <code>IncorrectPasswordException</code> with the specified detail
-     * message.
+     * <code>VersioningIOException</code> with the specified detail message.
      *
      * @param msg the detail message.
      */
-    public IncorrectPasswordException(String msg) {
+    public VersioningIOException(String msg) {
         super(msg);
     }
 }

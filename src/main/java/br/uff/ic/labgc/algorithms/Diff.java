@@ -18,6 +18,23 @@ public class Diff {
     // <- Não definido ainda ! ->
     //
     
+    private final static byte EOL = (new String("\n")).getBytes()[0];
+    private final static byte EOF = (new String("\n")).getBytes()[0];
+    
+    public static void main( String args[] ){
+        byte[] testeA;
+        byte[] testeB;
+        String teste2 = "A" + '\n' + "B" + '\n' + "C" + '\n' + "D" + '\n';
+        String teste3 = "A" + '\n' + "F" + '\n' + "C" + '\n';
+        
+        testeA = teste2.getBytes();
+        testeB = teste3.getBytes();
+        
+        //teste = getFline(teste);
+        
+        System.out.println("-->\n" + new String(lcs(testeA, testeB)));
+    }
+    
     public static byte[] run( VersionedItem file1, VersionedItem file2 ) throws ApplicationException, IncompatibleItensException{
         
         if( isFile(file1) && isFile(file2) ){
@@ -51,11 +68,7 @@ public class Diff {
             byte[] lcs_file = Diff.lcs( file1.getContent(), file2.getContent() );
             int num_of_blocks = countLines(lcs_file);
             
-            addBlock( lcs_file, final_file );
-            
             for( int i = 0; i < num_of_blocks + 1; i++ ){
-                byte[] block = identifyBlock( file1, lcs_file, i );
-                addBlock( block, final_file );
             }
             
         }
@@ -75,66 +88,104 @@ public class Diff {
         }
         return true;
     }
-    
+
     // Finalizado
     private static byte[] lcs( byte[] seq1, byte[] seq2 ){
         
-        byte[] fline_seq1 = getFline(seq1); // Identifica primeira linha seq1
-        byte[] fline_seq2 = getFline(seq2); // Identifica segunda  linha seq2
-        
-        byte[] new_seq1 = delFline( fline_seq1, seq1 ); // Remove primeiras linhas das sequências
-        byte[] new_seq2 = delFline( fline_seq2, seq2 );
-        
-        if( hasDiff( fline_seq1, fline_seq2 ) ){            
-            // Chamar duas frentes de LCS
-            byte[] lcs1 = lcs( new_seq1, seq2 );
-            byte[] lcs2 = lcs( seq1, new_seq2 );
-            
-            // Verifica qual das duas frentes possui maior sequência comum
-            // Retorna
-            if( countLines(lcs1) >= countLines(lcs2) ){
-                return lcs1;
+        if( !isNull( seq1 ) && !isNull( seq2 ) ){
+            byte[] fline_seq1 = getFline(seq1); // Identifica primeira linha seq1
+            byte[] fline_seq2 = getFline(seq2); // Identifica segunda  linha seq2
+
+            byte[] new_seq1 = delFline( fline_seq1, seq1 ); // Remove primeiras linhas das sequências
+            byte[] new_seq2 = delFline( fline_seq2, seq2 );
+
+            if( hasDiff( fline_seq1, fline_seq2 ) ){            
+                // Chamar duas frentes de LCS
+                byte[] lcs1 = lcs( new_seq1, seq2 );
+                byte[] lcs2 = lcs( seq1, new_seq2 );
+
+                // Verifica qual das duas frentes possui maior sequência comum
+                // Retorna
+                if( countLines(lcs1) >= countLines(lcs2) ){
+                    return lcs1;
+                } else {
+                    return lcs2;
+                }
             } else {
-                return lcs2;
+                return addFline( fline_seq1, lcs( new_seq1, new_seq2 ) );
             }
-        } else {
-            return addFline( fline_seq1, lcs( new_seq1, new_seq2 ) );
+
+        }else{
+            return new byte[0];
         }
 
     }
 
     // Finalizado
     private static boolean hasDiff(byte[] fline_seq1, byte[] fline_seq2) {
+        if( !(isNull(fline_seq1) && isNull(fline_seq2)) && fline_seq1.length == fline_seq2.length ){
         for( int i = 0; i < fline_seq1.length; i++ ){
-            if( fline_seq1[i] != fline_seq2[i] ){
+            if( Byte.compare(fline_seq1[i], fline_seq2[i]) != 0 ){
                 return true;
             }
+        }
         }
         return false;
     }
 
     private static byte[] delFline( byte[] fline_seq1, byte[] seq ) {
-        throw new UnsupportedOperationException("Not yet implemented");
+       
+        byte[] retorno = new byte[seq.length - fline_seq1.length];
+        
+        for( int j = 0; j < retorno.length; j++ ){
+            retorno[j] = seq[j + fline_seq1.length];
+        }
+        
+        return retorno;
+        
     }
 
     private static byte[] getFline( byte[] seq ) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        
+        if( seq.length != 0){
+        int i = 0;
+        while( Byte.compare(seq[i++], EOL) != 0 );
+        byte[] retorno = new byte[i];
+        
+        for( int j = 0; j < i; j++ ){
+            retorno[j] = seq[j];
+        }
+        
+        return retorno;
+        } else {
+            return new byte[0];
+        }
+        
     }
 
     private static byte[] addFline( byte[] fline_seq1, byte[] seq ) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        byte[] retorno = new byte[fline_seq1.length + seq.length];
+        
+        for(int i = 0; i < fline_seq1.length; i++ ){
+            retorno[i] = fline_seq1[i];
+        }
+        for(int i = 0; i < seq.length; i++){
+            retorno[i + fline_seq1.length] = seq[i];
+        }
+        
+        return retorno;
     }
 
     private static int countLines(byte[] lcs_file) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        int tam = 0;
+        for( int i = 0; i < lcs_file.length; i++ ){
+            if( Byte.compare(lcs_file[i], EOL) == 0 ){ tam++; }
+        }
+        return tam;
     }
-
-    private static void addBlock(byte[] lcs_file, byte[] final_file) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    private static byte[] identifyBlock(VersionedFile file1, byte[] lcs_file, int i) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    
+    private static boolean isNull( byte[] seq ){
+        return seq.length == 0;
     }
     
 }

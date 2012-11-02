@@ -8,23 +8,22 @@ package br.uff.ic.labgc.exception;
  *
  * @author jokerfvd
  */
-public class IncorrectPasswordException extends VersioningException {
+public class StorageException extends ApplicationException {
 
     /**
      * Creates a new instance of
-     * <code>IncorrectPasswordException</code> without detail message.
+     * <code>StorageException</code> without detail message.
      */
-    public IncorrectPasswordException() {
+    public StorageException() {
     }
 
     /**
      * Constructs an instance of
-     * <code>IncorrectPasswordException</code> with the specified detail
-     * message.
+     * <code>StorageException</code> with the specified detail message.
      *
      * @param msg the detail message.
      */
-    public IncorrectPasswordException(String msg) {
+    public StorageException(String msg) {
         super(msg);
     }
 }

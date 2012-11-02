@@ -19,7 +19,7 @@ import org.hibernate.criterion.Restrictions;
  */
 public class ProjectDAO extends DAO{
 
-    public Project getName(String name) {
+    public Project getByName(String name) throws ObjectNotFoundException{
         try {
             Session sessao = HibernateUtil.getSession();
             
@@ -35,6 +35,10 @@ public class ProjectDAO extends DAO{
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
+    }
+    
+    public boolean exist(String name) throws InfrastructureException{
+        return exist(Project.class,"name",name);
     }
     
     public Project get(int id){

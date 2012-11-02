@@ -11,9 +11,12 @@ LABCG_MODE=server
 #
 #
 
+if [[ $# -eq 1 ]]
+then
+  LABCG_RMI_HOSTNAME=$1
+fi
 
-
-LABCG_OUT="java -cp $(readlink -f $LABCG_PATH) -Dbr.uff.ic.labgc.mode=$LABCG_MODE -Djava.rmi.server.codebase=file:$(readlink -f $LABCG_RMI_CODEBASE)/ -Djava.rmi.server.hostname=$LABCG_RMI_HOSTNAME -Djava.security.policy=$(readlink -f $LABCG_POLICITY) br.uff.ic.labgc.AppCLI $*"
+LABCG_OUT="java -cp $(readlink -f $LABCG_PATH) -Dbr.uff.ic.labgc.mode=$LABCG_MODE -Djava.rmi.server.codebase=file:$(readlink -f $LABCG_RMI_CODEBASE)/ -Djava.rmi.server.hostname=$LABCG_RMI_HOSTNAME -Djava.security.policy=$(readlink -f $LABCG_POLICITY) br.uff.ic.labgc.AppCLI"
 
 echo $LABCG_OUT
 

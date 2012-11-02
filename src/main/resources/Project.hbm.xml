@@ -7,7 +7,7 @@
                 <param name="sequence">LABGC.SEQ_PROJECT</param>
             </generator>       
         </id>     
-        <property name="name" column="name" type="string" not-null="true"/>
+        <property name="name" column="name" type="string" not-null="true" unique="true"/>
         <set name="projectUsers" order-by="USER_ID asc">
             <key column="PROJEC_ID"/>
             <one-to-many class="br.uff.ic.labgc.storage.ProjectUser"/>
