@@ -91,7 +91,7 @@ public class Workspace implements IObservable {
     FilenameFilter filter = new FilenameFilter() {
         @Override
         public boolean accept(File dir, String name) {
-        if (!name.endsWith("espelho.r")) {
+        if (!name.endsWith(".labgc")) {
             return true;
         }       
             return false;
