@@ -24,6 +24,7 @@ public class DAO implements IDAO{
         try {
             Session sessao = HibernateUtil.getSession();
             sessao.save(obj);
+            sessao.flush();
             return obj.getId();
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
@@ -36,6 +37,7 @@ public class DAO implements IDAO{
             Session sessao = HibernateUtil.getSession();
 
             sessao.delete(obj);
+            sessao.flush();
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
@@ -47,6 +49,7 @@ public class DAO implements IDAO{
             Session sessao = HibernateUtil.getSession();
 
             sessao.update(obj);
+            sessao.flush();
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }
@@ -59,6 +62,25 @@ public class DAO implements IDAO{
 
             Object obj = sessao.get(type, id);
 
+            if (obj == null) {
+                throw new ObjectNotFoundException();
+            }
+
+            return obj;
+        } catch (HibernateException e) {
+            throw new InfrastructureException(e);
+        }
+    }
+    
+    public Object getBy(Class objClass, String searchBy, String searchValue) 
+            throws ObjectNotFoundException{
+        try {
+            Session sessao = HibernateUtil.getSession();
+
+            Criteria criteria = sessao.createCriteria(objClass)
+                .add(Restrictions.eq(searchBy, searchValue));
+            Object obj = criteria.uniqueResult();
+            
             if (obj == null) {
                 throw new ObjectNotFoundException();
             }

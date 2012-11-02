@@ -18,27 +18,14 @@ import org.hibernate.criterion.Restrictions;
  * @author jokerfvd
  */
 public class ProjectDAO extends DAO{
+    public static final String NAME = "name";
 
     public Project getByName(String name) throws ObjectNotFoundException{
-        try {
-            Session sessao = HibernateUtil.getSession();
-            
-            Criteria criteria = sessao.createCriteria(Project.class)
-                .add(Restrictions.eq("name", name));
-            Project project = (Project) criteria.uniqueResult();
-
-            if (project == null) {
-                throw new ObjectNotFoundException();
-            }
-
-            return project;
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
+        return (Project)getBy(Project.class, NAME, name);
     }
     
     public boolean exist(String name) throws InfrastructureException{
-        return exist(Project.class,"name",name);
+        return exist(Project.class, NAME, name);
     }
     
     public Project get(int id){
