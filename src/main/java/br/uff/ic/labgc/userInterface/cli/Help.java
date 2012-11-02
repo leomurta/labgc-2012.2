@@ -9,7 +9,7 @@ import org.apache.commons.cli.*;
  */
 public class Help 
 {
-    public String m_strHelp ="The most commonly used git commands are: \n \t mkdir Creates a directory \n";
+    public String m_strHelp ="The most commonly used commands are: \n \t mkdir Creates a directory \n";
    
     public void run(Options _options) //throws ParseException
     {

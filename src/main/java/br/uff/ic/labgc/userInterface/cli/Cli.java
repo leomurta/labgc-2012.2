@@ -52,7 +52,7 @@ public class Cli implements IObserver
         m_options.addOption( OptionBuilder.withLongOpt( "checkout" )
                                         .withDescription( "Checkout a branch or paths to the working tree" )
                                         .hasArgs(2)
-                                        .withArgName("HOST REPOSITORY")
+                                        .withArgName("HOST PATH")
                                         .create("checkout") );
         
         m_options.addOption( OptionBuilder.withLongOpt( "revert" )
@@ -195,10 +195,10 @@ public class Cli implements IObserver
            if(checkArgs.length > 1)
            {
                Messages msg = new Messages();
-               for (int i = 0; i < checkArgs.length; i++) {
-                   System.out.println(i + "==>" + checkArgs[i]);
+               //for (int i = 0; i < checkArgs.length; i++) 
+                  // System.out.println(i + "==>" + checkArgs[i]);
                    
-               }
+               
                String strUrl = checkArgs[0];
                // Break URL in repo and host
                //file:/// or http://

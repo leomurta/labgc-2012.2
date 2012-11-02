@@ -14,8 +14,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,11 +31,11 @@ import java.util.logging.Logger;
  */
 public class Workspace implements IObservable {
 
-    private String LocalRepo;
+    private String LocalRepo; 
     private IObserver observer;
 
     public Workspace(String LocalRepo) {
-        this.LocalRepo = LocalRepo;
+        this.LocalRepo = LocalRepo; //caminho do projeto gravado na WS
     }
 
     /**
@@ -63,8 +67,92 @@ public class Workspace implements IObservable {
 
     }
     
-    // Primitiva de cópia de diretórios
+    // primitiva de listar diretório e colocar em array de File
     
+
+  static private List<File> listingDir(File startDir) 
+          throws FileNotFoundException {
+    List<File> result = new ArrayList<File>(); //cria
+    File[] strDir = startDir.listFiles();
+    List<File> str = Arrays.asList(strDir); //transforma
+    for(File file : str) {
+      if ( ! file.isFile() ) {
+        List<File> deeperList = listingDir(file);
+        result.addAll(deeperList);
+      }else{
+          result.add(file);
+      }
+    }
+    return result;
+  }
+  static private List<File> listingDirNotEspelho(File startDir) 
+          throws FileNotFoundException {
+    List<File> result = new ArrayList<File>(); //cria
+    FilenameFilter filter = new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+        if (!name.endsWith(".labgc")) {
+            return true;
+        }       
+            return false;
+        }
+    };
+    File[] strDir = startDir.listFiles(filter);
+    List<File> str = Arrays.asList(strDir); //transforma
+    for(File file : str) {
+      if ( ! file.isFile() ) {
+        List<File> deeperList = listingDir(file);
+        result.addAll(deeperList);
+      }else{
+          result.add(file);
+      }
+    }
+    return result;
+  }  
+    
+    // Primitiva de comparação de diretórios espelho x projeto
+   public static void compareDir(String dir1, String dir2, List<File> lDirM, List<File> lDirD, List<File> lDirA) {
+        List<File> strDir1 = new ArrayList<File>();
+        List<File> strDir2= new ArrayList<File>();
+        
+        String repo=LocalRepo;
+        Path baseDir = Paths.get(repo+File.separator+".labgc"+File.separator+"espelho.r");
+        int countdir=baseDir.getNameCount();
+        int max;
+        File dir=new File(dir1);
+        strDir1=listingDir(dir);
+        
+        // compara se teve modificação e "deleção"
+        for (File f : strDir1) { 
+            baseDir = Paths.get(f.getPath());
+            max=baseDir.getNameCount();
+            Path relativeDir=baseDir.subpath(countdir, max);
+            File d=relativeDir.toFile();
+            File file2=new File(LocalRepo+File.separator,d.toString());
+            if(f.lastModified()<file2.lastModified()){ //se foi modificado
+                lDirM.add (file2);
+            }
+            if (!file2.exists()) { //se foi deletado
+                lDirD.add (file2);
+            } 
+        }
+        baseDir = Paths.get(dir2);
+        countdir=baseDir.getNameCount();
+        File dir02 = new File(dir2);
+        strDir2=listingDirNotEspelho(dir02);
+        for (File f : strDir2) { 
+            baseDir = Paths.get(f.getPath());
+            max=baseDir.getNameCount();
+            Path relativeDir=baseDir.subpath(countdir, max);
+            File d=relativeDir.toFile();
+            File file2=new File(LocalRepo+File.separator,d.toString());
+            if (!file2.exists()) {  //se foi adicionado
+                lDirA.add (f);
+            }
+        }
+}
+
+    // Primitiva de cópia de diretórios
     void copyDir(File src, File dest)
     	throws IOException{
      	if(src.isDirectory()){
@@ -221,11 +309,45 @@ public class Workspace implements IObservable {
         return true;
     }
     
+public static void status(List<File> lDirM, List<File> lDirD, List<File> lDirA) 
+        throws IOException, WorkspaceException {
+    
+        File local = new File(LocalRepo);
+        File parent = new File(local.getParent());
+       
+        if (!parent.exists()) {
+            throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
 
-    public String status() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        }
+        File diretorio1 = new File(local + File.separator + ".labgc");
 
-    }
+        // testa se existe o diretorio de versionamento
+        if (!diretorio1.exists()) {
+            throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
+
+        }
+        // procura pelo espelho 
+        File[] stDir = diretorio1.listFiles();
+        boolean achou = false;
+        for (File file : stDir) {
+            String name = file.getName();
+            String extensao = name.substring(name.lastIndexOf("."), name.length());
+            int pos = name.lastIndexOf(".");
+            if (pos > 0) {
+                name = name.substring(0, pos);
+            }
+            if (name == "espelho") {
+//                diretorio1 = new File(diretorio + File.separator + name + extensao);
+                achou = true;
+            }
+        }
+        if (!achou) {
+            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
+        }
+        String dir01=LocalRepo+File.separator+".labgc"+File.separator+"espelho.r";
+        String dir02=LocalRepo;
+        compareDir(dir01, dir02, lDirM, lDirD, lDirA);
+}
 
     public boolean release() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -503,7 +625,11 @@ public class Workspace implements IObservable {
             result = new VersionedFile();
             result.setLastChangedTime(new Date(file.lastModified()));
             result.setName(file.getName());
-            ((VersionedFile)result).setContent(Files.readAllBytes(file));
+            try {
+                ((VersionedFile)result).setContent(Files.readAllBytes(file.toPath()));
+            } catch (IOException ex) {
+                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return result;
     }
