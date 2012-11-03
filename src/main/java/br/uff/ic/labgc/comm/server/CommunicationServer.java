@@ -81,7 +81,7 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public String log() throws RemoteException {
+    public VersionedItem log() throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: log");
         try {
             return server.log();
@@ -116,16 +116,7 @@ public class CommunicationServer implements ICommunicationServer {
         }
     }
 
-    @Override
-    public String diff(VersionedItem item, String version) throws RemoteException {
-        Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: diff");
-        try {
-            item.inflate();
-            return server.diff(item, version);
-        } catch (ApplicationException ex) {
-            throw new RemoteException("Erro ao executar diff.", ex);
-        }
-    }
+    
 
     @Override
     public byte[] getItemContent(String hash) throws RemoteException {

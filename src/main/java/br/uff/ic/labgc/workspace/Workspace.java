@@ -256,12 +256,12 @@ public class Workspace implements IObservable {
 
     }
     public boolean revert(String file)
-    throws IOException, WorkspaceException {
+    throws WorkspaceException {
         return true;
     }
     
     public boolean revert()
-            throws IOException, WorkspaceException {
+            throws  WorkspaceException {
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
        
@@ -297,13 +297,17 @@ public class Workspace implements IObservable {
         if (!deleteDir(parent)){
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não foi possível limpar WorkSpace.");
         }
-        copyDir (diretorio1, parent);
-/*        stDir = diretorio1.listFiles();
-        // copia os arquivos
-        for (File file : stDir) {
-            String name = file.getName();
-            copy(file, new File(diretorio + "\\" + name), true);
-        }*/
+        try {
+            copyDir (diretorio1, parent);
+    /*        stDir = diretorio1.listFiles();
+            // copia os arquivos
+            for (File file : stDir) {
+                String name = file.getName();
+                copy(file, new File(diretorio + "\\" + name), true);
+            }*/
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+        }
                 
         // se tudo deu certo    
         return true;
@@ -633,5 +637,30 @@ public static void status(List<File> lDirM, List<File> lDirD, List<File> lDirA)
         }
         return result;
     }
+    
+    
+    //implementar para o cliente
+
+    public VersionedItem status() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public VersionedItem diff(String file, String version) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void update(VersionedItem files) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public VersionedItem commit() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void setRevision(String revision) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+   
     
 } //End
