@@ -46,11 +46,11 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public String commit(VersionedItem item, String token) throws RemoteException {
+    public String commit(VersionedItem item, String message, String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: commit");
         try {
             item.inflate();
-            return server.commit(item, token);
+            return server.commit(item, message, token);
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar commit.", ex);
         }
@@ -81,10 +81,10 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public VersionedItem log() throws RemoteException {
+    public VersionedItem log(String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: log");
         try {
-            return server.log();
+            return server.log(token);
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar log.", ex);
         }

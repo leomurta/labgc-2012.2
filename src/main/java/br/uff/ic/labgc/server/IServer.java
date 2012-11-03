@@ -20,7 +20,7 @@ public interface IServer {
      * @param token Token que identifica o usuário e o repositório
      * @return Número da nova revisão do repositório
      */
-     public String commit(VersionedItem file, String token) throws ApplicationException;
+     public String commit(VersionedItem file, String message, String token) throws ApplicationException;
     /**
      * Atualiza a cópia de trabalho com a revisão solicitada.
      * @param revision Revisão para a qual se deseja atualizar a cópia de trabalho
@@ -46,7 +46,7 @@ public interface IServer {
      */
     public String login(String user, String pwd, String repository)throws ApplicationException;
 
-    public VersionedItem log() throws ApplicationException;
+    public VersionedItem log(String token) throws ApplicationException;
     
     public String getRepPath();
     public String getRepHost();

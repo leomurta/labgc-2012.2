@@ -44,7 +44,11 @@ public class Client implements IClient {
      * conjunto de observadores registrados na api client
      */
     private Set<IObserver> observers = new TreeSet<IObserver>();
-
+    /**
+     * nome do parametro que irá guardar o token de autenticacao
+     */
+    private final String AUTHENTICATION_TOKEN = "token";
+    
     /**
      * Construtor para acesso sem area de trabalho(workspace)
      *
@@ -80,15 +84,14 @@ public class Client implements IClient {
     //comandos para o servidor
     public VersionedItem commit(String message) throws ApplicationException{
         VersionedItem files = workspace.commit();
-        String revision = server.commit(files,message);
+        String revision = server.commit(files,message,loginToken);
         workspace.setRevision(revision);
         return files;
     }
 
     public VersionedItem update() throws ApplicationException{
         String clientRevision = workspace.getRevision();
-        String token = workspace.getParam("token");
-        VersionedItem files = server.update(clientRevision, token);
+        VersionedItem files = server.update(clientRevision, loginToken);
         workspace.update(files);
         return files;
     }
@@ -98,7 +101,7 @@ public class Client implements IClient {
     }
 
     public VersionedItem log() throws ApplicationException{
-        return server.log();
+        return server.log(loginToken);
     }
 
     public VersionedItem status() throws ApplicationException{
@@ -167,7 +170,7 @@ public class Client implements IClient {
 
         if (loginToken == null && workspace.isWorkspace()) {
             try {
-                loginToken = workspace.getParam("token");
+                loginToken = workspace.getParam(AUTHENTICATION_TOKEN);
             } catch (WorkspaceException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 throw new ClientWorkspaceNotInitialized();
@@ -218,6 +221,7 @@ public class Client implements IClient {
         workspace.setParam("token", loginToken);
 
     }
+
 
     /**
      * Recupera uma instancia de IServer;

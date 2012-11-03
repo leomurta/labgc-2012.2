@@ -33,7 +33,7 @@ public class Server extends AbstractServer {
         super(hostName);
     }
 
-    public String commit(VersionedItem file, String token) throws ApplicationException {
+    public String commit(VersionedItem file, String message, String token) throws ApplicationException {
         return versioning.addRevision((VersionedDir)file, token);
     }
 
@@ -45,7 +45,7 @@ public class Server extends AbstractServer {
         return versioning.getRevision(revision, token);
     }
 
-    public VersionedItem log() throws ApplicationException {
+    public VersionedItem log(String token) throws ApplicationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

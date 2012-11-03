@@ -51,7 +51,7 @@ public interface IVersioning {
     
     public byte[] getVersionedFileContent(String hash, String token) throws VersioningIOException;
     
-    public void addRevision(VersionedDir vd, String token);
+    public String addRevision(VersionedDir vd, String token);
     
     /**
      * realiza o import. Nao dava pra usar o nome import

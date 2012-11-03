@@ -280,15 +280,18 @@ public class Workspace implements IObservable {
     
     
     public boolean revert(String fileOrDir)
-    throws IOException, WorkspaceException {
+    throws  WorkspaceException {
         
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
         File target= new File(fileOrDir);
-        
-        // testa se o caminho está no repositório
-        if (! isSubDir(parent, target)){
-            throw new WorkspaceRepNaoExisteException("ERRO: Alvo não está no repositório.");
+        try {
+            // testa se o caminho está no repositório
+            if (! isSubDir(parent, target)){
+                throw new WorkspaceRepNaoExisteException("ERRO: Alvo não está no repositório.");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
         }
         // testa se é versionado
         if (!parent.exists()) {
