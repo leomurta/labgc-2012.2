@@ -230,5 +230,10 @@ public class Versioning implements IVersioning{
         }
             
     }
+
+    @Override
+    public VersionedDir updateRevision(String revNum, String token) throws ObjectNotFoundException {
+        return getRevision(EVCSConstants.REVISION_HEAD, token);
+    }
     
 }

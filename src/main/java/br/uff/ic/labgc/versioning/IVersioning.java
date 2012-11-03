@@ -45,6 +45,8 @@ public interface IVersioning {
      */
     public VersionedDir getRevision(String revNum, String token) throws ObjectNotFoundException;
     
+    public VersionedDir updateRevision(String revNum, String token) throws ObjectNotFoundException;
+    
     public String login(String projectName, String userName, String pass) throws ObjectNotFoundException, IncorrectPasswordException;
     
     public byte[] getVersionedFileContent(String hash, String token) throws VersioningIOException;
