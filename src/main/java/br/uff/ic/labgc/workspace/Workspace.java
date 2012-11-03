@@ -322,13 +322,22 @@ public class Workspace implements IObservable {
         }
         // testa se for arquivo copia por cima
         if (target.isFile()){
-            
+            //precisa extrair caminho relativo à baseDir (parent)
+            //adicionar caminho relativo ao espelho
+            //buscar o arquivo origem no espelho - testar se existe.
+            //  se sim sobrescrever o arquivo
+            //  senão throw exception
         }else{// diretório
-            //apaga origem
-            //recupera 
+            
+            //precisa extrair caminho relativo à baseDir (parent)-caminho-baseDir
+            //adicionar caminho relativo ao espelho - espelhor+relativeDir
+            //Se existe dir no espelho
+            //  apaga origem
+            //  copyDir
+            //senão lança exception
             
         }
-        
+      
         // se for diretório apaga e depois copia do espelho
         
         return true;
