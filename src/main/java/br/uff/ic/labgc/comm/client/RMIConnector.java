@@ -93,10 +93,10 @@ public class RMIConnector extends AbstractServer {
      * efetuar o update
      */
     @Override
-    public VersionedItem update(String revision, String token) throws ApplicationException {
+    public VersionedItem update(String clientRevision,  String revision, String token) throws ApplicationException {
         VersionedItem result = null;
         try {
-            result = server.update(revision, token);
+            result = server.update(clientRevision, revision, token);
             result.inflate();
         } catch (RemoteException ex) {
             handleRemoteException(ex);

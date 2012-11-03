@@ -17,7 +17,7 @@ public interface IClient extends IObservable{
     //comandos server
     
     public VersionedItem commit(String message) throws ApplicationException;
-    public VersionedItem update() throws ApplicationException;
+    public VersionedItem update(String revision) throws ApplicationException;
     public VersionedItem diff(String file, String version) throws ApplicationException;
     public VersionedItem log() throws ApplicationException;
     public VersionedItem status() throws ApplicationException;

@@ -89,9 +89,9 @@ public class Client implements IClient {
         return files;
     }
 
-    public VersionedItem update() throws ApplicationException{
+    public VersionedItem update(String revision) throws ApplicationException{
         String clientRevision = workspace.getRevision();
-        VersionedItem files = server.update(clientRevision, loginToken);
+        VersionedItem files = server.update(clientRevision, revision ,loginToken);
         workspace.update(files);
         return files;
     }

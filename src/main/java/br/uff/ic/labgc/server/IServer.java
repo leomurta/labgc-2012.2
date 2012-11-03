@@ -27,7 +27,7 @@ public interface IServer {
      * @param token Token que identifica o usuário e o repositório
      * @return Item versionado composto referente à revisão solicitada
      */
-    public VersionedItem update(String revision, String token) throws ApplicationException;
+    public VersionedItem update(String clientRevision, String revision, String token) throws ApplicationException;
     /**
      * Efetua o checkout da revisão solicitada.
      * @param revision Revisão que se deseja efetuar o checkout

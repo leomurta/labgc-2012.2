@@ -57,10 +57,10 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public VersionedItem update(String revision, String token) throws RemoteException {
+    public VersionedItem update(String clientRevision, String revision, String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: update");
         try {
-            VersionedItem result = server.update(revision, token);
+            VersionedItem result = server.update(clientRevision, revision, token);
             result.deflate();
             return result;
         } catch (ApplicationException ex) {
