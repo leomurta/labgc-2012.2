@@ -48,8 +48,7 @@ public interface ICommunicationServer extends Remote {
      * @throws RemoteException 
      */
     public String login(String user, String pwd, String repository)throws RemoteException;
-    public String diff(VersionedItem file, String version) throws RemoteException;
-    public String log() throws RemoteException;
+    public VersionedItem log() throws RemoteException;
     /**
      * Retorna o conteúdo do item versionado representado pelo hash informado.
      * @param hash Identifica o item versionado para o qual se deseja retornar o conteúdo

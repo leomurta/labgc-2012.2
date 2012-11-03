@@ -113,17 +113,7 @@ public class RMIConnector extends AbstractServer {
      * @throws ApplicationException Exceção ocorrida no servidor ao tentar
      * efetuar o diff
      */
-    @Override
-    public String diff(VersionedItem item, String version) throws ApplicationException {
-        String result = null;
-        try {
-            item.deflate();
-            result = server.diff(item, version);
-        } catch (RemoteException ex) {
-            handleRemoteException(ex);
-        }
-        return result;
-    }
+    
 
     /**
      * Executa remotamente o comando log
@@ -133,8 +123,8 @@ public class RMIConnector extends AbstractServer {
      * efetuar o log
      */
     @Override
-    public String log() throws ApplicationException {
-        String result = null;
+    public VersionedItem log() throws ApplicationException {
+        VersionedItem result = null;
         try {
             result = server.log();
         } catch (RemoteException ex) {

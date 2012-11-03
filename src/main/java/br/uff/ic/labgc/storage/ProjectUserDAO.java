@@ -109,16 +109,4 @@ public class ProjectUserDAO {
             throw new InfrastructureException(e);
         }
     }
-
-    public List getProjectUsers() {
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            List produtoCategorias = sessao.createQuery(
-                    "from ProjectUser as pu order by id asc").list();
-            return produtoCategorias;
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
-    }
 }

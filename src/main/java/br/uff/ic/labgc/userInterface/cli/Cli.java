@@ -52,7 +52,7 @@ public class Cli implements IObserver
         m_options.addOption( OptionBuilder.withLongOpt( "checkout" )
                                         .withDescription( "Checkout a branch or paths to the working tree" )
                                         .hasArgs(2)
-                                        .withArgName("HOST REPOSITORY")
+                                        .withArgName("HOST PATH")
                                         .create("checkout") );
         
         m_options.addOption( OptionBuilder.withLongOpt( "revert" )
@@ -109,7 +109,7 @@ public class Cli implements IObserver
         {
             String path = cmd.getOptionValue("mkdir");
             
-            runMakeDir(path);
+            //runMakeDir(path);
             return;
         }
         
@@ -195,10 +195,10 @@ public class Cli implements IObserver
            if(checkArgs.length > 1)
            {
                Messages msg = new Messages();
-               for (int i = 0; i < checkArgs.length; i++) {
-                   System.out.println(i + "==>" + checkArgs[i]);
+               //for (int i = 0; i < checkArgs.length; i++) 
+                  // System.out.println(i + "==>" + checkArgs[i]);
                    
-               }
+               
                String strUrl = checkArgs[0];
                // Break URL in repo and host
                //file:/// or http://
@@ -308,15 +308,6 @@ public class Cli implements IObserver
         return true;
     }
     
-    private void runMakeDir(String path)
-    {
-         String strCurrentTerminalPath = "";    
-         m_IClient = new Client(strCurrentTerminalPath);
-        
-        if(m_IClient.mkdir(path))
-            System.out.println("Directory successfully created.");  
-        else
-            System.out.println("The directory can not be created (Check permissions and the remaining space on the disc).");
-    }
+    
      
 }
