@@ -142,4 +142,10 @@ public abstract class VersionedItem implements Serializable {
      * @throws CompressionException
      */
     public abstract void deflate() throws ContentNotAvailableException, CompressionException;
+    
+    /**
+     * Informa se um VersionedItem é um diretorio
+     * @return true para diretorio e false para arquivo
+     */
+    public abstract boolean isDir();
 }

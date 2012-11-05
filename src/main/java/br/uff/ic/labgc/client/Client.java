@@ -9,7 +9,6 @@ import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.*;
 import br.uff.ic.labgc.server.*;
 import br.uff.ic.labgc.workspace.*;
-import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
