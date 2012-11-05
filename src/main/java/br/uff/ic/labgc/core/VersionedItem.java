@@ -47,6 +47,12 @@ public abstract class VersionedItem implements Serializable {
      */
     private boolean compressed;
     
+     
+    /**
+     * Status do VersionedItem
+    */
+    private int status;
+    
     /**
      * Indica se o conteudo do item é um diff.
      */
@@ -107,6 +113,15 @@ public abstract class VersionedItem implements Serializable {
     public void setCommitMessage(String commitMessage) {
         this.commitMessage = commitMessage;
     }
+    
+    
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
 
     /**
@@ -122,6 +137,7 @@ public abstract class VersionedItem implements Serializable {
     protected void setSize(long size) {
         this.size = size;
     }
+    
 
     /**
      * Expande o conteúdo deste item.

@@ -6,6 +6,7 @@ package br.uff.ic.labgc.client;
 
 import br.uff.ic.labgc.exception.*;
 import br.uff.ic.labgc.core.*;
+import java.util.List;
 
 
 /**
@@ -33,7 +34,7 @@ public interface IClient extends IObservable{
     
     boolean add(String file);
     
-    String status();
+    List<VersionedItem> status();
     boolean release();
     boolean resolve(String file);
     

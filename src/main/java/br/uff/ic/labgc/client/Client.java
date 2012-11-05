@@ -114,8 +114,19 @@ public class Client implements IClient {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String status() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public  List<VersionedItem> status()
+    {  
+        List<VersionedItem> stat = new ArrayList<VersionedItem>();
+        try 
+        {
+            stat =  workspace.statusVersionedItem();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (WorkspaceException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return stat;
     }
 
     public boolean release() {
