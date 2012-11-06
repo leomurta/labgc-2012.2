@@ -100,7 +100,7 @@ public class Client implements IClient {
         return workspace.diff(file,version);
     }
 
-    public VersionedItem log() throws ApplicationException{
+    public List<VersionedItem> log() throws ApplicationException{
         return server.log(loginToken);
     }
     
@@ -124,10 +124,14 @@ public class Client implements IClient {
         try 
         {
             stat =  workspace.statusVersionedItem();
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (WorkspaceException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        catch (IOException ex) 
+        {
+            throw new ApplicationException(ex.getMessage());
+        } 
+        catch (WorkspaceException ex) 
+        {
+             throw new ApplicationException(ex.getMessage());
         }
         
         return stat;
@@ -201,7 +205,7 @@ public class Client implements IClient {
 
         IObserver clientObs = new IObserver() {
             public void sendNotify(String msg) {
-                this.sendNotify(msg);
+                Client.this.sendNotify(msg);
             }
         };
 

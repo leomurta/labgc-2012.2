@@ -14,6 +14,8 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -123,8 +125,8 @@ public class RMIConnector extends AbstractServer {
      * efetuar o log
      */
     @Override
-    public VersionedItem log(String token) throws ApplicationException {
-        VersionedItem result = null;
+    public  List<VersionedItem> log(String token) throws ApplicationException {
+         List<VersionedItem> result = new ArrayList<VersionedItem>();
         try {
             result = server.log(token);
         } catch (RemoteException ex) {

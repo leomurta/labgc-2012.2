@@ -15,6 +15,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,7 +72,8 @@ public class CommunicationServer implements ICommunicationServer {
     @Override
     public VersionedItem checkout(String revision, String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: checkout");
-        try {
+        try 
+        {
             VersionedItem result = server.checkout(revision, token);
             result.deflate();
             return result;
@@ -81,7 +83,7 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public VersionedItem log(String token) throws RemoteException {
+    public  List<VersionedItem> log(String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: log");
         try {
             return server.log(token);

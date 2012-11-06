@@ -20,7 +20,7 @@ public interface IClient extends IObservable{
     public VersionedItem commit(String message) throws ApplicationException;
     public VersionedItem update(String revision) throws ApplicationException;
     public VersionedItem diff(String file, String version) throws ApplicationException;
-    public VersionedItem log() throws ApplicationException;
+    public  List<VersionedItem> log() throws ApplicationException;
     public boolean resolve(String file) throws ApplicationException;
     public List<VersionedItem> status() throws ApplicationException;
     //implementados

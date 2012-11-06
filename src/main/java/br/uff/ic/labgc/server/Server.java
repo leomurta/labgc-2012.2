@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +46,7 @@ public class Server extends AbstractServer {
         return versioning.getRevision(revision, token);
     }
 
-    public VersionedItem log(String token) throws ApplicationException {
+    public  List<VersionedItem> log(String token) throws ApplicationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

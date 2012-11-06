@@ -7,6 +7,7 @@ package br.uff.ic.labgc.comm.server;
 import br.uff.ic.labgc.core.VersionedItem;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 /**
  *
@@ -48,7 +49,7 @@ public interface ICommunicationServer extends Remote {
      * @throws RemoteException 
      */
     public String login(String user, String pwd, String repository)throws RemoteException;
-    public VersionedItem log(String token) throws RemoteException;
+    public  List<VersionedItem> log(String token) throws RemoteException;
     /**
      * Retorna o conteúdo do item versionado representado pelo hash informado.
      * @param hash Identifica o item versionado para o qual se deseja retornar o conteúdo

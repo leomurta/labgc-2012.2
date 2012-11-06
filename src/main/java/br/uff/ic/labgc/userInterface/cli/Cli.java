@@ -67,16 +67,22 @@ public class Cli
                                         .withArgName("USER PASSWORD")
                                         .create("login") );
         
-        m_options.addOption( OptionBuilder.withDescription( "Get the status of a item" )
+        m_options.addOption( OptionBuilder.withDescription( "Get the status of a item or path" )
                                         .hasArgs()
-                                        .withArgName("ITEM PATH")
+                                        .withArgName("ITEM(OPTIONAL)")
                                         .create("status") );
         
         m_options.addOption( OptionBuilder.withLongOpt("m")
                                         .withDescription( "Commit the changes made" )
-                                        .hasArgs()
-                                        .withArgName("PATH COMMIT_MESSAGE")
+                                        .hasArgs(0)
+                                        .withArgName("COMMIT_MESSAGE")
                                         .create("commit") );
+        
+        
+         m_options.addOption( OptionBuilder.withDescription( "Log of the latest revisions" )
+                                        .hasArgs()
+                                        .withArgName("ITEM(OPTIONAL)")
+                                        .create("log") );
     }
     
     private void dysplayHelp() 
@@ -115,7 +121,6 @@ public class Cli
         IObserver clientObs = new IObserver() {
             public void sendNotify(String msg) 
             {
-                //this.sendNotify(msg);
                  System.out.println(msg+"\n");
             }
         };
@@ -201,6 +206,15 @@ public class Cli
         {
             String [] commitArg = cmd.getOptionValues("commit"); 
             runCommit(commitArg);
+           
+            return;
+        }
+        
+        
+        if(cmd.hasOption("log")) 
+        {
+            String [] logtArg = cmd.getOptionValues("log"); 
+            runLog(logtArg);
            
             return;
         }
@@ -388,11 +402,11 @@ public class Cli
      private void runCommit(String [] commitArgs)
      {
          
-         if(commitArgs.length >=2)
+         if(commitArgs.length >0)
          {
              
-             String strCommitPath = commitArgs[0];
-             String strMessage = commitArgs[1];
+             String strCommitPath = invocationPath;
+             String strMessage = commitArgs[0];
            
              m_IClient = new Client(strCommitPath);
              registerObserver();
@@ -417,10 +431,10 @@ public class Cli
      private void runStatus(String [] statusArg)
      {
          
+         String strItemPath=invocationPath;
          if(statusArg.length>0)
-         {
-             String strItemPath = statusArg[0];
-           
+            strItemPath += statusArg[0];
+             
              m_IClient = new Client(strItemPath);
              
              List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
@@ -438,14 +452,36 @@ public class Cli
              for (VersionedItem v : listItem)
              {
                   System.out.println(v.getName()+"    "+ GetStatus(v.getStatus())+"\n");
-             }
-                 
+             } 
+         
+     }
+     
+     
+     private void runLog(String [] logArg)
+     {
+         
+         String strItemPath=invocationPath;
+         if(logArg.length>0)
+            strItemPath += logArg[0];
              
-         }
-         else
-         {
-            System.out.println("The amount of arguments is insufficient ("+statusArg.length+").");
-         }
+             m_IClient = new Client(strItemPath);
+             
+             List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
+             try 
+             {
+                listItem = m_IClient.log();
+                //Collections.sort(listItem, compare);
+             } 
+             catch (ApplicationException ex) 
+             {
+                //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+                 System.out.println(ex.getMessage());
+             }
+             
+             for (VersionedItem v : listItem)
+             {
+                  
+             } 
          
      }
      
