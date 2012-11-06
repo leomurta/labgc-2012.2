@@ -44,7 +44,7 @@ public class Client implements IClient {
      */
     private Set<IObserver> observers = new TreeSet<IObserver>();
     /**
-     * nome do parametro que ir√° guardar o token de autenticacao
+     * nome do parametro que ir· guardar o token de autenticacao
      */
     private final String AUTHENTICATION_TOKEN = "token";
     
@@ -120,6 +120,21 @@ public class Client implements IClient {
         return workspace.revert(file);
     }
     
+
+     public  List<VersionedItem> status()
+    {  
+        List<VersionedItem> stat = new ArrayList<VersionedItem>();
+        try 
+        {
+            stat =  workspace.statusVersionedItem();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (WorkspaceException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return stat;
+    }
 
     public void checkout(String revision) throws ApplicationException {
 

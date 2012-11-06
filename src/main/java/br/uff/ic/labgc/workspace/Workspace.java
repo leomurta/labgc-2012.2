@@ -113,7 +113,7 @@ public class Workspace implements IObservable {
   }  
     
     // Primitiva de comparação de diretórios espelho x projeto
-   public static void compareDir(String dir1, String dir2, List<File> lDirM, List<File> lDirD, List<File> lDirA) {
+   public  void compareDir(String dir1, String dir2, List<File> lDirM, List<File> lDirD, List<File> lDirA) throws FileNotFoundException {
         List<File> strDir1 = new ArrayList<File>();
         List<File> strDir2= new ArrayList<File>();
         
@@ -152,6 +152,80 @@ public class Workspace implements IObservable {
                 lDirA.add (f);
             }
         }
+}
+   
+    public  List<VersionedItem> compareDir(String dir1, String dir2) throws FileNotFoundException {
+        List<File> strDir1 = new ArrayList<File>();
+        List<File> strDir2= new ArrayList<File>();
+        
+        List<VersionedItem> lItem = new ArrayList<VersionedItem>();
+        String repo=LocalRepo;
+        Path baseDir = Paths.get(repo+File.separator+".labgc"+File.separator+"espelho.r");
+        int countdir=baseDir.getNameCount();
+        int max;
+        File dir=new File(dir1);
+        strDir1=listingDir(dir);
+        
+        // compara se teve modificação e "deleção"
+        for (File f : strDir1) 
+        { 
+            VersionedItem item;
+            baseDir = Paths.get(f.getPath());
+            max=baseDir.getNameCount();
+            Path relativeDir=baseDir.subpath(countdir, max);
+            File d=relativeDir.toFile();
+            File file2=new File(LocalRepo+File.separator,d.toString());
+            if(f.lastModified()<file2.lastModified())
+            { //se foi modificado
+                
+                if(file2.isDirectory())
+                    item = new VersionedDir();
+                else
+                    item = new VersionedFile();
+                
+                item.setName(file2.getName());
+                item.setStatus(EVCSConstants.MODIFIED);
+                lItem.add (item);
+            }
+            if (!file2.exists()) 
+            { //se foi deletado
+                
+                if(file2.isDirectory())
+                    item = new VersionedDir();
+                else
+                    item = new VersionedFile();
+                
+                item.setName(file2.getName());
+                item.setStatus(EVCSConstants.DELETED);
+                lItem.add (item);
+            } 
+        }
+        baseDir = Paths.get(dir2);
+        countdir=baseDir.getNameCount();
+        File dir02 = new File(dir2);
+        strDir2=listingDirNotEspelho(dir02);
+        for (File f : strDir2) 
+        { 
+            VersionedItem item;
+            baseDir = Paths.get(f.getPath());
+            max=baseDir.getNameCount();
+            Path relativeDir=baseDir.subpath(countdir, max);
+            File d=relativeDir.toFile();
+            File file2=new File(LocalRepo+File.separator,d.toString());
+            if (!file2.exists()) 
+            {  
+                if(f.isDirectory())
+                    item = new VersionedDir();
+                else
+                    item = new VersionedFile();
+                //se foi adicionado
+                item.setName(f.getName());
+                lItem.add (item);
+            }
+        }
+        
+        
+        return lItem;
 }
 
     // Primitiva de cópia de diretórios
@@ -406,7 +480,7 @@ throws  WorkspaceException {
     return true;
 }
     
-public static void status(List<File> lDirM, List<File> lDirD, List<File> lDirA) 
+public  void status(List<File> lDirM, List<File> lDirD, List<File> lDirA) 
         throws IOException, WorkspaceException {
     
         File local = new File(LocalRepo);
@@ -444,6 +518,51 @@ public static void status(List<File> lDirM, List<File> lDirD, List<File> lDirA)
         String dir01=LocalRepo+File.separator+".labgc"+File.separator+"espelho.r";
         String dir02=LocalRepo;
         compareDir(dir01, dir02, lDirM, lDirD, lDirA);
+}
+
+public  List<VersionedItem> statusVersionedItem() 
+        throws IOException, WorkspaceException {
+    
+        File local = new File(LocalRepo);
+        File parent = new File(local.getParent());
+       
+        if (!parent.exists()) {
+            throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
+
+        }
+        File diretorio1 = new File(local + File.separator + ".labgc");
+
+        // testa se existe o diretorio de versionamento
+        if (!diretorio1.exists()) {
+            throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
+
+        }
+        // procura pelo espelho 
+        File[] stDir = diretorio1.listFiles();
+        boolean achou = false;
+        for (File file : stDir) 
+        {
+            String name = file.getName();
+            String extensao = name.substring(name.lastIndexOf("."), name.length());
+            int pos = name.lastIndexOf(".");
+            if (pos > 0) {
+                name = name.substring(0, pos);
+            }
+            if (name == "espelho") {
+//                diretorio1 = new File(diretorio + File.separator + name + extensao);
+                achou = true;
+            }
+        }
+        if (!achou) {
+            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
+        }
+        String dir01=LocalRepo+File.separator+".labgc"+File.separator+"espelho.r";
+        String dir02=LocalRepo;
+        
+        List<VersionedItem> lItem;
+        lItem  = compareDir(dir01, dir02);
+        
+        return lItem;
 }
 
     public boolean release() {
