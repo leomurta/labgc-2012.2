@@ -626,7 +626,7 @@ public static void status(List<File> lDirM, List<File> lDirD, List<File> lDirA)
      *
      * @return
      */
-    public String getHostname() throws WorkspaceException {
+    public String getHost() throws WorkspaceException {
         return getParam("hostname");
     }
 
@@ -636,7 +636,7 @@ public static void status(List<File> lDirM, List<File> lDirD, List<File> lDirA)
      *
      * @return
      */
-    public String getRepository() throws WorkspaceException {
+    public String getProject() throws WorkspaceException {
         return getParam("repositorio");
     }
     /**
