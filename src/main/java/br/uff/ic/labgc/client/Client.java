@@ -73,8 +73,8 @@ public class Client implements IClient {
 
         workspace = new Workspace(systemDirectory);
         try {
-            this.hostname = workspace.getHostname();
-            this.repository = workspace.getRepository();
+            this.hostname = workspace.getHost();
+            this.repository = workspace.getProject();
         } catch (WorkspaceException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
