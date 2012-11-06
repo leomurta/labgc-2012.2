@@ -149,7 +149,7 @@ public class VersioningJUnitTest {
         
         vd.addItem(vf);
         try {
-            versioning.addProject(vd, "username1");
+            versioning.addFirstRevision(vd, "username1");
             
             Project project = projectDAO.getByName("projeto10");
             assertNotNull(project);
