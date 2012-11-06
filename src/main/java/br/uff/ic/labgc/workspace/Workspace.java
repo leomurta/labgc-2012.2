@@ -10,6 +10,7 @@ import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
 import br.uff.ic.labgc.exception.WorkspaceRepNaoExisteException;
+import br.uff.ic.labgc.util.VersionedItems;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,11 +34,113 @@ public class Workspace implements IObservable {
 
     private String LocalRepo; 
     private IObserver observer;
+    private final String PROPERTIES_FILE = "labgc.properties";
+    private final String PROPERTY_REVISION = "revision";
+    private final String PROPERTY_HOST = "hostname";
+    private final String PROPERTY_PROJECT = "repository";
+    private final String WS_FOLDER = ".labgc";
+    private final String ESPELHO = "espelho.r";
 
     public Workspace(String LocalRepo) {
         this.LocalRepo = LocalRepo; //caminho do projeto gravado na WS
     }
 
+    //Métodos de propriedades
+    public void setParam(String key, String value)
+            throws WorkspaceException {
+        setProperty(key, value);
+    }
+    
+
+    /**
+     * metodo para pegar o valor de um parametro salvo
+     *
+     * @param key, chave do parametro salvo
+     * @return
+     */
+    public String getParam(String key)
+            throws WorkspaceException {
+            
+        return getProperty(key);
+        
+    }
+
+    /**
+     * retorna valor do hostname guardado na criacao do workspace
+     *
+     * @return
+     */
+    public String getHost() throws WorkspaceException {
+        return getProperty(PROPERTY_HOST);
+    }
+
+    /**
+     * retorna o valor do relacionado ao repositorio do projeto no servidor.
+     * Valor adicionado na criacao do workspace
+     *
+     * @return
+     */
+    public String getProject() throws WorkspaceException {
+        return getProperty(PROPERTY_PROJECT);
+    }
+    /**
+     * retorna o valor do relacionado ao repositorio do projeto no servidor.
+     * Valor adicionado na criacao do workspace
+     *
+     * @return
+     */
+    public String getRevision() throws WorkspaceException {
+        return getProperty(PROPERTY_REVISION);
+    }
+
+     public void setRevision(String revision) throws WorkspaceException{
+        setProperty(PROPERTY_REVISION, revision);
+    }
+    
+    private void setProperty(String chave, String valor) throws WorkspaceException{
+        File vcs = new File(this.LocalRepo, WS_FOLDER);
+        File file = new File(vcs, PROPERTIES_FILE);
+        Properties properties = new Properties();
+        if (file.exists()) {
+            FileInputStream fis;
+            try {
+                fis = new FileInputStream(file);
+                properties.load(fis);
+                fis.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WorkspaceException("nao foi possivel abrir arquivo de propriedades");
+            }
+        } else {
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WorkspaceException("nao foi possivel criar");
+            }
+        }
+    }
+    
+    private String getProperty (String chave) throws WorkspaceException{
+        File vcs = new File(this.LocalRepo, WS_FOLDER);
+        File file = new File(vcs, PROPERTIES_FILE);
+
+        Properties properties = new Properties();
+        FileInputStream fi;
+        try {
+            fi = new FileInputStream(file);
+            properties.load(fi);
+            fi.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException("Erro ao manipular o arquivo de parametro");
+        }
+
+        return properties.getProperty(chave);
+    
+    }
+    
+    
     /**
      *
      * @param file
@@ -70,7 +173,7 @@ public class Workspace implements IObservable {
     // primitiva de listar diretório e colocar em array de File
     
 
-  static private List<File> listingDir(File startDir) 
+  private List<File> listingDir(File startDir) 
           throws FileNotFoundException {
     List<File> result = new ArrayList<File>(); //cria coleção
     File[] strDir = startDir.listFiles();
@@ -85,7 +188,7 @@ public class Workspace implements IObservable {
     }
     return result;
   }
-  static private List<File> listingDirNotEspelho(File startDir) 
+ private List<File> listingDirNotEspelho(File startDir) 
           throws FileNotFoundException {
     List<File> result = new ArrayList<File>(); //cria coleção
     // filtro para não entrar no diretorio de controle
@@ -595,38 +698,30 @@ public  List<VersionedItem> statusVersionedItem()
 
         //pega os items, grava os arquivos no disco e 
         //grava a pasta de controle dentro da pasta do projeto
-
+        
         File local = new File(LocalRepo);
-        File parent = new File(local.getParent());
-        String revision = items.getLastChangedRevision();
-
-        try {
-            this.writeVersionedDir((VersionedDir) items, parent);
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
-        }
-
-        // cria diretorio de controle
-        File vcs = new File(local, ".labgc");
-        vcs.mkdir();
-
-        // cria diretorio espelho da versao atual
-        File espelho;
-        espelho = new File(vcs, "espelho.r");
+        File controle = new File(local, WS_FOLDER);
+        File espelho = new File(controle, ESPELHO);
+        
+        local.mkdir();
+        controle.mkdir();
         espelho.mkdir();
         
-        // Escreve arquivos no diretorio espelho
-        try {
-            this.writeVersionedDir((VersionedDir) items, espelho);
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
-        }
+        IObserver observer = new IObserver() {
+
+                    @Override
+                    public void sendNotify(String path) {
+                        notifyObservers(path);
+                    }
+                };
         
-        setParam("repositorio", repository);
-        setParam("hostname", hostname);
-        setParam("revision", revision);
+        
+        VersionedItems.write(local, ((VersionedDir)items).getContainedItens(),new IObserver[]{observer});
+        VersionedItems.write(espelho, ((VersionedDir)items).getContainedItens());
+        
+        setProperty(PROPERTY_PROJECT,repository);
+        setProperty(PROPERTY_HOST, hostname);
+        setRevision(items.getLastChangedRevision());
     }
 
 
@@ -647,137 +742,10 @@ public  List<VersionedItem> statusVersionedItem()
         return false;
     }
     
-    
-    /**
-     * salva arquivos versionados, do servidor, para o workspace(disco local)
-     *
-     * @param items, arquivo de itens versionados, sendo que o conjunto contem
-     * arquivos e pastas
-     */
-    public void storeLocalData(VersionedItem items) {
-    }
-
-    private void writeVersionedDir(VersionedDir dir, File folder ) throws IOException, ApplicationException {
-        File directory = new File(folder, dir.getName());
-        directory.mkdir();
-
-        for (VersionedItem item : dir.getContainedItens()) {
-            if (item instanceof VersionedDir) {
-                writeVersionedDir((VersionedDir) item, directory);
-            } else {
-                writeVersionedFile((VersionedFile) item, directory);
-            }
-        }
-        directory.setLastModified(dir.getLastChangedTime().getTime());
-    }
-
-    private void writeVersionedFile(VersionedFile f, File folder) throws IOException, ApplicationException {
-
-        File file = new File(folder, f.getName());
-        file.createNewFile();
-
-        byte[] content;
-            
-        content = f.getContent();
-        FileOutputStream fileWriter = new FileOutputStream(file);
-        fileWriter.write(content);
-        fileWriter.close();
-        file.setLastModified(f.getLastChangedTime().getTime());
-        this.notifyObservers(file.getPath());
-            
-        
-    }
-    
     /*
      * setParam - coloca em um arquivo um par chave/valor
      */
 
-    public void setParam(String key, String value)
-            throws WorkspaceException {
-        File vcs = new File(this.LocalRepo, ".labgc");
-        File file = new File(vcs, "labgc.properties");
-        Properties properties = new Properties();
-        if (file.exists()) {
-            FileInputStream fis;
-            try {
-                fis = new FileInputStream(file);
-                properties.load(fis);
-                fis.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WorkspaceException("nao foi possivel abrir arquivo de propriedades");
-            }
-        } else {
-            try {
-                file.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WorkspaceException("nao foi possivel criar");
-            }
-        }
-
-        properties.setProperty(key, value);
-        try {
-            properties.store(new FileOutputStream(file), null);
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("nao foi possivel gravar");
-        }
-    }
-
-    /**
-     * metodo para pegar o valor de um parametro salvo
-     *
-     * @param key, chave do parametro salvo
-     * @return
-     */
-    public String getParam(String key)
-            throws WorkspaceException {
-
-        File vcs = new File(this.LocalRepo, ".labgc");
-        File file = new File(vcs, "labgc.properties");
-
-        Properties properties = new Properties();
-        FileInputStream fi;
-        try {
-            fi = new FileInputStream(file);
-            properties.load(fi);
-            fi.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("Erro ao manipular o arquivo de parametro");
-        }
-
-        return properties.getProperty(key);
-    }
-
-    /**
-     * retorna valor do hostname guardado na criacao do workspace
-     *
-     * @return
-     */
-    public String getHost() throws WorkspaceException {
-        return getParam("hostname");
-    }
-
-    /**
-     * retorna o valor do relacionado ao repositorio do projeto no servidor.
-     * Valor adicionado na criacao do workspace
-     *
-     * @return
-     */
-    public String getProject() throws WorkspaceException {
-        return getParam("repositorio");
-    }
-    /**
-     * retorna o valor do relacionado ao repositorio do projeto no servidor.
-     * Valor adicionado na criacao do workspace
-     *
-     * @return
-     */
-    public String getRevision() throws WorkspaceException {
-        return getParam("revision");
-    }
 
     /**
      * verifica se o localRepo e um workspace valido e inicializado
@@ -880,10 +848,7 @@ public  List<VersionedItem> statusVersionedItem()
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public void setRevision(String revision) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-    
+   
    
     
 } //End
