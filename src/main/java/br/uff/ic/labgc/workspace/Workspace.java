@@ -10,6 +10,7 @@ import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
 import br.uff.ic.labgc.exception.WorkspaceRepNaoExisteException;
+import br.uff.ic.labgc.util.VersionedItems;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -697,38 +698,30 @@ public  List<VersionedItem> statusVersionedItem()
 
         //pega os items, grava os arquivos no disco e 
         //grava a pasta de controle dentro da pasta do projeto
-
+        
         File local = new File(LocalRepo);
-        File parent = new File(local.getParent());
-        String revision = items.getLastChangedRevision();
-
-        try {
-            this.writeVersionedDir((VersionedDir) items, parent);
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
-        }
-
-        // cria diretorio de controle
-        File vcs = new File(local, ".labgc");
-        vcs.mkdir();
-
-        // cria diretorio espelho da versao atual
-        File espelho;
-        espelho = new File(vcs, "espelho.r");
+        File controle = new File(local, WS_FOLDER);
+        File espelho = new File(controle, ESPELHO);
+        
+        local.mkdir();
+        controle.mkdir();
         espelho.mkdir();
         
-        // Escreve arquivos no diretorio espelho
-        try {
-            this.writeVersionedDir((VersionedDir) items, espelho);
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
-        }
+        IObserver observer = new IObserver() {
+
+                    @Override
+                    public void sendNotify(String path) {
+                        notifyObservers(path);
+                    }
+                };
         
-        setParam("repositorio", repository);
-        setParam("hostname", hostname);
-        setParam("revision", revision);
+        
+        VersionedItems.write(local, ((VersionedDir)items).getContainedItens(),new IObserver[]{observer});
+        VersionedItems.write(espelho, ((VersionedDir)items).getContainedItens());
+        
+        setProperty(PROPERTY_PROJECT,repository);
+        setProperty(PROPERTY_HOST, hostname);
+        setRevision(items.getLastChangedRevision());
     }
 
 
@@ -747,47 +740,6 @@ public  List<VersionedItem> statusVersionedItem()
             return true;
         }
         return false;
-    }
-    
-    
-    /**
-     * salva arquivos versionados, do servidor, para o workspace(disco local)
-     *
-     * @param items, arquivo de itens versionados, sendo que o conjunto contem
-     * arquivos e pastas
-     */
-    public void storeLocalData(VersionedItem items) {
-    }
-
-    private void writeVersionedDir(VersionedDir dir, File folder ) throws IOException, ApplicationException {
-        File directory = new File(folder, dir.getName());
-        directory.mkdir();
-
-        for (VersionedItem item : dir.getContainedItens()) {
-            if (item instanceof VersionedDir) {
-                writeVersionedDir((VersionedDir) item, directory);
-            } else {
-                writeVersionedFile((VersionedFile) item, directory);
-            }
-        }
-        directory.setLastModified(dir.getLastChangedTime().getTime());
-    }
-
-    private void writeVersionedFile(VersionedFile f, File folder) throws IOException, ApplicationException {
-
-        File file = new File(folder, f.getName());
-        file.createNewFile();
-
-        byte[] content;
-            
-        content = f.getContent();
-        FileOutputStream fileWriter = new FileOutputStream(file);
-        fileWriter.write(content);
-        fileWriter.close();
-        file.setLastModified(f.getLastChangedTime().getTime());
-        this.notifyObservers(file.getPath());
-            
-        
     }
     
     /*
