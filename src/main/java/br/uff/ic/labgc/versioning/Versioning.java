@@ -297,9 +297,40 @@ public class Versioning implements IVersioning{
             
     }
 
+    /*
+     * Dada uma revisão, madar o diff para que esta seja atualizada para outra
+     */
     @Override
-    public VersionedDir updateRevision(String revNum, String token) throws ObjectNotFoundException {
+    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ObjectNotFoundException {
         return getRevision(EVCSConstants.REVISION_HEAD, token);
     }
     
+    public List<VersionedDir> getLastLogs(String token){
+        return getLastLogs(EVCSConstants.DEFAULT_LOG_MSG, token);
+    }
+    
+    /*
+     * primeiro da lista é o + recente
+     */
+    @Override
+    public List<VersionedDir> getLastLogs(int num, String token){
+        List<VersionedDir> list = new ArrayList();
+        ProjectUser pu = projectUserDAO.getByToken(token);
+        String revNum = revisionDAO.getHeadRevisionNumber(pu.getProject());
+        Revision revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), revNum);
+        ConfigurationItem ci = revision.getConfigItem();
+        for(int i=0; i < num; i++){
+            VersionedDir vd = new VersionedDir();
+            vd.setAuthor(ci.getRevision().getUser().getName());
+            vd.setCommitMessage(ci.getRevision().getDescription());
+            vd.setLastChangedRevision(ci.getRevision().getNumber());
+            vd.setLastChangedTime(ci.getRevision().getDate());
+            vd.setName(ci.getName());
+            //vd.setStatus();
+            list.add(vd);
+            ci = ci.getPrevious();
+        }
+        
+        return list;
+    }
 }

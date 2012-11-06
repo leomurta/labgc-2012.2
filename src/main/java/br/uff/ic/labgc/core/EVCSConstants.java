@@ -15,6 +15,11 @@ public interface EVCSConstants {
      */
     public static final String REVISION_HEAD = "-1";
     
+    /*
+     * Identifica a quantidade de msgs default que o log retornará
+     */
+    public static final int DEFAULT_LOG_MSG = 10;
+    
     /**
      * Identifica que o item nao foi modificado
      */
