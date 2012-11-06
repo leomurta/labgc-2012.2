@@ -23,7 +23,7 @@ import org.apache.derby.tools.sysinfo;
  * Hello world!
  *
  */
-public class Cli implements IObserver
+public class Cli
 {
     private Options m_options;
     private IClient m_IClient;
@@ -44,38 +44,39 @@ public class Cli implements IObserver
         m_options = new Options();
         
         //Add Help 
-        m_options.addOption(" ","help", false, "Display help"); 
+        m_options.addOption("help",false, "Display help"); 
         
-        //m_options.addOption(" ","mkdir", true, "Creates a directory");
-        m_options.addOption( OptionBuilder.withLongOpt( "mkdir" )
-                                        .withDescription( "Creates a directory" )
+        
+        m_options.addOption( OptionBuilder.withDescription( "Creates a directory" )
                                         .hasArg()
                                         .withArgName("PATH")
                                         .create("mkdir") );       
         
-        m_options.addOption( OptionBuilder.withLongOpt( "checkout" )
-                                        .withDescription( "Checkout a branch or paths to the working tree" )
+        m_options.addOption( OptionBuilder.withDescription( "Checkout a branch or paths to the working tree" )
                                         .hasArgs(2)
                                         .withArgName("HOST PATH")
                                         .create("checkout") );
         
-        m_options.addOption( OptionBuilder.withLongOpt( "revert" )
-                                        .withDescription( "Revert modfications on a especific file or files in a directory" )
+        m_options.addOption( OptionBuilder.withDescription( "Revert modfications on a especific file or files in a directory" )
                                         .hasArg()
                                         .withArgName("FILENAME OR PATH")
                                         .create("revert") );
         
-        m_options.addOption( OptionBuilder.withLongOpt( "login" )
-                                        .withDescription( "Make login" )
+        m_options.addOption( OptionBuilder.withDescription( "Make login" )
                                         .hasArgs(2)
                                         .withArgName("USER PASSWORD")
                                         .create("login") );
         
-        m_options.addOption( OptionBuilder.withLongOpt( "status" )
-                                        .withDescription( "Get the status of a item" )
+        m_options.addOption( OptionBuilder.withDescription( "Get the status of a item" )
                                         .hasArgs()
-                                        .withArgName("Item")
+                                        .withArgName("ITEM PATH")
                                         .create("status") );
+        
+        m_options.addOption( OptionBuilder.withLongOpt("m")
+                                        .withDescription( "Commit the changes made" )
+                                        .hasArgs()
+                                        .withArgName("PATH COMMIT_MESSAGE")
+                                        .create("commit") );
     }
     
     private void dysplayHelp() 
@@ -108,10 +109,27 @@ public class Cli implements IObserver
         return "";
     }
     
+    
+    private void registerObserver()
+    {
+        IObserver clientObs = new IObserver() {
+            public void sendNotify(String msg) 
+            {
+                //this.sendNotify(msg);
+                 System.out.println(msg+"\n");
+            }
+        };
+        
+        m_IClient.registerInterest(clientObs);
+    }
+    
+    
+    
     public void  run(String[] args) throws ParseException, ClientWorkspaceUnavailableException
     {
         
-        CommandLineParser parser = new PosixParser();
+        //CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new GnuParser();
         addOptions(); 
         Messages msg = new Messages();   
         CommandLine cmd = null;
@@ -179,6 +197,22 @@ public class Cli implements IObserver
             return;
         }
         
+        if(cmd.hasOption("commit")) 
+        {
+            String [] commitArg = cmd.getOptionValues("commit"); 
+            runCommit(commitArg);
+           
+            return;
+        }
+        
+        /*Option [] str =  cmd.getOptions();
+        for (Option v : str)
+        {
+            System.out.println("saddsda");
+            System.out.println(v.getValue());
+        }*/
+        
+        
         System.out.println("Unrecognized Option "); 
        
     }
@@ -207,6 +241,7 @@ public class Cli implements IObserver
              String strCurrentTerminalPath = "";
              
              m_IClient = new Client(strCurrentTerminalPath);
+             registerObserver();
              try 
              {
                  m_IClient.login(user, passWord);
@@ -249,6 +284,8 @@ public class Cli implements IObserver
                //String path = System.getProperty("user.dir");
            
                m_IClient = new Client(strHost, strRepository, strPath) ;
+               registerObserver();
+               
                String strRevision = "";
                
                if(checkArgs.length >2)
@@ -348,10 +385,39 @@ public class Cli implements IObserver
     
      
     
+     private void runCommit(String [] commitArgs)
+     {
+         
+         if(commitArgs.length >=2)
+         {
+             
+             String strCommitPath = commitArgs[0];
+             String strMessage = commitArgs[1];
+           
+             m_IClient = new Client(strCommitPath);
+             registerObserver();
+            try 
+            {
+                m_IClient.commit(strMessage);
+            } 
+            catch (ApplicationException ex) 
+            {
+                 System.out.println(ex.getMessage());
+            }
+             
+         }
+         else
+         {
+            System.out.println("The amount of arguments is insufficient ("+commitArgs.length+").");
+         }
+         
+     }
+     
+     
      private void runStatus(String [] statusArg)
      {
          
-         if(statusArg.length<1)
+         if(statusArg.length>0)
          {
              String strItemPath = statusArg[0];
            
@@ -366,7 +432,7 @@ public class Cli implements IObserver
              catch (ApplicationException ex) 
              {
                 //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
-                 System.out.println("Operation failed.");
+                 System.out.println(ex.getMessage());
              }
              
              for (VersionedItem v : listItem)
