@@ -72,9 +72,9 @@ public class Workspace implements IObservable {
 
   static private List<File> listingDir(File startDir) 
           throws FileNotFoundException {
-    List<File> result = new ArrayList<File>(); //cria
+    List<File> result = new ArrayList<File>(); //cria coleção
     File[] strDir = startDir.listFiles();
-    List<File> str = Arrays.asList(strDir); //transforma
+    List<File> str = Arrays.asList(strDir); //transforma em coleção
     for(File file : str) {
       if ( ! file.isFile() ) {
         List<File> deeperList = listingDir(file);
@@ -87,8 +87,9 @@ public class Workspace implements IObservable {
   }
   static private List<File> listingDirNotEspelho(File startDir) 
           throws FileNotFoundException {
-    List<File> result = new ArrayList<File>(); //cria
-    FilenameFilter filter = new FilenameFilter() {
+    List<File> result = new ArrayList<File>(); //cria coleção
+    // filtro para não entrar no diretorio de controle
+    FilenameFilter filter = new FilenameFilter() { 
         @Override
         public boolean accept(File dir, String name) {
         if (!name.endsWith(".labgc")) {
@@ -96,9 +97,10 @@ public class Workspace implements IObservable {
         }       
             return false;
         }
-    };
+    }; // fim filtro
+    
     File[] strDir = startDir.listFiles(filter);
-    List<File> str = Arrays.asList(strDir); //transforma
+    List<File> str = Arrays.asList(strDir); //transforma em coleção
     for(File file : str) {
       if ( ! file.isFile() ) {
         List<File> deeperList = listingDir(file);
@@ -255,16 +257,43 @@ public class Workspace implements IObservable {
         throw new UnsupportedOperationException("Not supported yet.");
 
     }
-    public boolean revert(String file)
-    throws IOException, WorkspaceException {
-        return true;
-    }
+
+   /*
+    * Testa se é um subDir de um Dir
+    * base tem que ser um diretorio
+    * child pode ser um arquivo com caminho completo
+    */
+  public boolean isSubDir(File baseDir, File child)
+      throws IOException {
+      baseDir = baseDir.getCanonicalFile();
+      child = child.getCanonicalFile();
+
+      File parentFile = child;
+      while (parentFile != null) {
+          if (baseDir.equals(parentFile)) {
+              return true;
+          }
+          parentFile = parentFile.getParentFile();
+      }
+      return false;
+  }
     
-    public boolean revert()
-            throws IOException, WorkspaceException {
+    
+    public boolean revert(String fileOrDir)
+    throws  WorkspaceException {
+        
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
-       
+        File target= new File(fileOrDir);
+        try {
+            // testa se o caminho está dentro do repositório
+            if (! isSubDir(parent, target)){
+                throw new WorkspaceRepNaoExisteException("ERRO: Alvo não está no repositório.");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        // testa se é versionado
         if (!parent.exists()) {
             throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
 
@@ -287,7 +316,71 @@ public class Workspace implements IObservable {
                 name = name.substring(0, pos);
             }
             if (name == "espelho") {
-//                diretorio1 = new File(diretorio + File.separator + name + extensao);
+                diretorio1 = new File(diretorio1 + File.separator + name + extensao);
+                achou = true;
+            }
+        }
+        if (!achou) {
+            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
+        }
+        // testa se for arquivo copia por cima
+        
+            //extrair caminho relativo à baseDir (parent)
+            Path baseDir = Paths.get(parent.toString());
+            Path targetDir=Paths.get(target.toString());
+            int countdir=baseDir.getNameCount();
+            int max=targetDir.getNameCount();
+            Path relativeDir=targetDir.subpath(countdir, max);
+            File d=relativeDir.toFile();
+            //adicionar caminho relativo ao espelho
+            File file2=new File(diretorio1+File.separator,d.toString());
+            //buscar o arquivo origem no espelho - testar se existe.
+            if (!file2.exists()){
+                throw new WorkspaceException("ERRO: Não existe arquivo no espelho.");
+            }else{
+                if (target.isFile()){
+                    copy(file2, target, true);
+                }else{// diretório
+                   if (!deleteDir(target)){
+                        throw new WorkspaceException("ERRO: Não foi possível limpar WorkSpace.");
+                    }
+                    try {
+                        copyDir (file2, target);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                        throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
+                    }  
+                }
+            }
+        return true;
+    }
+    
+public boolean revert()
+throws  WorkspaceException {
+        File local = new File(LocalRepo);
+        File parent = new File(local.getParent());
+       
+        if (!parent.exists()) {
+            throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
+        }
+        File diretorio1 = new File(local + File.separator + ".labgc");
+
+        // testa se existe o diretorio de versionamento
+        if (!diretorio1.exists()) {
+            throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
+        }
+        // procura pelo espelho 
+        File[] stDir = diretorio1.listFiles();
+        boolean achou = false;
+        for (File file : stDir) {
+            String name = file.getName();
+            String extensao = name.substring(name.lastIndexOf("."), name.length());
+            int pos = name.lastIndexOf(".");
+            if (pos > 0) {
+                name = name.substring(0, pos);
+            }
+            if (name == "espelho") {
+                diretorio1 = new File(diretorio1 + File.separator + name + extensao);
                 achou = true;
             }
         }
@@ -295,19 +388,23 @@ public class Workspace implements IObservable {
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
         }
         if (!deleteDir(parent)){
-            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não foi possível limpar WorkSpace.");
+            throw new WorkspaceException("ERRO: Não foi possível limpar WorkSpace.");
         }
-        copyDir (diretorio1, parent);
-/*        stDir = diretorio1.listFiles();
-        // copia os arquivos
-        for (File file : stDir) {
-            String name = file.getName();
-            copy(file, new File(diretorio + "\\" + name), true);
-        }*/
-                
-        // se tudo deu certo    
-        return true;
-    }
+        try {
+             copyDir (diretorio1, parent);
+             /*        stDir = diretorio1.listFiles();
+            // copia os arquivos
+            for (File file : stDir) {
+                String name = file.getName();
+                copy(file, new File(diretorio + "\\" + name), true);
+            }*/
+        } catch (IOException ex) {
+                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
+        } 
+    // se tudo deu certo   
+    return true;
+}
     
 public static void status(List<File> lDirM, List<File> lDirD, List<File> lDirA) 
         throws IOException, WorkspaceException {
@@ -633,5 +730,30 @@ public static void status(List<File> lDirM, List<File> lDirD, List<File> lDirA)
         }
         return result;
     }
+    
+    
+    //implementar para o cliente
+
+    public VersionedItem status() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public VersionedItem diff(String file, String version) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void update(VersionedItem files) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public VersionedItem commit() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public void setRevision(String revision) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+   
     
 } //End

@@ -109,7 +109,7 @@ public class Cli implements IObserver
         {
             String path = cmd.getOptionValue("mkdir");
             
-            runMakeDir(path);
+            //runMakeDir(path);
             return;
         }
         
@@ -308,15 +308,6 @@ public class Cli implements IObserver
         return true;
     }
     
-    private void runMakeDir(String path)
-    {
-         String strCurrentTerminalPath = "";    
-         m_IClient = new Client(strCurrentTerminalPath);
-        
-        if(m_IClient.mkdir(path))
-            System.out.println("Directory successfully created.");  
-        else
-            System.out.println("The directory can not be created (Check permissions and the remaining space on the disc).");
-    }
+    
      
 }

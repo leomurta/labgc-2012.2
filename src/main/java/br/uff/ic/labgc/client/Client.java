@@ -9,7 +9,6 @@ import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.*;
 import br.uff.ic.labgc.server.*;
 import br.uff.ic.labgc.workspace.*;
-import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +43,11 @@ public class Client implements IClient {
      * conjunto de observadores registrados na api client
      */
     private Set<IObserver> observers = new TreeSet<IObserver>();
-
+    /**
+     * nome do parametro que irá guardar o token de autenticacao
+     */
+    private final String AUTHENTICATION_TOKEN = "token";
+    
     /**
      * Construtor para acesso sem area de trabalho(workspace)
      *
@@ -78,67 +81,45 @@ public class Client implements IClient {
     }
 
     //comandos para o servidor
-    public boolean commit(String message) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public VersionedItem commit(String message) throws ApplicationException{
+        VersionedItem files = workspace.commit();
+        String revision = server.commit(files,message,loginToken);
+        workspace.setRevision(revision);
+        return files;
     }
 
-    public String update() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public VersionedItem update(String revision) throws ApplicationException{
+        String clientRevision = workspace.getRevision();
+        VersionedItem files = server.update(clientRevision, revision ,loginToken);
+        workspace.update(files);
+        return files;
     }
 
-    public String diff(String file, String version) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public VersionedItem diff(String file, String version) throws ApplicationException{
+        return workspace.diff(file,version);
     }
 
-    public String log() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public VersionedItem log() throws ApplicationException{
+        return server.log(loginToken);
     }
 
-    public boolean remove(String file) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public VersionedItem status() throws ApplicationException{
+        return workspace.status();
     }
 
-    public boolean move(String file, String dest) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean copy(String file, String dest) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean mkdir(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean add(String file) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String status() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean release() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public boolean resolve(String file) {
+    public boolean resolve(String file) throws ApplicationException{
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     //implementados
-    public boolean revert() throws ClientException {
-        boolean revert = false;
-        try {
-            revert = workspace.revert();
-        } catch (IOException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (WorkspaceException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return revert;
+    public boolean revert() throws ApplicationException {
+        return workspace.revert();
     }
+    
+    public boolean revert(String file) throws ApplicationException {
+        return workspace.revert(file);
+    }
+    
 
     public void checkout(String revision) throws ApplicationException {
 
@@ -188,7 +169,7 @@ public class Client implements IClient {
 
         if (loginToken == null && workspace.isWorkspace()) {
             try {
-                loginToken = workspace.getParam("token");
+                loginToken = workspace.getParam(AUTHENTICATION_TOKEN);
             } catch (WorkspaceException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 throw new ClientWorkspaceNotInitialized();
@@ -239,6 +220,7 @@ public class Client implements IClient {
         workspace.setParam("token", loginToken);
 
     }
+
 
     /**
      * Recupera uma instancia de IServer;
