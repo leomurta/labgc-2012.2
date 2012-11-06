@@ -152,7 +152,7 @@ public class Versioning implements IVersioning{
     }
 
     @Override
-    public void addRevision(VersionedDir vd, String token){
+    public String addRevision(VersionedDir vd, String token){
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
