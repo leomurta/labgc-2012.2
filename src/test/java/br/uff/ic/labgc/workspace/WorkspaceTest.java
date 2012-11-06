@@ -177,7 +177,7 @@ public class WorkspaceTest {
     /**
      * Test of status method, of class Workspace.
      */
-    @Test
+    /*@Test
     public void testStatus() {
         System.out.println("status");
         Workspace instance = null;
@@ -186,7 +186,7 @@ public class WorkspaceTest {
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
-    }
+    }*/
 
     /**
      * Test of release method, of class Workspace.

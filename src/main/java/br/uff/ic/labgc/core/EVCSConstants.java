@@ -14,4 +14,25 @@ public interface EVCSConstants {
      * Identifica a revisão HEAD
      */
     public static final String REVISION_HEAD = "-1";
+    
+    /**
+     * Identifica que o item nao foi modificado
+     */
+    public static final int UNMODIFIED = 0;
+    
+    /**
+     * Identifica que o item foi modificado
+     */
+    public static final int MODIFIED = 1;
+    
+    /**
+     * Identifica que o item nao foi adicionado
+     */
+    public static final int ADDED = 2;
+    
+    /**
+     * Identifica que o item nao foi deletado
+     */
+    public static final int DELETED = 3;
+    
 }

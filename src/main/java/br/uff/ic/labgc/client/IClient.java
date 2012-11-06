@@ -6,6 +6,7 @@ package br.uff.ic.labgc.client;
 
 import br.uff.ic.labgc.exception.*;
 import br.uff.ic.labgc.core.*;
+import java.util.List;
 
 
 /**
@@ -20,9 +21,8 @@ public interface IClient extends IObservable{
     public VersionedItem update(String revision) throws ApplicationException;
     public VersionedItem diff(String file, String version) throws ApplicationException;
     public VersionedItem log() throws ApplicationException;
-    public VersionedItem status() throws ApplicationException;
     public boolean resolve(String file) throws ApplicationException;
-    
+    public List<VersionedItem> status() throws ApplicationException;
     //implementados
     /**
      * Desfaz as alteracoes ainda nao comitadas do espaco de trabalho

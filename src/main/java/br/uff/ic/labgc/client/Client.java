@@ -9,6 +9,7 @@ import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.*;
 import br.uff.ic.labgc.server.*;
 import br.uff.ic.labgc.workspace.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +45,7 @@ public class Client implements IClient {
      */
     private Set<IObserver> observers = new TreeSet<IObserver>();
     /**
-     * nome do parametro que irá guardar o token de autenticacao
+     * nome do parametro que ir� guardar o token de autenticacao
      */
     private final String AUTHENTICATION_TOKEN = "token";
     
@@ -102,11 +103,7 @@ public class Client implements IClient {
     public VersionedItem log() throws ApplicationException{
         return server.log(loginToken);
     }
-
-    public VersionedItem status() throws ApplicationException{
-        return workspace.status();
-    }
-
+    
     public boolean resolve(String file) throws ApplicationException{
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -120,6 +117,21 @@ public class Client implements IClient {
         return workspace.revert(file);
     }
     
+
+     public  List<VersionedItem> status() throws ApplicationException
+    {  
+        List<VersionedItem> stat = new ArrayList<VersionedItem>();
+        try 
+        {
+            stat =  workspace.statusVersionedItem();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (WorkspaceException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return stat;
+    }
 
     public void checkout(String revision) throws ApplicationException {
 

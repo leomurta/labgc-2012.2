@@ -3,12 +3,16 @@ import br.uff.ic.labgc.client.Client;
 import br.uff.ic.labgc.client.IClient;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.IObserver;
+import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ClientException;
 import br.uff.ic.labgc.exception.ClientLoginRequiredException;
 import br.uff.ic.labgc.exception.ClientWorkspaceUnavailableException;
 import br.uff.ic.labgc.userInterface.common.Messages;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,6 +70,12 @@ public class Cli implements IObserver
                                         .hasArgs(2)
                                         .withArgName("USER PASSWORD")
                                         .create("login") );
+        
+        m_options.addOption( OptionBuilder.withLongOpt( "status" )
+                                        .withDescription( "Get the status of a item" )
+                                        .hasArgs()
+                                        .withArgName("Item")
+                                        .create("status") );
     }
     
     private void dysplayHelp() 
@@ -74,6 +84,28 @@ public class Cli implements IObserver
          Help help = new Help();
          //System.out.println(help.m_strHelp);
          help.run(m_options);
+    }
+    
+    public boolean compare(VersionedItem object1, VersionedItem object2) 
+    {
+        return object1.getStatus() <= object2.getStatus();
+    }
+    
+    private String GetStatus(int status)
+    {
+        if(status==EVCSConstants.UNMODIFIED)
+            return "Unmodified";
+            
+        if(status==EVCSConstants.MODIFIED)
+             return "Modified";
+            
+        if(status==EVCSConstants.ADDED)
+             return "Added";
+            
+        if(status==EVCSConstants.DELETED)
+             return "Deleted";
+        
+        return "";
     }
     
     public void  run(String[] args) throws ParseException, ClientWorkspaceUnavailableException
@@ -139,6 +171,14 @@ public class Cli implements IObserver
             return;
         }
         
+        if(cmd.hasOption("status")) 
+        {
+           String [] statusArg = cmd.getOptionValues("status");
+           runStatus(statusArg);
+           
+            return;
+        }
+        
         System.out.println("Unrecognized Option "); 
        
     }
@@ -195,10 +235,7 @@ public class Cli implements IObserver
            if(checkArgs.length > 1)
            {
                Messages msg = new Messages();
-               //for (int i = 0; i < checkArgs.length; i++) 
-                  // System.out.println(i + "==>" + checkArgs[i]);
-                   
-               
+              
                String strUrl = checkArgs[0];
                // Break URL in repo and host
                //file:/// or http://
@@ -310,4 +347,43 @@ public class Cli implements IObserver
     
     
      
+    
+     private void runStatus(String [] statusArg)
+     {
+         
+         if(statusArg.length<1)
+         {
+             String strItemPath = statusArg[0];
+           
+             m_IClient = new Client(strItemPath);
+             
+             List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
+             try 
+             {
+                listItem = m_IClient.status();
+                //Collections.sort(listItem, compare);
+             } 
+             catch (ApplicationException ex) 
+             {
+                //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+                 System.out.println("Operation failed.");
+             }
+             
+             for (VersionedItem v : listItem)
+             {
+                  System.out.println(v.getName()+"    "+ GetStatus(v.getStatus())+"\n");
+             }
+                 
+             
+         }
+         else
+         {
+            System.out.println("The amount of arguments is insufficient ("+statusArg.length+").");
+         }
+         
+     }
+     
+    
+    
+    
 }
