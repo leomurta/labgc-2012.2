@@ -17,32 +17,18 @@ import org.hibernate.criterion.Restrictions;
  * @author jokerfvd
  */
 public class UserDAO extends DAO{
-
+    public static final String USERNAME = "username";
+    
     public User get(int id) {
         return (User)get(id, User.class);
     }
     
     public User getByUserName(String username) throws ObjectNotFoundException{
-        try {
-            Session sessao = HibernateUtil.getSession();
-
-            Criteria criteria = sessao.createCriteria(User.class)
-                .add(Restrictions.eq("username", username));
-            User user = (User) criteria.uniqueResult();
-
-
-            if (user == null) {
-                throw new ObjectNotFoundException();
-            }
-
-            return user;
-        } catch (HibernateException e) {
-            throw new InfrastructureException(e);
-        }
+        return (User)getBy(User.class, USERNAME, username);
     }
     
     public boolean exist(String userName) throws InfrastructureException{
-        return exist(User.class,"username",userName);
+        return exist(User.class, USERNAME, userName);
     }
     
     public List getUsers()

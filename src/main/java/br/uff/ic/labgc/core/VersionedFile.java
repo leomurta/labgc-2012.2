@@ -172,4 +172,9 @@ public class VersionedFile extends VersionedItem implements Serializable {
             setCompressed(true);
         }
     }
+
+    @Override
+    public boolean isDir() {
+        return false;
+    }
 }

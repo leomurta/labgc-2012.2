@@ -45,6 +45,10 @@ public class VersionedDir extends VersionedItem implements Serializable {
         setSize(this.size+item.getSize());
         
     }
+    public void addItem(List<VersionedItem> items) {
+        for(VersionedItem item:items)
+            this.addItem(item);        
+    }
     
     /**
      * Expande o conteúdo de todos os itens contidos neste diretório.
@@ -74,5 +78,10 @@ public class VersionedDir extends VersionedItem implements Serializable {
             VersionedItem versionedItem = it.next();
             versionedItem.deflate();
         }
+    }
+
+    @Override
+    public boolean isDir() {
+        return true;
     }
 }

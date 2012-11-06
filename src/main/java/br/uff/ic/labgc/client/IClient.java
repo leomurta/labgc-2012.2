@@ -17,27 +17,14 @@ public interface IClient extends IObservable{
     
     //comandos server
     
-    boolean commit(String message);
-    String update();
+    public VersionedItem commit(String message) throws ApplicationException;
+    public VersionedItem update(String revision) throws ApplicationException;
+    public VersionedItem diff(String file, String version) throws ApplicationException;
+    public VersionedItem log() throws ApplicationException;
+    public VersionedItem status() throws ApplicationException;
+    public boolean resolve(String file) throws ApplicationException;
     
-    String diff(String file, String version);
-    String log();
-    
-    //comandos similares ao OS
-    
-    boolean remove(String file);
-    boolean move(String file, String dest);
-    boolean copy(String file, String dest);
-    boolean mkdir(String name);
-    
-    //comandos do diretorio
-    
-    boolean add(String file);
-    
-    List<VersionedItem> status();
-    boolean release();
-    boolean resolve(String file);
-    
+     List<VersionedItem> status();
     //implementados
     /**
      * Desfaz as alteracoes ainda nao comitadas do espaco de trabalho

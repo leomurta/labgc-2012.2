@@ -72,11 +72,11 @@ public class RMIConnector extends AbstractServer {
      * efetuar o commit
      */
     @Override
-    public String commit(VersionedItem item, String token) throws ApplicationException {
+    public String commit(VersionedItem item, String message, String token) throws ApplicationException {
         String result = null;
         try {
             item.deflate();
-            result = server.commit(item, token);
+            result = server.commit(item, message, token);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
@@ -93,10 +93,10 @@ public class RMIConnector extends AbstractServer {
      * efetuar o update
      */
     @Override
-    public VersionedItem update(String revision, String token) throws ApplicationException {
+    public VersionedItem update(String clientRevision,  String revision, String token) throws ApplicationException {
         VersionedItem result = null;
         try {
-            result = server.update(revision, token);
+            result = server.update(clientRevision, revision, token);
             result.inflate();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
@@ -113,17 +113,7 @@ public class RMIConnector extends AbstractServer {
      * @throws ApplicationException Exceção ocorrida no servidor ao tentar
      * efetuar o diff
      */
-    @Override
-    public String diff(VersionedItem item, String version) throws ApplicationException {
-        String result = null;
-        try {
-            item.deflate();
-            result = server.diff(item, version);
-        } catch (RemoteException ex) {
-            handleRemoteException(ex);
-        }
-        return result;
-    }
+    
 
     /**
      * Executa remotamente o comando log
@@ -133,10 +123,10 @@ public class RMIConnector extends AbstractServer {
      * efetuar o log
      */
     @Override
-    public String log() throws ApplicationException {
-        String result = null;
+    public VersionedItem log(String token) throws ApplicationException {
+        VersionedItem result = null;
         try {
-            result = server.log();
+            result = server.log(token);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }

@@ -20,14 +20,14 @@ public interface IServer {
      * @param token Token que identifica o usuário e o repositório
      * @return Número da nova revisão do repositório
      */
-    public String commit(VersionedItem item, String token) throws ApplicationException;
+     public String commit(VersionedItem file, String message, String token) throws ApplicationException;
     /**
      * Atualiza a cópia de trabalho com a revisão solicitada.
      * @param revision Revisão para a qual se deseja atualizar a cópia de trabalho
      * @param token Token que identifica o usuário e o repositório
      * @return Item versionado composto referente à revisão solicitada
      */
-    public VersionedItem update(String revision, String token) throws ApplicationException;
+    public VersionedItem update(String clientRevision, String revision, String token) throws ApplicationException;
     /**
      * Efetua o checkout da revisão solicitada.
      * @param revision Revisão que se deseja efetuar o checkout
@@ -45,8 +45,9 @@ public interface IServer {
      * @throws ServerException 
      */
     public String login(String user, String pwd, String repository)throws ApplicationException;
-    public String diff(VersionedItem file, String version) throws ApplicationException;
-    public String log() throws ApplicationException;
+
+    public VersionedItem log(String token) throws ApplicationException;
+    
     public String getRepPath();
     public String getRepHost();
     /**
@@ -56,4 +57,6 @@ public interface IServer {
      * @throws ServerException 
      */
     public byte[] getItemContent(String hash) throws ApplicationException;
+
+     
 }
