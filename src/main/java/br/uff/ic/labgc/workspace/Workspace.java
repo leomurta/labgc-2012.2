@@ -756,7 +756,7 @@ public  List<VersionedItem> statusVersionedItem()
      *
      * @return
      */
-    public String getHostname() throws WorkspaceException {
+    public String getHost() throws WorkspaceException {
         return getParam("hostname");
     }
 
@@ -766,7 +766,7 @@ public  List<VersionedItem> statusVersionedItem()
      *
      * @return
      */
-    public String getRepository() throws WorkspaceException {
+    public String getProject() throws WorkspaceException {
         return getParam("repositorio");
     }
     /**
