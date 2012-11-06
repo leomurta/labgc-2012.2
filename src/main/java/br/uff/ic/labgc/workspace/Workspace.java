@@ -33,11 +33,113 @@ public class Workspace implements IObservable {
 
     private String LocalRepo; 
     private IObserver observer;
+    private final String PROPERTIES_FILE = "labgc.properties";
+    private final String PROPERTY_REVISION = "revision";
+    private final String PROPERTY_HOST = "hostname";
+    private final String PROPERTY_PROJECT = "repository";
+    private final String WS_FOLDER = ".labgc";
+    private final String ESPELHO = "espelho.r";
 
     public Workspace(String LocalRepo) {
         this.LocalRepo = LocalRepo; //caminho do projeto gravado na WS
     }
 
+    //Métodos de propriedades
+    public void setParam(String key, String value)
+            throws WorkspaceException {
+        setProperty(key, value);
+    }
+    
+
+    /**
+     * metodo para pegar o valor de um parametro salvo
+     *
+     * @param key, chave do parametro salvo
+     * @return
+     */
+    public String getParam(String key)
+            throws WorkspaceException {
+            
+        return getProperty(key);
+        
+    }
+
+    /**
+     * retorna valor do hostname guardado na criacao do workspace
+     *
+     * @return
+     */
+    public String getHost() throws WorkspaceException {
+        return getProperty(PROPERTY_HOST);
+    }
+
+    /**
+     * retorna o valor do relacionado ao repositorio do projeto no servidor.
+     * Valor adicionado na criacao do workspace
+     *
+     * @return
+     */
+    public String getProject() throws WorkspaceException {
+        return getProperty(PROPERTY_PROJECT);
+    }
+    /**
+     * retorna o valor do relacionado ao repositorio do projeto no servidor.
+     * Valor adicionado na criacao do workspace
+     *
+     * @return
+     */
+    public String getRevision() throws WorkspaceException {
+        return getProperty(PROPERTY_REVISION);
+    }
+
+     public void setRevision(String revision) throws WorkspaceException{
+        setProperty(PROPERTY_REVISION, revision);
+    }
+    
+    private void setProperty(String chave, String valor) throws WorkspaceException{
+        File vcs = new File(this.LocalRepo, WS_FOLDER);
+        File file = new File(vcs, PROPERTIES_FILE);
+        Properties properties = new Properties();
+        if (file.exists()) {
+            FileInputStream fis;
+            try {
+                fis = new FileInputStream(file);
+                properties.load(fis);
+                fis.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WorkspaceException("nao foi possivel abrir arquivo de propriedades");
+            }
+        } else {
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WorkspaceException("nao foi possivel criar");
+            }
+        }
+    }
+    
+    private String getProperty (String chave) throws WorkspaceException{
+        File vcs = new File(this.LocalRepo, WS_FOLDER);
+        File file = new File(vcs, PROPERTIES_FILE);
+
+        Properties properties = new Properties();
+        FileInputStream fi;
+        try {
+            fi = new FileInputStream(file);
+            properties.load(fi);
+            fi.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException("Erro ao manipular o arquivo de parametro");
+        }
+
+        return properties.getProperty(chave);
+    
+    }
+    
+    
     /**
      *
      * @param file
@@ -70,7 +172,7 @@ public class Workspace implements IObservable {
     // primitiva de listar diretório e colocar em array de File
     
 
-  static private List<File> listingDir(File startDir) 
+  private List<File> listingDir(File startDir) 
           throws FileNotFoundException {
     List<File> result = new ArrayList<File>(); //cria coleção
     File[] strDir = startDir.listFiles();
@@ -85,7 +187,7 @@ public class Workspace implements IObservable {
     }
     return result;
   }
-  static private List<File> listingDirNotEspelho(File startDir) 
+ private List<File> listingDirNotEspelho(File startDir) 
           throws FileNotFoundException {
     List<File> result = new ArrayList<File>(); //cria coleção
     // filtro para não entrar no diretorio de controle
@@ -692,92 +794,6 @@ public  List<VersionedItem> statusVersionedItem()
      * setParam - coloca em um arquivo um par chave/valor
      */
 
-    public void setParam(String key, String value)
-            throws WorkspaceException {
-        File vcs = new File(this.LocalRepo, ".labgc");
-        File file = new File(vcs, "labgc.properties");
-        Properties properties = new Properties();
-        if (file.exists()) {
-            FileInputStream fis;
-            try {
-                fis = new FileInputStream(file);
-                properties.load(fis);
-                fis.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WorkspaceException("nao foi possivel abrir arquivo de propriedades");
-            }
-        } else {
-            try {
-                file.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WorkspaceException("nao foi possivel criar");
-            }
-        }
-
-        properties.setProperty(key, value);
-        try {
-            properties.store(new FileOutputStream(file), null);
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("nao foi possivel gravar");
-        }
-    }
-
-    /**
-     * metodo para pegar o valor de um parametro salvo
-     *
-     * @param key, chave do parametro salvo
-     * @return
-     */
-    public String getParam(String key)
-            throws WorkspaceException {
-
-        File vcs = new File(this.LocalRepo, ".labgc");
-        File file = new File(vcs, "labgc.properties");
-
-        Properties properties = new Properties();
-        FileInputStream fi;
-        try {
-            fi = new FileInputStream(file);
-            properties.load(fi);
-            fi.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("Erro ao manipular o arquivo de parametro");
-        }
-
-        return properties.getProperty(key);
-    }
-
-    /**
-     * retorna valor do hostname guardado na criacao do workspace
-     *
-     * @return
-     */
-    public String getHostname() throws WorkspaceException {
-        return getParam("hostname");
-    }
-
-    /**
-     * retorna o valor do relacionado ao repositorio do projeto no servidor.
-     * Valor adicionado na criacao do workspace
-     *
-     * @return
-     */
-    public String getRepository() throws WorkspaceException {
-        return getParam("repositorio");
-    }
-    /**
-     * retorna o valor do relacionado ao repositorio do projeto no servidor.
-     * Valor adicionado na criacao do workspace
-     *
-     * @return
-     */
-    public String getRevision() throws WorkspaceException {
-        return getParam("revision");
-    }
 
     /**
      * verifica se o localRepo e um workspace valido e inicializado
@@ -880,10 +896,7 @@ public  List<VersionedItem> statusVersionedItem()
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public void setRevision(String revision) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-    
+   
    
     
 } //End
