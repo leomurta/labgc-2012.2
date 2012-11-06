@@ -10,6 +10,7 @@ import br.uff.ic.labgc.exception.ClientLoginRequiredException;
 import br.uff.ic.labgc.exception.ClientWorkspaceUnavailableException;
 import br.uff.ic.labgc.userInterface.common.Messages;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
@@ -353,25 +354,24 @@ public class Cli implements IObserver
          if(statusArg.length<1)
          {
              String strItemPath = statusArg[0];
-             
-             /*String [] strTmp = strItemPath.split("//");
-             
-             strItemPath = "";
-             for(int i=0;i<(strTmp.length-1);i++)
-                 strItemPath+=strTmp[i];
-             
-             String strItem = strTmp[strTmp.length-1];*/
-             
-             
+           
              m_IClient = new Client(strItemPath);
              
-             List<VersionedItem> listItem; 
-             listItem = m_IClient.status();
-             //Collections.sort(listItem, compare);
+             List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
+             try 
+             {
+                listItem = m_IClient.status();
+                //Collections.sort(listItem, compare);
+             } 
+             catch (ApplicationException ex) 
+             {
+                //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+                 System.out.println("Operation failed.");
+             }
              
              for (VersionedItem v : listItem)
              {
-                  System.out.println(v.getName()+"    "+ GetStatus(v.getStatus()));
+                  System.out.println(v.getName()+"    "+ GetStatus(v.getStatus())+"\n");
              }
                  
              

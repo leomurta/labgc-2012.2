@@ -413,7 +413,18 @@ public class Workspace implements IObservable {
                 throw new WorkspaceException("ERRO: Não existe arquivo no espelho.");
             }else{
                 if (target.isFile()){
+                try 
+                {
                     copy(file2, target, true);
+                } 
+                catch (FileNotFoundException ex) 
+                {
+                   throw new WorkspaceException("File not found.");
+                } 
+                catch (IOException ex) 
+                {
+                     throw new WorkspaceException("IO Exception.");
+                }
                 }else{// diretório
                    if (!deleteDir(target)){
                         throw new WorkspaceException("ERRO: Não foi possível limpar WorkSpace.");
