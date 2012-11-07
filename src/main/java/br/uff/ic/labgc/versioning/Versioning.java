@@ -10,6 +10,7 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
+import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
 import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
@@ -119,7 +120,7 @@ public class Versioning implements IVersioning{
 
 
     @Override
-    public VersionedDir getRevision(String revNum, String token) throws ObjectNotFoundException{
+    public VersionedDir getRevision(String revNum, String token) throws VersioningException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         if (revNum.equals(EVCSConstants.REVISION_HEAD)) {
             revNum = revisionDAO.getHeadRevisionNumber(pu.getProject());
@@ -131,7 +132,7 @@ public class Versioning implements IVersioning{
     }
     
     //nao encontrado, senha incorreta, sem permissao
-    public String login(String projectName, String userName, String pass) throws ObjectNotFoundException, IncorrectPasswordException{
+    public String login(String projectName, String userName, String pass) throws VersioningException{
         User user = userDAO.getByUserName(userName);
         if (!user.getPassword().equals(pass)){
             throw new IncorrectPasswordException();
@@ -145,7 +146,7 @@ public class Versioning implements IVersioning{
     }
 
     @Override
-    public byte[] getVersionedFileContent (String hash, String token) throws VersioningIOException{
+    public byte[] getVersionedFileContent (String hash, String token) throws VersioningException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         String projName = pu.getProject().getName();
         Path path = Paths.get(dirPath+projName+"/"+hashToPath(hash));
@@ -180,9 +181,7 @@ public class Versioning implements IVersioning{
      * atualizar
      */
     @Override
-    public synchronized String addRevision(VersionedDir vd, String token) throws 
-            VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
-            VersioningNeedToUpdateException{
+    public synchronized String addRevision(VersionedDir vd, String token) throws VersioningException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         String projectName = pu.getProject().getName();
         
@@ -248,9 +247,8 @@ public class Versioning implements IVersioning{
      * @param vd
      * @param user 
      */
-    public String addFirstRevision(VersionedDir vd, String userName) throws 
-            VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
-            VersioningCanNotCreateDirException{
+    @Override
+    public String addFirstRevision(VersionedDir vd, String userName) throws VersioningException{
         String projectName = vd.getName();
         if (projectDAO.exist(projectName)){
             throw new VersioningProjectAlreadyExistException();
@@ -317,7 +315,7 @@ public class Versioning implements IVersioning{
      * Dada uma revisão, madar o diff para que esta seja atualizada para outra
      */
     @Override
-    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ObjectNotFoundException {
+    public VersionedDir updateRevision(String revNum, String revTo, String token) throws VersioningException {
         return getRevision(EVCSConstants.REVISION_HEAD, token);
     }
     

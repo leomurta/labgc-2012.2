@@ -157,7 +157,7 @@ public class VersioningTest {
     /**
      * Test of addFirstRevision method, of class Versioning.
      */
-    //@Test
+    @Test
     public void testAddFirstRevision() throws Exception {
         System.out.println("addFirstRevision");
         VersionedDir vd = new VersionedDir();

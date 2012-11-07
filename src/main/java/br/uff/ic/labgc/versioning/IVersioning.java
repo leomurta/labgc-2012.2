@@ -9,6 +9,7 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
+import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
 import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
@@ -44,19 +45,17 @@ public interface IVersioning {
      * @param token
      * @return 
      */
-    public VersionedDir getRevision(String revNum, String token) throws ObjectNotFoundException;
+    public VersionedDir getRevision(String revNum, String token) throws VersioningException;
     
-    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ObjectNotFoundException;
+    public VersionedDir updateRevision(String revNum, String revTo, String token) throws VersioningException;
     
-    public String login(String projectName, String userName, String pass) throws ObjectNotFoundException, IncorrectPasswordException;
+    public String login(String projectName, String userName, String pass) throws VersioningException;
     
-    public byte[] getVersionedFileContent(String hash, String token) throws VersioningIOException;
+    public byte[] getVersionedFileContent(String hash, String token) throws VersioningException;
     
     public List<VersionedDir> getLastLogs(int num, String token);
     
-    public String addRevision(VersionedDir vd, String token) throws 
-            VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
-            VersioningNeedToUpdateException;
+    public String addRevision(VersionedDir vd, String token) throws VersioningException;
     
     /**
      * realiza o import. Nao dava pra usar o nome import
@@ -64,7 +63,5 @@ public interface IVersioning {
      * @param project
      * @param user 
      */
-    public String addFirstRevision(VersionedDir vd, String userName) throws 
-            VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
-            VersioningCanNotCreateDirException;
+    public String addFirstRevision(VersionedDir vd, String userName) throws VersioningException;
 }
