@@ -79,7 +79,7 @@ public class Versioning implements IVersioning{
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
-    private VersionedDir ConfigItemToVersionedDir(ConfigurationItem ci){
+    private VersionedDir configItemToVersionedDir(ConfigurationItem ci){
         VersionedDir vd = new VersionedDir();
         for (Iterator it = ci.getChildren().iterator(); it.hasNext(); )
         {	
@@ -87,7 +87,7 @@ public class Versioning implements IVersioning{
             Revision ciRev = configItem.getRevision();
             VersionedItem vi;
             if (configItem.isDir()){
-                vi = ConfigItemToVersionedDir(configItem);
+                vi = configItemToVersionedDir(configItem);
             }
             else{
                 vi = new VersionedFile(configItem.getHash(),configItem.getSize());
@@ -99,8 +99,21 @@ public class Versioning implements IVersioning{
             vi.setLastChangedTime(ciRev.getDate());
             vi.setName(configItem.getName());
             
+            //TODO DUVAL
+            //vd.setStatus(status);
+            
             vd.addItem(vi);
         }
+        Revision ciRev = ci.getRevision();
+        vd.setAuthor(ciRev.getUser().getName());
+        vd.setCommitMessage(ciRev.getDescription());
+        vd.setLastChangedRevision(ciRev.getNumber());
+        vd.setLastChangedTime(ciRev.getDate());
+        vd.setName(ci.getName());
+        
+        //TODO DUVAL
+        //vd.setStatus(status);
+        
       return vd;
     }
 
@@ -113,7 +126,7 @@ public class Versioning implements IVersioning{
         }
         Revision revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), revNum);
         ConfigurationItem ci = revision.getConfigItem();
-        VersionedDir vd = ConfigItemToVersionedDir(ci);
+        VersionedDir vd = configItemToVersionedDir(ci);
         return vd;
     }
     
@@ -152,6 +165,14 @@ public class Versioning implements IVersioning{
         return path;
     }
     
+    private String incrementRevision(String revision){
+        int pos = revision.lastIndexOf(".")+1;
+        int num = Integer.parseInt(revision.substring(pos));
+        num++;
+        String rev = revision.substring(0,pos).concat(Integer.toString(num));
+        return rev;
+    }
+    
     /*
      * no caso de não estar sendo usado o diff, temos os status para saber o que
      * foi modificado
@@ -166,27 +187,22 @@ public class Versioning implements IVersioning{
         String projectName = pu.getProject().getName();
         
         try{
-            Date date = new Date();
             String number = vd.getLastChangedRevision();
-            //incrementar o number, se tiver com a mais atual pode, senão throws erro
+            //incrementar o number, se tiver com a mais atual pode, senno throws erro
             String headRevision = revisionDAO.getHeadRevisionNumber(pu.getProject());
             
             if (!headRevision.equals(number)){
                 throw new VersioningNeedToUpdateException();
             }
             
-            Revision oldRevision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(),headRevision);
+            Revision currRevision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(),headRevision);
+            String newHeadRevision = incrementRevision(headRevision);
             
-            //criando nova
-            int pos = headRevision.lastIndexOf(".");
-            int num = Integer.parseInt(headRevision.substring(pos+1));
-            num++;
-            String newHeadRevision = headRevision.substring(0,num).concat(Integer.toString(num));
-            
+            Date date = new Date();
             Revision revision = new Revision(date, vd.getCommitMessage(), newHeadRevision, pu.getUser(), pu.getProject());
             revisionDAO.add(revision);
             //TODO Duval, o status vem como int, passar para char
-            ConfigurationItem previous = oldRevision.getConfigItem();
+            ConfigurationItem previous = currRevision.getConfigItem();
             char type;
             switch (vd.getStatus()) {
                 case EVCSConstants.ADDED:

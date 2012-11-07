@@ -39,6 +39,7 @@ public class ConfigurationItem extends DBClass{
         this.size = size;
         this.next = next;
         this.previous = previous;
+        this.revision = revision;
     }
 
     public long getSize() {
