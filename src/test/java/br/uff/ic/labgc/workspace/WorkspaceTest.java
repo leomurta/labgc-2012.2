@@ -5,6 +5,8 @@
 package br.uff.ic.labgc.workspace;
 
 import br.uff.ic.labgc.core.IObserver;
+import br.uff.ic.labgc.core.VersionedDir;
+import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import java.io.File;
 import org.junit.After;
@@ -42,7 +44,7 @@ public class WorkspaceTest {
     /**
      * Test of remove method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testRemove() throws Exception {
         System.out.println("remove");
         File file = null;
@@ -57,7 +59,7 @@ public class WorkspaceTest {
     /**
      * Test of move method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testMove() throws Exception {
         System.out.println("move");
         File file = null;
@@ -73,7 +75,7 @@ public class WorkspaceTest {
     /**
      * Test of copyDir method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testCopyDir() throws Exception {
         System.out.println("copyDir");
         File src = null;
@@ -87,7 +89,7 @@ public class WorkspaceTest {
     /**
      * Test of copy method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testCopy() throws Exception {
         System.out.println("copy");
         File origem = null;
@@ -104,7 +106,7 @@ public class WorkspaceTest {
     /**
      * Test of mkdir method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testMkdir() throws Exception {
         System.out.println("mkdir");
         String name = "";
@@ -119,7 +121,7 @@ public class WorkspaceTest {
     /**
      * Test of deleteDir method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testDeleteDir() {
         System.out.println("deleteDir");
         File dir = null;
@@ -133,7 +135,7 @@ public class WorkspaceTest {
     /**
      * Test of add method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testAdd() throws Exception {
         System.out.println("add");
         File file = null;
@@ -148,7 +150,7 @@ public class WorkspaceTest {
     /**
      * Test of revert method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testRevert_String() throws Exception {
         System.out.println("revert");
         String file = "";
@@ -163,7 +165,7 @@ public class WorkspaceTest {
     /**
      * Test of revert method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testRevert_0args() throws Exception {
         System.out.println("revert");
         Workspace instance = null;
@@ -191,7 +193,7 @@ public class WorkspaceTest {
     /**
      * Test of release method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testRelease() {
         System.out.println("release");
         Workspace instance = null;
@@ -205,7 +207,7 @@ public class WorkspaceTest {
     /**
      * Test of resolve method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testResolve() {
         System.out.println("resolve");
         File file = null;
@@ -223,10 +225,24 @@ public class WorkspaceTest {
     @Test
     public void testCreateWorkspace() throws Exception {
         System.out.println("createWorkspace");
-        String hostname = "";
-        String repository = "";
-        VersionedItem items = null;
-        Workspace instance = null;
+        String hostname = "localhost";
+        String repository = "localhost";
+        VersionedDir items = new VersionedDir();
+        items.setAuthor("autor");
+        items.setCommitMessage("commitmessage");
+        items.setLastChangedRevision("1.0");
+        items.setName("pastaraiz");
+        
+        VersionedFile vf = new VersionedFile();
+        vf.setAuthor("autor");
+        vf.setCommitMessage("commitmessage");
+        vf.setLastChangedRevision("1.0");
+        vf.setName("arquivo.txt");
+        vf.setContent("conteudo do arquivo".getBytes());
+        
+        items.addItem(vf);
+        
+        Workspace instance = new Workspace(hostname);
         instance.createWorkspace(hostname, repository, items);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -235,7 +251,7 @@ public class WorkspaceTest {
     /**
      * Test of canCreate method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testCanCreate() {
         System.out.println("canCreate");
         Workspace instance = null;
@@ -249,20 +265,20 @@ public class WorkspaceTest {
     /**
      * Test of storeLocalData method, of class Workspace.
      */
-    @Test
-    public void testStoreLocalData() {
-        System.out.println("storeLocalData");
-        VersionedItem items = null;
-        Workspace instance = null;
-        instance.storeLocalData(items);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+//    @Test
+//    public void testStoreLocalData() {
+//        System.out.println("storeLocalData");
+//        VersionedItem items = null;
+//        Workspace instance = null;
+//        instance.storeLocalData(items);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
 
     /**
      * Test of setParam method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testSetParam() throws Exception {
         System.out.println("setParam");
         String key = "";
@@ -276,7 +292,7 @@ public class WorkspaceTest {
     /**
      * Test of getParam method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testGetParam() throws Exception {
         System.out.println("getParam");
         String key = "";
@@ -291,35 +307,35 @@ public class WorkspaceTest {
     /**
      * Test of getHostname method, of class Workspace.
      */
-    @Test
-    public void testGetHostname() throws Exception {
-        System.out.println("getHostname");
-        Workspace instance = null;
-        String expResult = "";
-        String result = instance.getHostname();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+//    @Test
+//    public void testGetHostname() throws Exception {
+//        System.out.println("getHostname");
+//        Workspace instance = null;
+//        String expResult = "";
+//        String result = instance.getHostname();
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
 
     /**
      * Test of getRepository method, of class Workspace.
      */
-    @Test
-    public void testGetRepository() throws Exception {
-        System.out.println("getRepository");
-        Workspace instance = null;
-        String expResult = "";
-        String result = instance.getRepository();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+//    @Test
+//    public void testGetRepository() throws Exception {
+//        System.out.println("getRepository");
+//        Workspace instance = null;
+//        String expResult = "";
+//        String result = instance.getRepository();
+//        assertEquals(expResult, result);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
 
     /**
      * Test of getRevision method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testGetRevision() throws Exception {
         System.out.println("getRevision");
         Workspace instance = null;
@@ -333,7 +349,7 @@ public class WorkspaceTest {
     /**
      * Test of isWorkspace method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testIsWorkspace() {
         System.out.println("isWorkspace");
         Workspace instance = null;
@@ -347,7 +363,7 @@ public class WorkspaceTest {
     /**
      * Test of registerInterest method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testRegisterInterest() {
         System.out.println("registerInterest");
         IObserver obs = null;
