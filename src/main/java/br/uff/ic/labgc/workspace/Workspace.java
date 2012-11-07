@@ -522,8 +522,10 @@ public class Workspace implements IObservable {
                 try {
                     copy(file2, target, true);
                 } catch (FileNotFoundException ex) {
+                     Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
                     throw new WorkspaceException("File not found.");
                 } catch (IOException ex) {
+                    Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
                     throw new WorkspaceException("IO Exception.");
                 }
             } else {// diretório

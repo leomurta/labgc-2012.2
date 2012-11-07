@@ -9,6 +9,7 @@ import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.*;
 import br.uff.ic.labgc.server.*;
 import br.uff.ic.labgc.workspace.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -47,7 +48,7 @@ public class Client implements IClient {
     /**
      * nome do parametro que ir� guardar o token de autenticacao
      */
-    private final String AUTHENTICATION_TOKEN = "token";
+    private String AUTHENTICATION_TOKEN = "token";
     
     /**
      * Construtor para acesso sem area de trabalho(workspace)
@@ -61,7 +62,7 @@ public class Client implements IClient {
         this.hostname = hostname;
         this.repository = repository;
 
-        workspace = new Workspace(systemDirectory + "//" + repository);
+        workspace = new Workspace(systemDirectory + File.separator + repository);
     }
 
     /**
@@ -121,18 +122,7 @@ public class Client implements IClient {
      public  List<VersionedItem> status() throws ApplicationException
     {  
         List<VersionedItem> stat = new ArrayList<VersionedItem>();
-        try 
-        {
-            stat =  workspace.statusVersionedItem();
-        } 
-        catch (IOException ex) 
-        {
-            throw new ApplicationException(ex.getMessage());
-        } 
-        catch (WorkspaceException ex) 
-        {
-             throw new ApplicationException(ex.getMessage());
-        }
+        
         
         return stat;
     }
@@ -169,10 +159,11 @@ public class Client implements IClient {
             loginToken = server.login(user, pwd, this.repository);
 
             if (workspace.isWorkspace()) {
-                workspace.setParam("token", loginToken);
+                workspace.setParam(AUTHENTICATION_TOKEN, loginToken);
             }
 
         } catch (ApplicationException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             throw new ClientServerNotAvailableException();
         }
 
@@ -233,7 +224,7 @@ public class Client implements IClient {
     private void createWorkspace(VersionedItem items) throws ApplicationException {
 
         workspace.createWorkspace(hostname, repository, items);
-        workspace.setParam("token", loginToken);
+        workspace.setParam(AUTHENTICATION_TOKEN, loginToken);
 
     }
 
@@ -248,6 +239,7 @@ public class Client implements IClient {
             try {
                 server = CommunicationFactory.getFactory().getServer(this.hostname);
             } catch (ApplicationException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 throw new ClientServerNotAvailableException();
             }
         }

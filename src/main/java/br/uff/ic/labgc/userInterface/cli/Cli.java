@@ -322,6 +322,7 @@ public class Cli
                catch(ClientWorkspaceUnavailableException workExc)
                {
                    //Classe de Mensagens -- GetMessage (Exception)
+                   Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, workExc);
                    System.out.println(msg.GetExceptionMessage(workExc));
                    return;
                }
@@ -329,11 +330,13 @@ public class Cli
                {
                    
                    //Classe de Mensagens -- GetMessage (Exception)
+                   Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, loginExc);
                    System.out.println(msg.GetExceptionMessage(loginExc));
                    return ;
                }
                catch(ApplicationException ex)
                {
+                   Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
                    System.out.println(msg.GetExceptionMessage(ex));
                    return;
                }
