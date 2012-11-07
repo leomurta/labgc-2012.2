@@ -591,48 +591,13 @@ public class Workspace implements IObservable {
         // se tudo deu certo   
         return true;
     }
-
-    public void status(List<File> lDirM, List<File> lDirD, List<File> lDirA)
-            throws IOException, WorkspaceException {
-
-        File local = new File(LocalRepo);
-        File parent = new File(local.getParent());
-
-        if (!parent.exists()) {
-            throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
-
-        }
-        File diretorio1 = new File(local + File.separator + ".labgc");
-
-        // testa se existe o diretorio de versionamento
-        if (!diretorio1.exists()) {
-            throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
-
-        }
-        // procura pelo espelho 
-        File[] stDir = diretorio1.listFiles();
-        boolean achou = false;
-        for (File file : stDir) {
-            String name = file.getName();
-            String extensao = name.substring(name.lastIndexOf("."), name.length());
-            int pos = name.lastIndexOf(".");
-            if (pos > 0) {
-                name = name.substring(0, pos);
-            }
-            if (name == "espelho") {
-//                diretorio1 = new File(diretorio + File.separator + name + extensao);
-                achou = true;
-            }
-        }
-        if (!achou) {
-            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
-        }
-        String dir01 = LocalRepo + File.separator + ".labgc" + File.separator + "espelho.r";
-        String dir02 = LocalRepo;
-        compareDir(dir01, dir02, lDirM, lDirD, lDirA);
-    }
-
-    public List<VersionedItem> statusVersionedItem()
+    /**
+     *
+     * @return
+     * @throws IOException
+     * @throws WorkspaceException
+     */
+    public List<VersionedItem> status()
             throws IOException, WorkspaceException {
 
         File local = new File(LocalRepo);
@@ -825,9 +790,6 @@ public class Workspace implements IObservable {
     }
 
     //implementar para o cliente
-    public VersionedItem status() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 
     public VersionedItem diff(String file, String version) {
         throw new UnsupportedOperationException("Not yet implemented");
