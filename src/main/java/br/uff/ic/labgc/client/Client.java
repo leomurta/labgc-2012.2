@@ -43,7 +43,7 @@ public class Client implements IClient {
     /**
      * conjunto de observadores registrados na api client
      */
-    private Set<IObserver> observers = new TreeSet<IObserver>();
+    private List<IObserver> observers = new ArrayList<IObserver>();
     /**
      * nome do parametro que ir� guardar o token de autenticacao
      */

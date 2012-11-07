@@ -249,15 +249,15 @@ public class WorkspaceTest {
     /**
      * Test of storeLocalData method, of class Workspace.
      */
-    @Test
-    public void testStoreLocalData() {
-        System.out.println("storeLocalData");
-        VersionedItem items = null;
-        Workspace instance = null;
-        instance.storeLocalData(items);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+//    @Test
+//    public void testStoreLocalData() {
+//        System.out.println("storeLocalData");
+//        VersionedItem items = null;
+//        Workspace instance = null;
+//        instance.storeLocalData(items);
+//        // TODO review the generated test code and remove the default call to fail.
+//        fail("The test case is a prototype.");
+//    }
 
     /**
      * Test of setParam method, of class Workspace.
@@ -296,7 +296,7 @@ public class WorkspaceTest {
         System.out.println("getHostname");
         Workspace instance = null;
         String expResult = "";
-        String result = instance.getHostname();
+        String result = instance.getHost();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -310,7 +310,7 @@ public class WorkspaceTest {
         System.out.println("getRepository");
         Workspace instance = null;
         String expResult = "";
-        String result = instance.getRepository();
+        String result = instance.getProject();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

@@ -6,5 +6,9 @@ package br.uff.ic.labgc.exception;
 
 
 public abstract class ClientException extends ApplicationException {
-    
+    public ClientException(String message) {
+        super(message);
+    }
+    public ClientException() {
+    }
 }

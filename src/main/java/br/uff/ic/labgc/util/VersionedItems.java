@@ -201,7 +201,6 @@ public class VersionedItems {
      * @throws ApplicationException 
      */
     private void writeFiles(File dir, List<VersionedItem> items) throws ApplicationException {
-
         for (VersionedItem item : items) {
             if (item.isDir()) {
                 try {
@@ -241,14 +240,19 @@ public class VersionedItems {
      * @throws ApplicationException 
      */
     private void writeVersionedFile(VersionedFile vfile, File root) throws IOException, ApplicationException {
-        File newfile = new File(root, vfile.getName());
+        System.out.println("writeVersionedFile - start");
+        
+        File newfile = new File(root, vfile.getName() );
         newfile.createNewFile();
+        
         byte[] content = vfile.getContent();
+                
         FileOutputStream fileWriter = new FileOutputStream(newfile);
         fileWriter.write(content);
         fileWriter.close();
         newfile.setLastModified(vfile.getLastChangedTime().getTime());
-        this.notifyObservers(newfile.getPath());
+        this.notifyObservers(vfile.getName() );
+         System.out.println("writeVersionedFile - end");
     }
 
     //observers
