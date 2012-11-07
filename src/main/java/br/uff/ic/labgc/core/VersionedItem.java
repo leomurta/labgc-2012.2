@@ -46,6 +46,19 @@ public abstract class VersionedItem implements Serializable {
      * conteúdo comprimido para trafegar o conteúdo na rede.
      */
     private boolean compressed;
+
+    protected VersionedItem(){   
+    }
+    
+    public VersionedItem(String lastChangedRevision, Date lastChangedTime, String name, String author, String commitMessage) {
+        this.lastChangedRevision = lastChangedRevision;
+        this.lastChangedTime = lastChangedTime;
+        this.name = name;
+        this.author = author;
+        this.commitMessage = commitMessage;
+    }
+    
+    
     
      
     /**

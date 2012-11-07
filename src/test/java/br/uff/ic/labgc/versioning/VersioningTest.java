@@ -157,7 +157,7 @@ public class VersioningTest {
     /**
      * Test of addFirstRevision method, of class Versioning.
      */
-    @Test
+    //@Test
     public void testAddFirstRevision() throws Exception {
         System.out.println("addFirstRevision");
         VersionedDir vd = new VersionedDir();
@@ -228,8 +228,7 @@ public class VersioningTest {
     }
     
     @Test
-    public void testIncrementRevision() throws NoSuchMethodException, IllegalAccessException, 
-    IllegalArgumentException, InvocationTargetException{
+    public void testIncrementRevision() throws Exception{
         System.out.println("incrementRevision");
         Class[] param = new Class[1];	
 	param[0] = String.class;
@@ -250,8 +249,7 @@ public class VersioningTest {
     }
     
     @Test 
-    public void testConfigItemToVersionedDir() throws NoSuchMethodException, 
-    IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+    public void testConfigItemToVersionedDir() throws Exception{
         System.out.println("configItemToVersionedDir");
         Class[] param = new Class[1];	
 	param[0] = ConfigurationItem.class;
@@ -288,8 +286,7 @@ public class VersioningTest {
     }
     
     @Test 
-    public void testHashToPath() throws NoSuchMethodException, 
-    IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+    public void testHashToPath() throws Exception{
         System.out.println("hashToPath");
         Class[] param = new Class[1];	
 	param[0] = String.class;
@@ -300,6 +297,44 @@ public class VersioningTest {
         String hash = "aaabbbbbbbbb";
         String path = (String)method.invoke(versioning, hash);
         assertEquals("aaa/bbbbbbbbb", path);
+    }
+    
+    @Test 
+    public void testVersionedDirToConfigItem() throws Exception{
+        System.out.println("versionedDirToConfigItem");
+        Class[] param = new Class[3];	
+	param[0] = VersionedDir.class;
+        param[1] = ConfigurationItem.class;
+        param[2] = boolean.class;
+        Method method;    
+        method = Versioning.class.getDeclaredMethod("versionedDirToConfigItem", param);
+        method.setAccessible(true);
+        
+        User user = new User("name", "username", "password");
+        VersionedDir vd = new VersionedDir(null, null, "raiz", user.getName(), "msg");
+        
+        VersionedFile vf1 = new VersionedFile(null, null, "arq1", user.getName(), "msg1");
+        vf1.setContent("conteudo1".getBytes());
+        VersionedDir vd1 = new VersionedDir(null, null, "dir1", user.getName(), "msgmsg");
+        vd1.addItem(vf1);
+        vd.addItem(vd1);
+        
+        VersionedFile vf2 = new VersionedFile(null, null, "arq2", user.getName(), "msg2");
+        vf2.setContent("conteudo2".getBytes());
+        vd.addItem(vf2);;
+        
+        //criar revisão 0
+        Date date = new Date();
+        Project project = new Project(vd.getName());
+        Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
+        ConfigurationItem ci = new ConfigurationItem(1,project.getName(),"",'A',
+                true,vd.getSize(),null,null,revision);
+        
+        method.invoke(versioning, vd,ci,true);
+        assertEquals(true, ci.isDir());
+        assertEquals(vf1.getSize()+vf2.getSize(), ci.getSize());
+        assertEquals(vd.getName(), ci.getName());
+        assertEquals(1, ci.getNumber());
     }
     
 }

@@ -225,7 +225,7 @@ public class Versioning implements IVersioning{
             ConfigurationItem ci = new ConfigurationItem(previous.getNumber()+1,
                     projectName,"",type, true,vd.getSize(),previous,null,revision);
             
-            VersionedDirToConfigItem(vd,ci,false);
+            versionedDirToConfigItem(vd,ci,false);
             
             configItemDAO.add(ci);
             
@@ -270,9 +270,9 @@ public class Versioning implements IVersioning{
             Date date = new Date();
             Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
             revisionDAO.add(revision);
-            ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',true,0,null,null,revision);
+            ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',true,vd.getSize(),null,null,revision);
             
-            VersionedDirToConfigItem(vd,ci,true);
+            versionedDirToConfigItem(vd,ci,true);
             
             configItemDAO.add(ci);
             
@@ -287,30 +287,30 @@ public class Versioning implements IVersioning{
        
     }
     
-    private void VersionedDirToConfigItem(VersionedDir vd, ConfigurationItem father, boolean first){
+    private void versionedDirToConfigItem(VersionedDir vd, ConfigurationItem father, boolean first){
         for (Iterator<VersionedItem> it = vd.getContainedItens().iterator(); it.hasNext(); ){
             VersionedItem vi = it.next();
             ConfigurationItem ci;
-            boolean isDir = (vi instanceof VersionedDir );
             String hash = "";
-            if (isDir){
+            if (!vi.isDir()){
                 hash = ((VersionedFile)vi).getHash();
             }
             
             if (first){
-                ci = new ConfigurationItem(1, vi.getName(), hash, 'A', isDir, vi.getSize(), null, null, father.getRevision());
+                ci = new ConfigurationItem(1, vi.getName(), hash, 'A', vi.isDir(),
+                        vi.getSize(), null, null, father.getRevision());
             }
-            else{//NAO EH PRIMEIRA REVISAO
+            else{
+                //TODO DUVAL
+                //NAO EH PRIMEIRA REVISAO
                 ci = new ConfigurationItem();
             }
             
-            if (isDir){
-                    VersionedDirToConfigItem((VersionedDir)vi,ci,first);
+            if (vi.isDir()){
+                versionedDirToConfigItem((VersionedDir)vi,ci,first);
             }
-            father.addChild(ci);
-                
-        }
-            
+            father.addChild(ci);            
+        }        
     }
 
     /*

@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,7 +52,6 @@ public class VersionedFile extends VersionedItem implements Serializable {
      * sendo instanciado.
      */
     public VersionedFile() {
-        super();
         this.loaded = false;
         setCompressed(false);
         try {
@@ -68,6 +68,16 @@ public class VersionedFile extends VersionedItem implements Serializable {
         this();
         this.hash = hash;
         this.size = size;
+    }
+    
+    public VersionedFile(String lastChangedRevision, Date lastChangedTime, String name, String author, String commitMessage) {
+        super(lastChangedRevision, lastChangedTime, name, author, commitMessage);
+        this.loaded = false;
+        setCompressed(false);
+        try {
+            this.originHost = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+        }
     }
     
 

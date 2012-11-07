@@ -9,6 +9,7 @@ import br.uff.ic.labgc.exception.ContentNotAvailableException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,9 +32,12 @@ public class VersionedDir extends VersionedItem implements Serializable {
     }
 
     public VersionedDir(long size) {
-        super();
+        this();
         this.size = size;
-        
+    }
+    
+    public VersionedDir(String lastChangedRevision, Date lastChangedTime, String name, String author, String commitMessage) {
+        super(lastChangedRevision, lastChangedTime, name, author, commitMessage);   
     }
 
     public void setContainedItens(List<VersionedItem> containedItens) {
