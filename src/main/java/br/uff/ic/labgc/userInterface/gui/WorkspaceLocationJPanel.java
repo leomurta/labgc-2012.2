@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -22,17 +23,22 @@ public class WorkspaceLocationJPanel extends javax.swing.JPanel {
     {
         initComponents();
         AddFileChooser();
+        strWorkspace ="";
     }
     
     public String GetWorkspaceLocation()
     {
-        return strWorkspace;
+        //JOptionPane.showMessageDialog(null,fileChooser.getCurrentDirectory().getAbsolutePath());
+        return fileChooser.getCurrentDirectory().getAbsolutePath();
     }
     
     private void AddFileChooser()
     {
-        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new java.io.File("."));
+        fileChooser.setDialogTitle("choosertitle");
         fileChooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setAcceptAllFileFilterUsed(false);
         this.setLayout(new BorderLayout());
         this.add(fileChooser, BorderLayout.NORTH);
         fileChooser.addActionListener(new ActionListener() 
@@ -74,5 +80,6 @@ public class WorkspaceLocationJPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
 private String strWorkspace;
+private JFileChooser fileChooser;
 
 }

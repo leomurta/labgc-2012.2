@@ -10,6 +10,7 @@ import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
 import br.uff.ic.labgc.exception.VersioningIOException;
+import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
 import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
 import br.uff.ic.labgc.exception.VersioningUserNotFoundException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
@@ -45,11 +46,17 @@ public interface IVersioning {
      */
     public VersionedDir getRevision(String revNum, String token) throws ObjectNotFoundException;
     
+    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ObjectNotFoundException;
+    
     public String login(String projectName, String userName, String pass) throws ObjectNotFoundException, IncorrectPasswordException;
     
     public byte[] getVersionedFileContent(String hash, String token) throws VersioningIOException;
     
-    public void addRevision(VersionedDir vd, String token);
+    public List<VersionedDir> getLastLogs(int num, String token);
+    
+    public String addRevision(VersionedDir vd, String token) throws 
+            VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
+            VersioningNeedToUpdateException;
     
     /**
      * realiza o import. Nao dava pra usar o nome import
@@ -57,7 +64,7 @@ public interface IVersioning {
      * @param project
      * @param user 
      */
-    public void addProject(VersionedDir vd, String userName) throws 
+    public String addFirstRevision(VersionedDir vd, String userName) throws 
             VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
             VersioningCanNotCreateDirException;
 }

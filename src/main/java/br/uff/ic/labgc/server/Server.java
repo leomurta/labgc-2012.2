@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,24 +34,19 @@ public class Server extends AbstractServer {
         super(hostName);
     }
 
-    public String commit(VersionedItem file, String token) throws ApplicationException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public String commit(VersionedItem file, String message, String token) throws ApplicationException {
+        return versioning.addRevision((VersionedDir)file, token);
     }
 
-    public VersionedItem update(String revision, String token) throws ApplicationException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public VersionedItem update(String clientRevision, String revision,  String token) throws ApplicationException {
+        return versioning.updateRevision(clientRevision, revision, token);
     }
 
     public VersionedItem checkout(String revision, String token) throws ApplicationException {
-
         return versioning.getRevision(revision, token);
     }
 
-    public String diff(VersionedItem file, String version) throws ApplicationException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String log() throws ApplicationException {
+    public  List<VersionedItem> log(String token) throws ApplicationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

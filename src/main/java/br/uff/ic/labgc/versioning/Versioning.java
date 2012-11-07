@@ -11,6 +11,7 @@ import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
 import br.uff.ic.labgc.exception.VersioningIOException;
+import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
 import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
 import br.uff.ic.labgc.exception.VersioningUserNotFoundException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
@@ -150,10 +151,76 @@ public class Versioning implements IVersioning{
         path = hash.substring(0, 3)+"/"+hash;
         return path;
     }
-
+    
+    /*
+     * no caso de não estar sendo usado o diff, temos os status para saber o que
+     * foi modificado
+     * synchronized para garantir que 2 processos não peguem a mesma versão para
+     * atualizar
+     */
     @Override
-    public void addRevision(VersionedDir vd, String token){
-        throw new UnsupportedOperationException("Not supported yet.");
+    public synchronized String addRevision(VersionedDir vd, String token) throws 
+            VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
+            VersioningNeedToUpdateException{
+        ProjectUser pu = projectUserDAO.getByToken(token);
+        String projectName = pu.getProject().getName();
+        
+        try{
+            Date date = new Date();
+            String number = vd.getLastChangedRevision();
+            //incrementar o number, se tiver com a mais atual pode, senão throws erro
+            String headRevision = revisionDAO.getHeadRevisionNumber(pu.getProject());
+            
+            if (!headRevision.equals(number)){
+                throw new VersioningNeedToUpdateException();
+            }
+            
+            Revision oldRevision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(),headRevision);
+            
+            //criando nova
+            int pos = headRevision.lastIndexOf(".");
+            int num = Integer.parseInt(headRevision.substring(pos+1));
+            num++;
+            String newHeadRevision = headRevision.substring(0,num).concat(Integer.toString(num));
+            
+            Revision revision = new Revision(date, vd.getCommitMessage(), newHeadRevision, pu.getUser(), pu.getProject());
+            revisionDAO.add(revision);
+            //TODO Duval, o status vem como int, passar para char
+            ConfigurationItem previous = oldRevision.getConfigItem();
+            char type;
+            switch (vd.getStatus()) {
+                case EVCSConstants.ADDED:
+                    type = 'A';
+                    break;
+                case EVCSConstants.DELETED:
+                    type = 'D';
+                    break;
+                case EVCSConstants.MODIFIED:
+                    type = 'M';
+                    break;  
+                case EVCSConstants.UNMODIFIED:
+                    type = 'U';
+                    break;  
+                default:
+                   type = 'U';
+                    break;
+            }
+            
+            ConfigurationItem ci = new ConfigurationItem(previous.getNumber()+1,
+                    projectName,"",type, true,vd.getSize(),previous,null,revision);
+            
+            VersionedDirToConfigItem(vd,ci,false);
+            
+            configItemDAO.add(ci);
+            
+            //verificar se vai ser atualizado no banco automaticamente
+            //e se precisa mesmo fazer isso
+            revision.setConfigItem(ci);
+            return revision.getNumber();
+            
+        }catch (ObjectNotFoundException e) {
+             throw new VersioningUserNotFoundException();   
+        }
     }
     
 
@@ -165,7 +232,7 @@ public class Versioning implements IVersioning{
      * @param vd
      * @param user 
      */
-    public void addProject(VersionedDir vd, String userName) throws 
+    public String addFirstRevision(VersionedDir vd, String userName) throws 
             VersioningProjectAlreadyExistException,VersioningUserNotFoundException,
             VersioningCanNotCreateDirException{
         String projectName = vd.getName();
@@ -184,9 +251,7 @@ public class Versioning implements IVersioning{
             }
             
             //criar revisão 0
-            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             Date date = new Date();
-            System.out.println(dateFormat.format(date));
             Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
             revisionDAO.add(revision);
             ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',true,0,null,null,revision);
@@ -198,6 +263,7 @@ public class Versioning implements IVersioning{
             //verificar se vai ser atualizado no banco automaticamente
             //e se precisa mesmo fazer isso
             revision.setConfigItem(ci);
+            return revision.getNumber();
             
         }catch (ObjectNotFoundException e) {
              throw new VersioningUserNotFoundException();   
@@ -230,5 +296,41 @@ public class Versioning implements IVersioning{
         }
             
     }
+
+    /*
+     * Dada uma revisão, madar o diff para que esta seja atualizada para outra
+     */
+    @Override
+    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ObjectNotFoundException {
+        return getRevision(EVCSConstants.REVISION_HEAD, token);
+    }
     
+    public List<VersionedDir> getLastLogs(String token){
+        return getLastLogs(EVCSConstants.DEFAULT_LOG_MSG, token);
+    }
+    
+    /*
+     * primeiro da lista é o + recente
+     */
+    @Override
+    public List<VersionedDir> getLastLogs(int num, String token){
+        List<VersionedDir> list = new ArrayList();
+        ProjectUser pu = projectUserDAO.getByToken(token);
+        String revNum = revisionDAO.getHeadRevisionNumber(pu.getProject());
+        Revision revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), revNum);
+        ConfigurationItem ci = revision.getConfigItem();
+        for(int i=0; i < num; i++){
+            VersionedDir vd = new VersionedDir();
+            vd.setAuthor(ci.getRevision().getUser().getName());
+            vd.setCommitMessage(ci.getRevision().getDescription());
+            vd.setLastChangedRevision(ci.getRevision().getNumber());
+            vd.setLastChangedTime(ci.getRevision().getDate());
+            vd.setName(ci.getName());
+            //vd.setStatus();
+            list.add(vd);
+            ci = ci.getPrevious();
+        }
+        
+        return list;
+    }
 }

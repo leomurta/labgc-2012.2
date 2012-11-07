@@ -15,6 +15,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,21 +47,21 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public String commit(VersionedItem item, String token) throws RemoteException {
+    public String commit(VersionedItem item, String message, String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: commit");
         try {
             item.inflate();
-            return server.commit(item, token);
+            return server.commit(item, message, token);
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar commit.", ex);
         }
     }
 
     @Override
-    public VersionedItem update(String revision, String token) throws RemoteException {
+    public VersionedItem update(String clientRevision, String revision, String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: update");
         try {
-            VersionedItem result = server.update(revision, token);
+            VersionedItem result = server.update(clientRevision, revision, token);
             result.deflate();
             return result;
         } catch (ApplicationException ex) {
@@ -71,7 +72,8 @@ public class CommunicationServer implements ICommunicationServer {
     @Override
     public VersionedItem checkout(String revision, String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: checkout");
-        try {
+        try 
+        {
             VersionedItem result = server.checkout(revision, token);
             result.deflate();
             return result;
@@ -81,10 +83,10 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public String log() throws RemoteException {
+    public  List<VersionedItem> log(String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: log");
         try {
-            return server.log();
+            return server.log(token);
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar log.", ex);
         }
@@ -116,16 +118,7 @@ public class CommunicationServer implements ICommunicationServer {
         }
     }
 
-    @Override
-    public String diff(VersionedItem item, String version) throws RemoteException {
-        Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: diff");
-        try {
-            item.inflate();
-            return server.diff(item, version);
-        } catch (ApplicationException ex) {
-            throw new RemoteException("Erro ao executar diff.", ex);
-        }
-    }
+    
 
     @Override
     public byte[] getItemContent(String hash) throws RemoteException {

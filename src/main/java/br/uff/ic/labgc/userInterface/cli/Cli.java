@@ -3,12 +3,16 @@ import br.uff.ic.labgc.client.Client;
 import br.uff.ic.labgc.client.IClient;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.IObserver;
+import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ClientException;
 import br.uff.ic.labgc.exception.ClientLoginRequiredException;
 import br.uff.ic.labgc.exception.ClientWorkspaceUnavailableException;
 import br.uff.ic.labgc.userInterface.common.Messages;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +23,7 @@ import org.apache.derby.tools.sysinfo;
  * Hello world!
  *
  */
-public class Cli implements IObserver
+public class Cli
 {
     private Options m_options;
     private IClient m_IClient;
@@ -40,32 +44,45 @@ public class Cli implements IObserver
         m_options = new Options();
         
         //Add Help 
-        m_options.addOption(" ","help", false, "Display help"); 
+        m_options.addOption("help",false, "Display help"); 
         
-        //m_options.addOption(" ","mkdir", true, "Creates a directory");
-        m_options.addOption( OptionBuilder.withLongOpt( "mkdir" )
-                                        .withDescription( "Creates a directory" )
+        
+        m_options.addOption( OptionBuilder.withDescription( "Creates a directory" )
                                         .hasArg()
                                         .withArgName("PATH")
                                         .create("mkdir") );       
         
-        m_options.addOption( OptionBuilder.withLongOpt( "checkout" )
-                                        .withDescription( "Checkout a branch or paths to the working tree" )
+        m_options.addOption( OptionBuilder.withDescription( "Checkout a branch or paths to the working tree" )
                                         .hasArgs(2)
-                                        .withArgName("HOST REPOSITORY")
+                                        .withArgName("HOST PATH")
                                         .create("checkout") );
         
-        m_options.addOption( OptionBuilder.withLongOpt( "revert" )
-                                        .withDescription( "Revert modfications on a especific file or files in a directory" )
+        m_options.addOption( OptionBuilder.withDescription( "Revert modfications on a especific file or files in a directory" )
                                         .hasArg()
                                         .withArgName("FILENAME OR PATH")
                                         .create("revert") );
         
-        m_options.addOption( OptionBuilder.withLongOpt( "login" )
-                                        .withDescription( "Make login" )
+        m_options.addOption( OptionBuilder.withDescription( "Make login" )
                                         .hasArgs(2)
                                         .withArgName("USER PASSWORD")
                                         .create("login") );
+        
+        m_options.addOption( OptionBuilder.withDescription( "Get the status of a item or path" )
+                                        .hasArgs()
+                                        .withArgName("ITEM(OPTIONAL)")
+                                        .create("status") );
+        
+        m_options.addOption( OptionBuilder.withLongOpt("m")
+                                        .withDescription( "Commit the changes made" )
+                                        .hasArgs(0)
+                                        .withArgName("COMMIT_MESSAGE")
+                                        .create("commit") );
+        
+        
+         m_options.addOption( OptionBuilder.withDescription( "Log of the latest revisions" )
+                                        .hasArgs()
+                                        .withArgName("ITEM(OPTIONAL)")
+                                        .create("log") );
     }
     
     private void dysplayHelp() 
@@ -76,10 +93,48 @@ public class Cli implements IObserver
          help.run(m_options);
     }
     
+    public boolean compare(VersionedItem object1, VersionedItem object2) 
+    {
+        return object1.getStatus() <= object2.getStatus();
+    }
+    
+    private String GetStatus(int status)
+    {
+        if(status==EVCSConstants.UNMODIFIED)
+            return "Unmodified";
+            
+        if(status==EVCSConstants.MODIFIED)
+             return "Modified";
+            
+        if(status==EVCSConstants.ADDED)
+             return "Added";
+            
+        if(status==EVCSConstants.DELETED)
+             return "Deleted";
+        
+        return "";
+    }
+    
+    
+    private void registerObserver()
+    {
+        IObserver clientObs = new IObserver() {
+            public void sendNotify(String msg) 
+            {
+                 System.out.println(msg+"\n");
+            }
+        };
+        
+        m_IClient.registerInterest(clientObs);
+    }
+    
+    
+    
     public void  run(String[] args) throws ParseException, ClientWorkspaceUnavailableException
     {
         
-        CommandLineParser parser = new PosixParser();
+        //CommandLineParser parser = new PosixParser();
+        CommandLineParser parser = new GnuParser();
         addOptions(); 
         Messages msg = new Messages();   
         CommandLine cmd = null;
@@ -109,7 +164,7 @@ public class Cli implements IObserver
         {
             String path = cmd.getOptionValue("mkdir");
             
-            runMakeDir(path);
+            //runMakeDir(path);
             return;
         }
         
@@ -139,6 +194,39 @@ public class Cli implements IObserver
             return;
         }
         
+        if(cmd.hasOption("status")) 
+        {
+           String [] statusArg = cmd.getOptionValues("status");
+           runStatus(statusArg);
+           
+            return;
+        }
+        
+        if(cmd.hasOption("commit")) 
+        {
+            String [] commitArg = cmd.getOptionValues("commit"); 
+            runCommit(commitArg);
+           
+            return;
+        }
+        
+        
+        if(cmd.hasOption("log")) 
+        {
+            String [] logtArg = cmd.getOptionValues("log"); 
+            runLog(logtArg);
+           
+            return;
+        }
+        
+        /*Option [] str =  cmd.getOptions();
+        for (Option v : str)
+        {
+            System.out.println("saddsda");
+            System.out.println(v.getValue());
+        }*/
+        
+        
         System.out.println("Unrecognized Option "); 
        
     }
@@ -167,6 +255,7 @@ public class Cli implements IObserver
              String strCurrentTerminalPath = "";
              
              m_IClient = new Client(strCurrentTerminalPath);
+             registerObserver();
              try 
              {
                  m_IClient.login(user, passWord);
@@ -195,10 +284,7 @@ public class Cli implements IObserver
            if(checkArgs.length > 1)
            {
                Messages msg = new Messages();
-               for (int i = 0; i < checkArgs.length; i++) {
-                   System.out.println(i + "==>" + checkArgs[i]);
-                   
-               }
+              
                String strUrl = checkArgs[0];
                // Break URL in repo and host
                //file:/// or http://
@@ -212,6 +298,8 @@ public class Cli implements IObserver
                //String path = System.getProperty("user.dir");
            
                m_IClient = new Client(strHost, strRepository, strPath) ;
+               registerObserver();
+               
                String strRevision = "";
                
                if(checkArgs.length >2)
@@ -308,15 +396,96 @@ public class Cli implements IObserver
         return true;
     }
     
-    private void runMakeDir(String path)
-    {
-         String strCurrentTerminalPath = "";    
-         m_IClient = new Client(strCurrentTerminalPath);
-        
-        if(m_IClient.mkdir(path))
-            System.out.println("Directory successfully created.");  
-        else
-            System.out.println("The directory can not be created (Check permissions and the remaining space on the disc).");
-    }
+    
      
+    
+     private void runCommit(String [] commitArgs)
+     {
+         
+         if(commitArgs.length >0)
+         {
+             
+             String strCommitPath = invocationPath;
+             String strMessage = commitArgs[0];
+           
+             m_IClient = new Client(strCommitPath);
+             registerObserver();
+            try 
+            {
+                m_IClient.commit(strMessage);
+            } 
+            catch (ApplicationException ex) 
+            {
+                 System.out.println(ex.getMessage());
+            }
+             
+         }
+         else
+         {
+            System.out.println("The amount of arguments is insufficient ("+commitArgs.length+").");
+         }
+         
+     }
+     
+     
+     private void runStatus(String [] statusArg)
+     {
+         
+         String strItemPath=invocationPath;
+         if(statusArg.length>0)
+            strItemPath += statusArg[0];
+             
+             m_IClient = new Client(strItemPath);
+             
+             List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
+             try 
+             {
+                listItem = m_IClient.status();
+                //Collections.sort(listItem, compare);
+             } 
+             catch (ApplicationException ex) 
+             {
+                //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+                 System.out.println(ex.getMessage());
+             }
+             
+             for (VersionedItem v : listItem)
+             {
+                  System.out.println(v.getName()+"    "+ GetStatus(v.getStatus())+"\n");
+             } 
+         
+     }
+     
+     
+     private void runLog(String [] logArg)
+     {
+         
+         String strItemPath=invocationPath;
+         if(logArg.length>0)
+            strItemPath += logArg[0];
+             
+             m_IClient = new Client(strItemPath);
+             
+             List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
+             try 
+             {
+                listItem = m_IClient.log();
+                //Collections.sort(listItem, compare);
+             } 
+             catch (ApplicationException ex) 
+             {
+                //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+                 System.out.println(ex.getMessage());
+             }
+             
+             for (VersionedItem v : listItem)
+             {
+                  
+             } 
+         
+     }
+     
+    
+    
+    
 }

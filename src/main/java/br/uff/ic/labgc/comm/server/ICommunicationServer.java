@@ -7,6 +7,7 @@ package br.uff.ic.labgc.comm.server;
 import br.uff.ic.labgc.core.VersionedItem;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 /**
  *
@@ -22,7 +23,7 @@ public interface ICommunicationServer extends Remote {
      * @return Número da nova revisão do repositório
      * @throws RemoteException
      */
-    public String commit(VersionedItem item, String token) throws RemoteException;
+    public String commit(VersionedItem item, String message, String token) throws RemoteException;
     /**
      * Atualiza a cópia de trabalho com a revisão solicitada.
      * @param revision Revisão para a qual se deseja atualizar a cópia de trabalho
@@ -30,7 +31,7 @@ public interface ICommunicationServer extends Remote {
      * @return Item versionado composto referente à revisão solicitada
      * @throws RemoteException
      */
-    public VersionedItem update(String revision, String token) throws RemoteException;
+    public VersionedItem update(String clientRevision, String revision, String token) throws RemoteException;
     /**
      * Efetua o checkout da revisão solicitada.
      * @param revision Revisão que se deseja efetuar o checkout
@@ -48,8 +49,7 @@ public interface ICommunicationServer extends Remote {
      * @throws RemoteException 
      */
     public String login(String user, String pwd, String repository)throws RemoteException;
-    public String diff(VersionedItem file, String version) throws RemoteException;
-    public String log() throws RemoteException;
+    public  List<VersionedItem> log(String token) throws RemoteException;
     /**
      * Retorna o conteúdo do item versionado representado pelo hash informado.
      * @param hash Identifica o item versionado para o qual se deseja retornar o conteúdo
