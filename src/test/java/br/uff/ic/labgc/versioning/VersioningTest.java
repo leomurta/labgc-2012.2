@@ -277,7 +277,21 @@ public class VersioningTest {
         //o get(0) cada hora retorna um diferente, entao eh melhor nao testa
         //assertEquals(vf.getName(), child1.getName());
         //assertEquals(vf.getHash(), child1.getHash());
+    }
+    
+    @Test 
+    public void testHashToPath() throws NoSuchMethodException, 
+    IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+        System.out.println("hashToPath");
+        Class[] param = new Class[1];	
+	param[0] = String.class;
+        Method method;    
+        method = Versioning.class.getDeclaredMethod("hashToPath", param);
+        method.setAccessible(true);
         
+        String hash = "aaabbbbbbbbb";
+        String path = (String)method.invoke(versioning, hash);
+        assertEquals("aaa/bbbbbbbbb", path);
     }
     
 }

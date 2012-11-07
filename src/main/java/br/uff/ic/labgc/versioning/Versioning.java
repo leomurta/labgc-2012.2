@@ -161,7 +161,7 @@ public class Versioning implements IVersioning{
     
     private String hashToPath(String hash){
         String path;
-        path = hash.substring(0, 3)+"/"+hash;
+        path = hash.substring(0, 3)+"/"+hash.substring(3);
         return path;
     }
     
