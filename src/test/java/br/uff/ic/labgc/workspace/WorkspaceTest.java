@@ -296,7 +296,7 @@ public class WorkspaceTest {
         System.out.println("getHostname");
         Workspace instance = null;
         String expResult = "";
-        String result = instance.getHost();
+        String result = instance.getHostname();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -310,7 +310,7 @@ public class WorkspaceTest {
         System.out.println("getRepository");
         Workspace instance = null;
         String expResult = "";
-        String result = instance.getProject();
+        String result = instance.getRepository();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

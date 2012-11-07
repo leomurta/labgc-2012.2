@@ -7,6 +7,7 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncompatibleItensException;
+import java.util.ArrayList;
 
 /**
  *
@@ -51,6 +52,14 @@ public class Diff {
     
     public static byte[] patch( VersionedItem file1, byte[] delta ){
         
+        byte[] delta_aux = delta;
+        
+        while(getFline(delta_aux)[0] != EOF){
+            // Comparação de Bytes
+            // Se R, Remove
+            // Se A, Adiciona
+        }
+        
         return null;
         
     }
@@ -65,19 +74,23 @@ public class Diff {
         byte[] lcs  = lcs(seq1, seq2);
         byte[] final_file = null;
         
-        System.out.println("-------------");
+        ArrayList<String> linhas_add = new ArrayList<String>();
+        
+//        System.out.println("-------------");
         System.out.println("SEQ1---------");
         System.out.println(new String(seq1));
         System.out.println("SEQ2---------");
         System.out.println(new String(seq2));
-        System.out.println("LCS----------");
-        System.out.println(new String(lcs ));
+//        System.out.println("LCS----------");
+//        System.out.println(new String(lcs ));
         System.out.println("-------------");
         
         // Registra METADADOS dos arquivos que estão sendo diferenciados
         int i = 0;
         int j = 0;
         int h = 0;
+        int tam_seq1 = countLines(seq1);
+        int tam_seq2 = countLines(seq2);
         int fim = countLines(lcs) + 1;
         
         //if( file1.getHash() != file2.getHash() ){
@@ -88,7 +101,6 @@ public class Diff {
 //                System.out.println("lcs -> " + h + " " + new String(getFline(lcs)));
                 if( !hasDiff(getFline(seq1), getFline(lcs)) ){
                     seq1 = delFline(getFline(seq1), seq1);
-                    i++;
                 }else{
                     // Remove da linha "i" até que seq1[i] == lcs[h]
                     int i_aux = i;
@@ -96,27 +108,33 @@ public class Diff {
                         seq1 = delFline(getFline(seq1), seq1);
                         i++;
                     }
-                    i--;
                     // R i_aux i
-                    System.out.println("R " + i_aux + " " + i);
+                    System.out.println("R " + i_aux + " " + (i-1));
                 }
+                i++;
+                
                 if( !hasDiff(getFline(seq2), getFline(lcs)) ){
                     seq2 = delFline(getFline(seq2), seq2);
-                    j++;
                 }else{
                     // Remove da linha "i" até que seq1[i] == lcs[h]
                     int j_aux = j;
+                    linhas_add.removeAll(linhas_add);
                     while( hasDiff(getFline(seq2), getFline(lcs)) && !isNull(seq2) ){
+                        linhas_add.add(new String(getFline(seq2)));
                         seq2 = delFline(getFline(seq2), seq2);
                         j++;
                     }
-                    j--;
                     // R i_aux i
-                    System.out.println("A " + j_aux + " " + j);
+                    System.out.println("A " + j_aux + " " + linhas_add.size());
+                    for(int z = 0; z < linhas_add.size(); z++){
+                        System.out.println(linhas_add.get(z));
+                    }
                 }
+                j++;
                 lcs = delFline(getFline(lcs), lcs);
                 h++;
             }
+            System.out.println("R " + i + " " + (tam_seq1-1));
             
         //}
         return null;
