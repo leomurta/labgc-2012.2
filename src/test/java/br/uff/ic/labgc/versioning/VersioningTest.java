@@ -6,9 +6,13 @@ package br.uff.ic.labgc.versioning;
 
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
+import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
+import br.uff.ic.labgc.storage.Project;
+import br.uff.ic.labgc.storage.ProjectDAO;
 import br.uff.ic.labgc.storage.Revision;
 import br.uff.ic.labgc.storage.User;
+import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -28,6 +32,7 @@ import static org.junit.Assert.*;
  */
 public class VersioningTest {
     private static Versioning versioning = new Versioning();
+    private static ProjectDAO projectDAO = new ProjectDAO();
     
     public VersioningTest() {
     }
@@ -93,50 +98,44 @@ public class VersioningTest {
     /**
      * Test of getRevision method, of class Versioning.
      */
-    ////@Test
+    @Test
     public void testGetRevision() {
         System.out.println("getRevision");
-        String revNum = "";
-        String token = "";
-        Versioning instance = new Versioning();
-        VersionedDir expResult = null;
-        VersionedDir result = instance.getRevision(revNum, token);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String token = "nvfdovhfdoivbiofdvf";
+        VersionedDir vd = versioning.getRevision("1.0", token);
+        assertTrue("Revision criada:",vd.getSize() != 0);
     }
 
     /**
      * Test of login method, of class Versioning.
      */
-    //@Test
+    @Test
     public void testLogin() throws Exception {
         System.out.println("login");
-        String projectName = "";
-        String userName = "";
-        String pass = "";
-        Versioning instance = new Versioning();
-        String expResult = "";
-        String result = instance.login(projectName, userName, pass);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String token = versioning.login("projeto1", "username1", "password1");
+        assertTrue("Token OK:", token.equals("nvfdovhfdoivbiofdvf"));
+        
+        try{
+            versioning.login("projeto1", "naoexiste", "password1");
+            fail("ObjectNotFoundException expected");
+        }catch (ObjectNotFoundException ex) {}
+        
+        try{
+            versioning.login("projeto1", "username1", "senhaerrada");
+            fail("IncorrectPasswordException expected");
+        }catch (IncorrectPasswordException ex) {}
     }
 
     /**
      * Test of getVersionedFileContent method, of class Versioning.
      */
-    //@Test
+    @Test
     public void testGetVersionedFileContent() throws Exception {
-        System.out.println("getVersionedFileContent");
-        String hash = "";
-        String token = "";
-        Versioning instance = new Versioning();
-        byte[] expResult = null;
-        byte[] result = instance.getVersionedFileContent(hash, token);
-        assertArrayEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        System.out.println("getVersionedFileContent");       
+        String token = "nvfdovhfdoivbiofdvf";
+        byte content[];
+        content = versioning.getVersionedFileContent("vnfdovh9e0h0", token);
+        assertTrue(content.length == 10);
     }
 
     /**
@@ -158,17 +157,26 @@ public class VersioningTest {
     /**
      * Test of addFirstRevision method, of class Versioning.
      */
-    //@Test
+    @Test
     public void testAddFirstRevision() throws Exception {
         System.out.println("addFirstRevision");
-        VersionedDir vd = null;
-        String userName = "";
-        Versioning instance = new Versioning();
-        String expResult = "";
-        String result = instance.addFirstRevision(vd, userName);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        VersionedDir vd = new VersionedDir();
+        vd.setAuthor("Autor10");
+        vd.setCommitMessage("msg10");
+        vd.setName("projeto10");
+        
+        VersionedFile vf = new VersionedFile();
+        vf.setAuthor(vd.getAuthor());
+        vf.setCommitMessage(vd.getCommitMessage());
+        vf.setName("arquivo10.txt");
+        vf.setContent("iabadabadu".getBytes());
+        
+        vd.addItem(vf);
+        versioning.addFirstRevision(vd, "username1");
+
+        Project project = projectDAO.getByName("projeto10");
+        assertNotNull(project);
+
     }
 
     /**
