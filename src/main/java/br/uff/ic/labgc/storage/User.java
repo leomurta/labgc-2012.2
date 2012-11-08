@@ -48,7 +48,7 @@ public class User extends DBClass{
     }
 
     public void setUsername(String username) {
-        this.name = username;
+        this.username = username;
     }
 
     public void setPassword(String password) {
