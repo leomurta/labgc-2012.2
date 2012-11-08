@@ -25,28 +25,55 @@ public class ProjectUserDAO {
 
     public ProjectUserId add(ProjectUser projectUser) {
         try {
+            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
 
             sessao.save(projectUser);
+            HibernateUtil.commitTransaction();
 
             return projectUser.getId();
         } catch (HibernateException e) {
-            throw new InfrastructureException(e);
+            try {
+                HibernateUtil.rollbackTransaction();
+            } catch (InfrastructureException ie) {
+            }
+
+            throw e;
+        } finally {
+            try {
+                HibernateUtil.closeSession();
+            } catch (InfrastructureException he) {
+                throw he;
+            }
         }
     }
 
     public void update(ProjectUser projectUser) {
         try {
+            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
 
             sessao.update(projectUser);
+            HibernateUtil.commitTransaction();
         } catch (HibernateException e) {
-            throw new InfrastructureException(e);
+            try {
+                HibernateUtil.rollbackTransaction();
+            } catch (InfrastructureException ie) {
+            }
+
+            throw e;
+        } finally {
+            try {
+                HibernateUtil.closeSession();
+            } catch (InfrastructureException he) {
+                throw he;
+            }
         }
     }
 
     public void remove(ProjectUserId projectUserId) {
         try {
+            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
 
             ProjectUser pu = (ProjectUser) sessao.get(ProjectUser.class, projectUserId);
@@ -55,26 +82,53 @@ public class ProjectUserDAO {
             //  primeiro nível de cache: a sessão.  
 
             sessao.delete(pu);
+            HibernateUtil.commitTransaction();
         } catch (HibernateException e) {
-            throw new InfrastructureException(e);
+            try {
+                HibernateUtil.rollbackTransaction();
+            } catch (InfrastructureException ie) {
+            }
+
+            throw e;
+        } finally {
+            try {
+                HibernateUtil.closeSession();
+            } catch (InfrastructureException he) {
+                throw he;
+            }
         }
     }
 
     public void remove(ProjectUser pu) {
         try {
+            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
 
             sessao.delete(pu);
+            HibernateUtil.commitTransaction();
         } catch (HibernateException e) {
-            throw new InfrastructureException(e);
+            try {
+                HibernateUtil.rollbackTransaction();
+            } catch (InfrastructureException ie) {
+            }
+
+            throw e;
+        } finally {
+            try {
+                HibernateUtil.closeSession();
+            } catch (InfrastructureException he) {
+                throw he;
+            }
         }
     }
 
     public ProjectUser get(ProjectUserId projectUserId) {
         try {
+            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
 
             ProjectUser pu = (ProjectUser) sessao.get(ProjectUser.class, projectUserId);
+            HibernateUtil.commitTransaction();
 
             if (pu == null) {
                 throw new ObjectNotFoundException();
@@ -82,7 +136,18 @@ public class ProjectUserDAO {
 
             return pu;
         } catch (HibernateException e) {
-            throw new InfrastructureException(e);
+            try {
+                HibernateUtil.rollbackTransaction();
+            } catch (InfrastructureException ie) {
+            }
+
+            throw e;
+        } finally {
+            try {
+                HibernateUtil.closeSession();
+            } catch (InfrastructureException he) {
+                throw he;
+            }
         }
     }
     
@@ -94,11 +159,13 @@ public class ProjectUserDAO {
     
      public ProjectUser getByToken(String token) {
         try {
+            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
             
             Criteria criteria = sessao.createCriteria(ProjectUser.class)
                 .add(Restrictions.eq("token", token));
             ProjectUser pu = (ProjectUser) criteria.uniqueResult();
+            HibernateUtil.commitTransaction();
 
             if (pu == null) {
                 throw new ObjectNotFoundException();
@@ -106,7 +173,18 @@ public class ProjectUserDAO {
 
             return pu;
         } catch (HibernateException e) {
-            throw new InfrastructureException(e);
+            try {
+                HibernateUtil.rollbackTransaction();
+            } catch (InfrastructureException ie) {
+            }
+
+            throw e;
+        } finally {
+            try {
+                HibernateUtil.closeSession();
+            } catch (InfrastructureException he) {
+                throw he;
+            }
         }
     }
 }

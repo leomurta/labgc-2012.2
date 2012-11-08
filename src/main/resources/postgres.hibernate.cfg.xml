@@ -7,7 +7,7 @@
     <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/postgres</property>
     <property name="hibernate.connection.username">labgc</property>
     <property name="hibernate.connection.password">labgc</property>
-    <property name="hibernate.show_sql">true</property>
+    <property name="hibernate.show_sql">false</property>
     <mapping resource="User.hbm.xml"/>
     <mapping resource="Project.hbm.xml"/>
     <mapping resource="Revision.hbm.xml"/>

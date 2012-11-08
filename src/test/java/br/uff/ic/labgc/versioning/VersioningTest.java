@@ -7,18 +7,22 @@ package br.uff.ic.labgc.versioning;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
+import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
 import br.uff.ic.labgc.storage.Project;
 import br.uff.ic.labgc.storage.ProjectDAO;
 import br.uff.ic.labgc.storage.Revision;
 import br.uff.ic.labgc.storage.User;
+import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -83,7 +87,7 @@ public class VersioningTest {
     /**
      * Test of getRevisionUserName method, of class Versioning.
      */
-    ////@Test
+    //@Test
     public void testGetRevisionUserName() {
         System.out.println("getRevisionUserName");
         String number = "";
@@ -98,8 +102,8 @@ public class VersioningTest {
     /**
      * Test of getRevision method, of class Versioning.
      */
-    @Test
-    public void testGetRevision() {
+    ///@Test
+    public void testGetRevision() throws VersioningException {
         System.out.println("getRevision");
         String token = "nvfdovhfdoivbiofdvf";
         VersionedDir vd = versioning.getRevision("1.0", token);
@@ -109,7 +113,7 @@ public class VersioningTest {
     /**
      * Test of login method, of class Versioning.
      */
-    @Test
+    ///@Test
     public void testLogin() throws Exception {
         System.out.println("login");
         String token = versioning.login("projeto1", "username1", "password1");
@@ -141,7 +145,7 @@ public class VersioningTest {
     /**
      * Test of addRevision method, of class Versioning.
      */
-    //@Test
+    ///@Test
     public void testAddRevision() throws Exception {
         System.out.println("addRevision");
         VersionedDir vd = null;
@@ -157,9 +161,9 @@ public class VersioningTest {
     /**
      * Test of addFirstRevision method, of class Versioning.
      */
-    @Test
+    //@Test
     public void testAddFirstRevision() throws Exception {
-        System.out.println("addFirstRevision");
+        System.out.println("addFirstRevision"); 
         VersionedDir vd = new VersionedDir();
         vd.setAuthor("Autor10");
         vd.setCommitMessage("msg10");
@@ -171,19 +175,23 @@ public class VersioningTest {
         vf.setName("arquivo10.txt");
         vf.setContent("iabadabadu".getBytes());
         
+        //removendo diretorio se existente
+        FileUtils.deleteDirectory(new File(Versioning.dirPath +vd.getName()));
+        
         vd.addItem(vf);
         versioning.addFirstRevision(vd, "username1");
-
         Project project = projectDAO.getByName("projeto10");
         assertNotNull(project);
-
+        
+        //removendo diretorio criado
+        FileUtils.deleteDirectory(new File(Versioning.dirPath +vd.getName()));
     }
 
     /**
      * Test of updateRevision method, of class Versioning.
      */
     //@Test
-    public void testUpdateRevision() {
+    public void testUpdateRevision() throws VersioningException {
         System.out.println("updateRevision");
         String revNum = "";
         String revTo = "";
@@ -227,7 +235,7 @@ public class VersioningTest {
         fail("The test case is a prototype.");
     }
     
-    @Test
+    ///@Test
     public void testIncrementRevision() throws Exception{
         System.out.println("incrementRevision");
         Class[] param = new Class[1];	
@@ -248,7 +256,7 @@ public class VersioningTest {
         assertEquals(newRev, "1.20.30.42");
     }
     
-    @Test 
+    ///@Test 
     public void testConfigItemToVersionedDir() throws Exception{
         System.out.println("configItemToVersionedDir");
         Class[] param = new Class[1];	
@@ -285,7 +293,7 @@ public class VersioningTest {
         //assertEquals(vf.getHash(), child1.getHash());
     }
     
-    @Test 
+    ///@Test 
     public void testHashToPath() throws Exception{
         System.out.println("hashToPath");
         Class[] param = new Class[1];	
@@ -299,7 +307,7 @@ public class VersioningTest {
         assertEquals("aaa/bbbbbbbbb", path);
     }
     
-    @Test 
+    ///@Test 
     public void testVersionedDirToConfigItem() throws Exception{
         System.out.println("versionedDirToConfigItem");
         Class[] param = new Class[3];	

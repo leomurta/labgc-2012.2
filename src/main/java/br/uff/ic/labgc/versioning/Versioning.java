@@ -58,7 +58,7 @@ public class Versioning implements IVersioning{
     private static RevisionDAO revisionDAO = new RevisionDAO();
     private static ConfigurationItemDAO configItemDAO = new ConfigurationItemDAO();
     
-    private String dirPath = "repositorio/";
+    public static String dirPath = "repositorio/";
 
     public Versioning() {
     }
@@ -343,6 +343,9 @@ public class Versioning implements IVersioning{
             //vd.setStatus();
             list.add(vd);
             ci = ci.getPrevious();
+            if (ci == null){
+                break;
+            }
         }
         
         return list;

@@ -8,8 +8,8 @@
             </generator>       
         </id>     
         <property name="name" column="name" type="string" not-null="true" unique="true"/>
-        <set name="projectUsers" order-by="USER_ID asc">
-            <key column="PROJEC_ID"/>
+        <set name="projectUsers" order-by="PROJEC_ID" inverse="true">
+            <key column="USER_ID"/>
             <one-to-many class="br.uff.ic.labgc.storage.ProjectUser"/>
         </set>
     </class>

@@ -84,6 +84,7 @@ public class ProjectDAOTest implements IDAOTest{
         Project project = new Project("Projeto 1");
         int id = projectDAO.add(project);
         assertTrue("id != 0:",id != 0);
+        projectDAO.remove(project);
     }
 
     @Test (expected=ObjectNotFoundException.class)
@@ -112,8 +113,6 @@ public class ProjectDAOTest implements IDAOTest{
         
         result = projectDAO.exist(old);
         assertEquals(false, result);
-        
-
-        
+        projectDAO.remove(project);
     }
 }

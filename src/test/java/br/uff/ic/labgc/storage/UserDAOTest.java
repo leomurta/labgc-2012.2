@@ -4,6 +4,8 @@
  */
 package br.uff.ic.labgc.storage;
 
+import br.uff.ic.labgc.storage.util.HibernateUtil;
+import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -49,9 +51,7 @@ public class UserDAOTest implements IDAOTest{
         assertNotNull(result);
     }
     
-    //@Test(expected=ObjectNotFoundException.class)
-    //O sessao.get em UserDAO era pra retornar null mas não esta retornando
-    //no testRemove funciona pq ?????
+    @Test(expected=ObjectNotFoundException.class)
     public void testUserNotFound() {
         userDAO.get(10);
     }
@@ -92,23 +92,45 @@ public class UserDAOTest implements IDAOTest{
     }
 
     @Test
-    public void testAdd() {
+    public void testAddAndRemove() {
         System.out.println("add");
         User user = new User("testAdd1","testAdd2","testAdd3");
-        userDAO.get(1);
         int id = userDAO.add(user);
         assertTrue("id != 0:",id != 0);
+        
+        String userName = user.getUsername();
+        userDAO.remove(user);
+        boolean result = userDAO.exist(userName);
+        assertEquals(false, result);
     }
 
-    //@Test
-    public void testRemove() {
-        System.out.println("remove");
+
+    @Test
+    public void testUpdate() {
+        System.out.println("update");
+        User user = userDAO.get(1);
+        String old = user.getUsername();
+        String newun = "nova";
+        user.setUsername(newun);
+        userDAO.update(user);
+        
+        boolean result = userDAO.exist(old);
+        assertEquals(false, result);
+        
+        result = userDAO.exist(newun);
+        assertEquals(true, result);
+        
+        user.setUsername(old);
+        userDAO.update(user);        
+    }
+
+    //nao precisa ser feito pois ja tem o testAddAndRemove
+    public void testAdd() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    //@Test
-    public void testUpdate() {
-        System.out.println("update");
+    //nao precisa ser feito pois ja tem o testAddAndRemove
+    public void testRemove() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 }

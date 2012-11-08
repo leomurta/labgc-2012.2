@@ -10,27 +10,7 @@
         <property name="name" column="name" type="string" not-null="true"/>
         <property name="username" column="username" type="string" not-null="true" unique="true"/>
         <property name="password" column="password" type="string" not-null="true"/>
-        <set name="userProjects" order-by="project_id asc" cascade="delete" inverse="true">
-<!--       
-           cascade="delete" diz ao Hibernate para navegar a associação e 
-           deletar instâncias persistentes quando um objeto for passado 
-           para o método delete(). 
-           
-           cascade="save-update" não é necessário em função da forma 
-           como uma ocorrência de ProdutoCategoria é inserida,
-           isto é, sem adicioná-la ao conjunto de produtoCategorias
-           de um produto.
-           
-           inverse="true" é necessário pois sem ele o Hibernate irá executar 
-           o comando abaixo (com o objetivo de destruir as ligações existentes
-           entre o produto que será apagado e suas ocorrências de produtoCategorias), 
-           antes de remover um produto:
-           
-           update PRODUTO_CATEGORIA set ID_PRODUTO=null where ID_PRODUTO=?
-           
-           E este comando dará erro uma vez que ID_PRODUTO faz parte da 
-           chave primária da tabela PRODUTO_CATEGORIA.
--->            
+        <set name="userProjects" order-by="project_id">         
             <key column="user_id"/>
             <one-to-many class="br.uff.ic.labgc.storage.ProjectUser"/>
         </set>

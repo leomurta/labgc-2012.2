@@ -19,6 +19,8 @@ import static org.junit.Assert.*;
  */
 public class ProjectUserDAOTest implements IDAOTest{
     private static ProjectUserDAO projectUserDAO = new ProjectUserDAO();
+    private static UserDAO userDAO = new UserDAO();
+    private static ProjectDAO projectDAO = new ProjectDAO();
     
     public ProjectUserDAOTest() {
     }
@@ -45,9 +47,16 @@ public class ProjectUserDAOTest implements IDAOTest{
     @Test
     public void testAdd() {
         System.out.println("add");
-        ProjectUser projectUser = new ProjectUser(10,10);
+        Project project = new Project("kjhkj");
+        projectDAO.add(project);
+        User user = new User("a1", "b1", "c1");
+        userDAO.add(user);
+        ProjectUser projectUser = new ProjectUser(project.getId(),user.getId());
         ProjectUserId result = projectUserDAO.add(projectUser);
         assertNotNull(result);
+        projectUserDAO.remove(result);
+        projectDAO.remove(project);
+        userDAO.remove(user);
     }
 
     /**
@@ -58,37 +67,61 @@ public class ProjectUserDAOTest implements IDAOTest{
         System.out.println("update");
         ProjectUserId id = new ProjectUserId(1,1);
         ProjectUser projectUser = projectUserDAO.get(id);
-        assertEquals("nvfdovhfdoivbiofdvf", projectUser.getToken());
-        assertEquals(11111, projectUser.getPermission());
-        projectUser.setPermission(10000);
+        int old = projectUser.getPermission();
+        int newp = 10000;
+        projectUser.setPermission(newp);
         projectUserDAO.update(projectUser);
         
         ProjectUser pu = projectUserDAO.get(id);
-        assertEquals(10000, pu.getPermission());
+        assertEquals(newp, pu.getPermission());
+        
+        projectUser.setPermission(old);
+        projectUserDAO.update(projectUser);
     }
 
     /**
      * Test of remove method, of class ProjectUserDAO.
      */
-    @Test (expected=ObjectNotFoundException.class)
+    @Test
     public void testRemove_ProjectUserId() {
         System.out.println("remove");
-        ProjectUser projectUser = new ProjectUser(11,11);
+        Project project = new Project("fivdf");
+        projectDAO.add(project);
+        User user = new User("a", "b", "c");
+        userDAO.add(user);
+        ProjectUser projectUser = new ProjectUser(project.getId(),user.getId());
         ProjectUserId result = projectUserDAO.add(projectUser);
         projectUserDAO.remove(result);
-        projectUserDAO.get(11,11);
+        
+         try{
+            projectUserDAO.get(project.getId(),user.getId());
+            fail("ObjectNotFoundException expected");
+        }catch (ObjectNotFoundException ex) {}
+         projectDAO.remove(project);
+         userDAO.remove(user);
+        
     }
 
     /**
      * Test of remove method, of class ProjectUserDAO.
      */
-    @Test (expected=ObjectNotFoundException.class)
+    @Test 
     public void testRemove_ProjectUser() {
         System.out.println("remove");
-        ProjectUser projectUser = new ProjectUser(12,12);
+        Project project = new Project("vfs");
+        projectDAO.add(project);
+        User user = new User("a2", "b2", "c2");
+        userDAO.add(user);
+        ProjectUser projectUser = new ProjectUser(project.getId(),user.getId());
         ProjectUserId id = projectUserDAO.add(projectUser);
         projectUserDAO.remove(projectUser);
-        projectUserDAO.get(id);
+        
+         try{
+            projectUserDAO.get(id);
+            fail("ObjectNotFoundException expected");
+        }catch (ObjectNotFoundException ex) {}
+         projectDAO.remove(project);
+         userDAO.remove(user);
     }
 
     /**

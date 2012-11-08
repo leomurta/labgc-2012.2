@@ -89,6 +89,7 @@ public class RevisionDAOTest implements IDAOTest{
         Revision revision = new Revision(date,description,number,pu.getUser(),pu.getProject());
         int id = revisionDAO.add(revision);
         assertTrue("id != 0:",id != 0);
+        revisionDAO.remove(revision);
     }
 
     @Test (expected=ObjectNotFoundException.class)
@@ -97,8 +98,7 @@ public class RevisionDAOTest implements IDAOTest{
         Date date = new Date();
         String description = "testAdd";
         String number = "1.1";
-        ProjectUserId projectUserId = new ProjectUserId(1,1);
-        ProjectUser pu = projectUserDAO.get(projectUserId);
+        ProjectUser pu = projectUserDAO.get(1,1);
         Revision revision = new Revision(date,description,number,pu.getUser(),pu.getProject());
         int id = revisionDAO.add(revision);
         Revision r1 = revisionDAO.get(id);
@@ -123,5 +123,6 @@ public class RevisionDAOTest implements IDAOTest{
         
         Revision r1 = revisionDAO.get(id);
         assertEquals(newDescription,r1.getDescription());
+        revisionDAO.remove(revision);
     }
 }

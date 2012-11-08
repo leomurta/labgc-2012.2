@@ -6,11 +6,8 @@ package br.uff.ic.labgc.storage;
 
 import br.uff.ic.labgc.storage.util.*;
 import java.util.List;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 
 /**
  *
