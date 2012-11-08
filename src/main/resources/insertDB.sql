@@ -11,13 +11,13 @@ insert into LABGC.T_REVISION (id,date,description,number,user_id,project_id) val
 (1,'13/10/2012','revisao 1','1.0',1,1);
 
 insert into LABGC.T_CONFIGURATION_ITEM (id,name,type,is_dir,size,revision_id,number) values 
-(1,'raiz/','A',1,15,1,1);
+(1,'raiz/','A','1',15,1,1);
 
 insert into LABGC.T_CONFIGURATION_ITEM (id,name,hash,type,is_dir,size,revision_id,number) values 
-(2,'raiz/arquivo1.txt','vnfdovh9e0h0','A',0,10,1,1);
+(2,'raiz/arquivo1.txt','vnfdovh9e0h0','A','0',10,1,1);
 
 insert into LABGC.T_CONFIGURATION_ITEM (id,name,hash,type,is_dir,size,revision_id,number) values 
-(3,'raiz/arquivo2.txt','vcdfsniovfbiov','A',0,5,1,1);
+(3,'raiz/arquivo2.txt','vcdfsniovfbiov','A','0',5,1,1);
 
 update LABGC.T_REVISION set config_item_id = 1 where id = 1;
 

@@ -12,7 +12,7 @@
     <property name="hash" column="hash" type="string"/>
     <property name="type" column="type" type="char" not-null="true"/>
     <property name="dir" column="is_dir" type="boolean" not-null="true"/>
-    <property name="size" column="size" type="int" not-null="true"/>
+    <property name="size" column="size" type="long" not-null="true"/>
     <many-to-one name="next" column="next_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
     <many-to-one name="previous" column="previous_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
     <many-to-one name="revision" column="revision_id" class="br.uff.ic.labgc.storage.Revision"/>

@@ -56,7 +56,7 @@ CREATE TABLE LABGC.T_CONFIGURATION_ITEM(
     name VARCHAR(300),
     hash VARCHAR(20),
     type CHAR,
-    is_dir NUMERIC(1),
+    is_dir BIT(1),
     size NUMERIC(10),
     next_id NUMERIC(20),
     previous_id NUMERIC(20),
