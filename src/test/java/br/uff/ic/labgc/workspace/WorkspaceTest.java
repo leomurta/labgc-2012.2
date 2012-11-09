@@ -226,15 +226,13 @@ public class WorkspaceTest {
     /**
      * Test of status method, of class Workspace.
      */
-    @Test
+    //@Test
     public void testStatus() throws Exception {
         System.out.println("status");
         Workspace instance = new Workspace("F:/mybackups/Educacao/Mestrado-UFF/Git/labgc-2012.2/launchers/windows/projeto1");
         VersionedItem expResult = null;
         VersionedItem result = instance.status();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
