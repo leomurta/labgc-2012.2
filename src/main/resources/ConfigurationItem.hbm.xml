@@ -17,7 +17,7 @@
     <many-to-one name="previous" column="previous_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
     <many-to-one name="revision" column="revision_id" class="br.uff.ic.labgc.storage.Revision"/>
     
-    <set name="children" table='LABGC.T_CHILDREN'>
+    <set name="children" table='LABGC.T_CHILDREN' cascade="all,delete-orphan">
             <key column="parent_id"/>
             <many-to-many column="child_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
     </set>  
