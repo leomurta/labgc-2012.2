@@ -14,10 +14,10 @@ insert into LABGC.T_CONFIGURATION_ITEM (id,name,type,is_dir,size,revision_id,num
 (1,'raiz/','A',1,15,1,1);
 
 insert into LABGC.T_CONFIGURATION_ITEM (id,name,hash,type,is_dir,size,revision_id,number) values 
-(2,'raiz/arquivo1.txt','vnfdovh9e0h0','A',0,10,1,1);
+(2,'arquivo1.txt','vnfdovh9e0h0','A',0,10,1,1);
 
 insert into LABGC.T_CONFIGURATION_ITEM (id,name,hash,type,is_dir,size,revision_id,number) values 
-(3,'raiz/arquivo2.txt','vcdfsniovfbiov','A',0,5,1,1);
+(3,'arquivo2.txt','vcdfsniovfbiov','A',0,5,1,1);
 
 update LABGC.T_REVISION set config_item_id = 1 where id = 1;
 
