@@ -8,6 +8,8 @@ import br.uff.ic.labgc.comm.client.CommunicationFactory;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.CompressionException;
 import br.uff.ic.labgc.exception.ContentNotAvailableException;
+import br.uff.ic.labgc.properties.ApplicationProperties;
+import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.util.CompressUtils;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -54,22 +56,20 @@ public class VersionedFile extends VersionedItem implements Serializable {
     public VersionedFile() {
         this.loaded = false;
         setCompressed(false);
-        try {
-            this.originHost = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-        }
+        this.originHost = ApplicationProperties.getPropertyValue(IPropertiesConstants.HOSTNAME);
     }
-    
+
     /**
      * Faz o mesmo que o construtor padrao so que seta o hash e size tambem
-     * @param hash 
+     *
+     * @param hash
      */
     public VersionedFile(String hash, long size) {
         this();
         this.hash = hash;
         this.size = size;
     }
-    
+
     public VersionedFile(String lastChangedRevision, Date lastChangedTime, String name, String author, String commitMessage) {
         super(lastChangedRevision, lastChangedTime, name, author, commitMessage);
         this.loaded = false;
@@ -79,7 +79,6 @@ public class VersionedFile extends VersionedItem implements Serializable {
         } catch (UnknownHostException e) {
         }
     }
-    
 
     /**
      * Retorna o conteúdo do arquivo representado por este arquivo versionado.
@@ -113,7 +112,7 @@ public class VersionedFile extends VersionedItem implements Serializable {
             Logger.getLogger(VersionedFile.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     //TODO passar a versão na qual o diff deve ser aplicado
     public void setDiffContent(byte[] content) {
         this.content = content;
@@ -127,7 +126,7 @@ public class VersionedFile extends VersionedItem implements Serializable {
             Logger.getLogger(VersionedFile.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public String getHash() {
         return this.hash;
     }
@@ -138,20 +137,21 @@ public class VersionedFile extends VersionedItem implements Serializable {
 
     /**
      * gera um hash com 32 chars
+     *
      * @param bytes
-     * @throws NoSuchAlgorithmException 
+     * @throws NoSuchAlgorithmException
      */
-    private void generateHash() throws NoSuchAlgorithmException{
+    private void generateHash() throws NoSuchAlgorithmException {
         MessageDigest m = MessageDigest.getInstance("MD5");
         m.reset();
         m.update(this.content);
         byte[] digest = m.digest();
-        BigInteger bigInt = new BigInteger(1,digest);
+        BigInteger bigInt = new BigInteger(1, digest);
         String hashtext = bigInt.toString(16);
         // Now we need to zero pad it if you actually want the full 32 chars.
-        while(hashtext.length() < 32 ){
-          hashtext = "0"+hashtext;
-        }     
+        while (hashtext.length() < 32) {
+            hashtext = "0" + hashtext;
+        }
         this.hash = hashtext;
     }
 
