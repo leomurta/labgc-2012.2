@@ -17,24 +17,13 @@ public class ApplicationProperties {
 
     private static ResourceBundle bundle;
 
-    private static ResourceBundle serverBundle;
-
     static {
         bundle = ResourceBundle.getBundle(IPropertiesConstants.PROPERTIES_FILE_NAME,
                 Locale.getDefault(), ClassLoader.getSystemClassLoader());
     }
 
-    static {
-        serverBundle = ResourceBundle.getBundle(IPropertiesConstants.PROPERTIES_SERVER_FILE_NAME,
-                Locale.getDefault(), ClassLoader.getSystemClassLoader());
-    }
-
     public static String getPropertyValue(String propertyKey) {
         return bundle.getString(propertyKey);
-    }
-    
-    public static String getServerPropertyValue(String propertyKey) {
-        return serverBundle.getString(propertyKey);
     }
     
 }
