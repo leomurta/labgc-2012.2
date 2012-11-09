@@ -295,13 +295,10 @@ public class Workspace implements IWorkspace {
         for (File file : stDir) {
             String name = file.getName();
             String extensao = name.substring(name.lastIndexOf("."), name.length());
-            int pos = name.lastIndexOf(".");
-            if (pos > 0) {
-                name = name.substring(0, pos);
-            }
-            if (name == "espelho") {
+            if (name.startsWith("espelho")) {
 //                diretorio1 = new File(diretorio + File.separator + name + extensao);
                 achou = true;
+                break;
             }
         }
         if (!achou) {
