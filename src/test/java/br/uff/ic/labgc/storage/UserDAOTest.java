@@ -5,6 +5,7 @@
 package br.uff.ic.labgc.storage;
 
 import br.uff.ic.labgc.storage.util.HibernateUtil;
+import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.util.List;
 import org.junit.After;
@@ -34,10 +35,18 @@ public class UserDAOTest implements IDAOTest{
     
     @Before
     public void setUp() {
+        HibernateUtil.beginTransaction();
     }
     
     @After
     public void tearDown() {
+        try{
+            HibernateUtil.commitTransaction();
+        }
+        catch(Exception e){	
+            HibernateUtil.rollbackTransaction();
+            HibernateUtil.closeSession();
+        }
     }
 
     /**
@@ -53,6 +62,7 @@ public class UserDAOTest implements IDAOTest{
     
     @Test(expected=ObjectNotFoundException.class)
     public void testUserNotFound() {
+        System.out.println("userNotFound");
         userDAO.get(10);
     }
 

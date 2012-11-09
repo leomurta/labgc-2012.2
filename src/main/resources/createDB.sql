@@ -1,4 +1,4 @@
-/*no mysql, não tem sequence, tem que usar auto_increment*/
+/*no mysql, nÃ£o tem sequence, tem que usar auto_increment*/
 /*esse sql funciona no postgres*/
 /*pra ver sequence no derby --> VALUES NEXT VALUE FOR LABGC.SEQ_USER;*/
 
@@ -54,9 +54,9 @@ ALTER TABLE labgc.T_REVISION OWNER TO labgc;
 CREATE TABLE LABGC.T_CONFIGURATION_ITEM(
     id NUMERIC(20),
     name VARCHAR(300),
-    hash VARCHAR(20),
+    hash VARCHAR(35),
     type CHAR,
-    is_dir BIT(1),
+    is_dir NUMERIC(1),
     size NUMERIC(10),
     next_id NUMERIC(20),
     previous_id NUMERIC(20),

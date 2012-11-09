@@ -4,6 +4,8 @@
  */
 package br.uff.ic.labgc.storage;
 
+import br.uff.ic.labgc.storage.util.HibernateUtil;
+import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -32,10 +34,18 @@ public class ProjectDAOTest implements IDAOTest{
     
     @Before
     public void setUp() {
+        HibernateUtil.beginTransaction();
     }
     
     @After
     public void tearDown() {
+        try{
+            HibernateUtil.commitTransaction();
+        }
+        catch(Exception e){	
+            HibernateUtil.rollbackTransaction();
+            HibernateUtil.closeSession();
+        }
     }
 
     /**
@@ -94,6 +104,7 @@ public class ProjectDAOTest implements IDAOTest{
         int id = projectDAO.add(project);
         projectDAO.remove(project);
         projectDAO.get(id);
+        
     }
 
     @Test

@@ -20,7 +20,7 @@ public class ConfigurationItem extends DBClass{
     //TODO DUVAL o hash deve ser do caminho do repo mais do conteudo do arquivo 
     private String hash;
     private char type; //diz se foi add, delete, update - "A", "D", "U"
-    private boolean dir;
+    private int dir;
     private long size;
     private ConfigurationItem next;
     private ConfigurationItem previous;
@@ -30,7 +30,7 @@ public class ConfigurationItem extends DBClass{
     public ConfigurationItem() {
     }
     
-    public ConfigurationItem(int number, String name, String hash, char type, boolean dir, long size, ConfigurationItem next, ConfigurationItem previous, Revision revision) {
+    public ConfigurationItem(int number, String name, String hash, char type, int dir, long size, ConfigurationItem next, ConfigurationItem previous, Revision revision) {
         this.number = number;
         this.name = name;
         this.hash = hash;
@@ -70,11 +70,11 @@ public class ConfigurationItem extends DBClass{
         this.children.add(child);
     }
 
-    public boolean isDir() {
+    public int getDir() {
         return dir;
     }
 
-    public void setDir(boolean dir) {
+    public void setDir(int dir) {
         this.dir = dir;
     }
 

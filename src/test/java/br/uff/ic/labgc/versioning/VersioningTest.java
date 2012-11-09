@@ -11,9 +11,14 @@ import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
 import br.uff.ic.labgc.storage.Project;
 import br.uff.ic.labgc.storage.ProjectDAO;
+import br.uff.ic.labgc.storage.ProjectUser;
+import br.uff.ic.labgc.storage.ProjectUserDAO;
 import br.uff.ic.labgc.storage.Revision;
+import br.uff.ic.labgc.storage.RevisionDAO;
 import br.uff.ic.labgc.storage.User;
+import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
+import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -37,6 +42,9 @@ import static org.junit.Assert.*;
 public class VersioningTest {
     private static Versioning versioning = new Versioning();
     private static ProjectDAO projectDAO = new ProjectDAO();
+    private static RevisionDAO revisionDAO = new RevisionDAO();
+    private static ProjectUserDAO projectUserDAO = new ProjectUserDAO();
+    private static UserDAO userDAO = new UserDAO();
     
     public VersioningTest() {
     }
@@ -51,10 +59,18 @@ public class VersioningTest {
     
     @Before
     public void setUp() {
+        HibernateUtil.beginTransaction();
     }
     
     @After
     public void tearDown() {
+        try{
+            HibernateUtil.commitTransaction();
+        }
+        catch(Exception e){	
+            HibernateUtil.rollbackTransaction();
+            HibernateUtil.closeSession();
+        }
     }
 
     /**
@@ -102,18 +118,18 @@ public class VersioningTest {
     /**
      * Test of getRevision method, of class Versioning.
      */
-    ///@Test
+    @Test
     public void testGetRevision() throws VersioningException {
         System.out.println("getRevision");
         String token = "nvfdovhfdoivbiofdvf";
         VersionedDir vd = versioning.getRevision("1.0", token);
-        assertTrue("Revision criada:",vd.getSize() != 0);
+        assertTrue("Revision criada:",vd.getSize() != 0);     
     }
 
     /**
      * Test of login method, of class Versioning.
      */
-    ///@Test
+    @Test
     public void testLogin() throws Exception {
         System.out.println("login");
         String token = versioning.login("projeto1", "username1", "password1");
@@ -145,7 +161,7 @@ public class VersioningTest {
     /**
      * Test of addRevision method, of class Versioning.
      */
-    ///@Test
+    //@Test
     public void testAddRevision() throws Exception {
         System.out.println("addRevision");
         VersionedDir vd = null;
@@ -161,8 +177,9 @@ public class VersioningTest {
     /**
      * Test of addFirstRevision method, of class Versioning.
      */
-    //@Test
+    @Test
     public void testAddFirstRevision() throws Exception {
+        try{
         System.out.println("addFirstRevision"); 
         VersionedDir vd = new VersionedDir();
         vd.setAuthor("Autor10");
@@ -179,12 +196,28 @@ public class VersioningTest {
         FileUtils.deleteDirectory(new File(Versioning.dirPath +vd.getName()));
         
         vd.addItem(vf);
-        versioning.addFirstRevision(vd, "username1");
+        User user = userDAO.getByUserName("username1");
+        versioning.addFirstRevision(vd, user.getUsername());
+        //HibernateUtil.commitTransaction();
         Project project = projectDAO.getByName("projeto10");
         assertNotNull(project);
         
         //removendo diretorio criado
         FileUtils.deleteDirectory(new File(Versioning.dirPath +vd.getName()));
+        
+        Revision rev = revisionDAO.getByProjectAndNumber(project.getId(), "1.0");
+        revisionDAO.remove(rev);
+        projectUserDAO.remove(project.getId(),user.getId());
+        projectDAO.remove(project);
+        
+//*        
+        }
+        catch(Exception e){	
+            HibernateUtil.rollbackTransaction();
+            HibernateUtil.closeSession();
+            throw e;
+        }
+ //*/       
     }
 
     /**
@@ -235,7 +268,7 @@ public class VersioningTest {
         fail("The test case is a prototype.");
     }
     
-    ///@Test
+    @Test
     public void testIncrementRevision() throws Exception{
         System.out.println("incrementRevision");
         Class[] param = new Class[1];	
@@ -256,7 +289,7 @@ public class VersioningTest {
         assertEquals(newRev, "1.20.30.42");
     }
     
-    ///@Test 
+    @Test 
     public void testConfigItemToVersionedDir() throws Exception{
         System.out.println("configItemToVersionedDir");
         Class[] param = new Class[1];	
@@ -268,10 +301,10 @@ public class VersioningTest {
         Date date = new Date();
         User user = new User("name", "username", "password");
         Revision revision = new Revision(date, "revisao 1", "1.0", user, null);
-        ConfigurationItem ci = new ConfigurationItem(1, "pastaraiz", null, 'A', true, 0, null, null, revision);
-        ConfigurationItem child1 = new ConfigurationItem(1, "teste1", "hash1", 'A', false, 10, null, null, revision);
+        ConfigurationItem ci = new ConfigurationItem(1, "pastaraiz", null, 'A', 1, 0, null, null, revision);
+        ConfigurationItem child1 = new ConfigurationItem(1, "teste1", "hash1", 'A', 0, 10, null, null, revision);
         ci.addChild(child1);
-        ConfigurationItem child2 = new ConfigurationItem(1, "teste2", "hash2", 'A', false, 5, null, null, revision);
+        ConfigurationItem child2 = new ConfigurationItem(1, "teste2", "hash2", 'A', 0, 5, null, null, revision);
         ci.addChild(child2);
         
         VersionedDir vd = (VersionedDir)method.invoke(versioning, ci);
@@ -293,7 +326,7 @@ public class VersioningTest {
         //assertEquals(vf.getHash(), child1.getHash());
     }
     
-    ///@Test 
+    @Test 
     public void testHashToPath() throws Exception{
         System.out.println("hashToPath");
         Class[] param = new Class[1];	
@@ -307,7 +340,7 @@ public class VersioningTest {
         assertEquals("aaa/bbbbbbbbb", path);
     }
     
-    ///@Test 
+    @Test 
     public void testVersionedDirToConfigItem() throws Exception{
         System.out.println("versionedDirToConfigItem");
         Class[] param = new Class[3];	
@@ -329,17 +362,17 @@ public class VersioningTest {
         
         VersionedFile vf2 = new VersionedFile(null, null, "arq2", user.getName(), "msg2");
         vf2.setContent("conteudo2".getBytes());
-        vd.addItem(vf2);;
+        vd.addItem(vf2);
         
         //criar revisão 0
         Date date = new Date();
         Project project = new Project(vd.getName());
         Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
         ConfigurationItem ci = new ConfigurationItem(1,project.getName(),"",'A',
-                true,vd.getSize(),null,null,revision);
+                1,vd.getSize(),null,null,revision);
         
         method.invoke(versioning, vd,ci,true);
-        assertEquals(true, ci.isDir());
+        assertEquals(1, ci.getDir());
         assertEquals(vf1.getSize()+vf2.getSize(), ci.getSize());
         assertEquals(vd.getName(), ci.getName());
         assertEquals(1, ci.getNumber());

@@ -17,181 +17,101 @@ import org.hibernate.criterion.Restrictions;
  *
  * @author jokerfvd
  */
-public class DAO implements IDAO {
+public class DAO implements IDAO{
 
     @Override
     public <T> int add(DBClass obj) {
         try {
-            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
             sessao.save(obj);
-            HibernateUtil.commitTransaction();
             return obj.getId();
         } catch (HibernateException e) {
-            try {
-                HibernateUtil.rollbackTransaction();
-            } catch (InfrastructureException ie) {
-            }
-
-            throw e;
-        } finally {
-            try {
-                HibernateUtil.closeSession();
-            } catch (InfrastructureException he) {
-                throw he;
-            }
+            throw new InfrastructureException(e);
         }
     }
 
     @Override
     public <T> void remove(DBClass obj) {
         try {
-            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
             sessao.delete(obj);
-            HibernateUtil.commitTransaction();
         } catch (HibernateException e) {
-            try {
-                HibernateUtil.rollbackTransaction();
-            } catch (InfrastructureException ie) {
-            }
-
-            throw e;
-        } finally {
-            try {
-                HibernateUtil.closeSession();
-            } catch (InfrastructureException he) {
-                throw he;
-            }
+            throw new InfrastructureException(e);
         }
     }
 
     @Override
     public <T> void update(DBClass obj) {
         try {
-            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
             sessao.update(obj);
-            HibernateUtil.commitTransaction();
         } catch (HibernateException e) {
-            try {
-                HibernateUtil.rollbackTransaction();
-            } catch (InfrastructureException ie) {
-            }
-
-            throw e;
-        } finally {
-            try {
-                HibernateUtil.closeSession();
-            } catch (InfrastructureException he) {
-                throw he;
-            }
+            throw new InfrastructureException(e);
         }
     }
 
     @Override
     public Object get(int id, Class type) {
         try {
-            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
-
             Object obj = sessao.get(type, id);
-            HibernateUtil.commitTransaction();
-
             if (obj == null) {
                 throw new ObjectNotFoundException();
             }
 
             return obj;
         } catch (HibernateException e) {
-            try {
-                HibernateUtil.rollbackTransaction();
-            } catch (InfrastructureException ie) {
-            }
-
-            throw e;
-        } finally {
-            try {
-                HibernateUtil.closeSession();
-            } catch (InfrastructureException he) {
-                throw he;
-            }
+            throw new InfrastructureException(e);
         }
     }
-
-    public Object getBy(Class objClass, String searchBy, String searchValue)
-            throws ObjectNotFoundException {
+    
+    public Object getBy(Class objClass, String searchBy, String searchValue) 
+            throws ObjectNotFoundException{
         try {
-            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
-
             Criteria criteria = sessao.createCriteria(objClass)
-                    .add(Restrictions.eq(searchBy, searchValue));
+                .add(Restrictions.eq(searchBy, searchValue));
             Object obj = criteria.uniqueResult();
-            HibernateUtil.commitTransaction();
-
+            
             if (obj == null) {
                 throw new ObjectNotFoundException();
             }
 
             return obj;
         } catch (HibernateException e) {
-            try {
-                HibernateUtil.rollbackTransaction();
-            } catch (InfrastructureException ie) {
-            }
-
-            throw e;
-        } finally {
-            try {
-                HibernateUtil.closeSession();
-            } catch (InfrastructureException he) {
-                throw he;
-            }
+            throw new InfrastructureException(e);
         }
     }
-
-    public boolean exist(Class objClass, String searchBy, String searchValue)
-            throws ObjectNotFoundException {
+    
+    public boolean exist(Class objClass, String searchBy, String searchValue) 
+            throws ObjectNotFoundException{
         try {
-            HibernateUtil.beginTransaction();
             Session sessao = HibernateUtil.getSession();
 
             Criteria criteria = sessao.createCriteria(objClass)
-                    .add(Restrictions.eq(searchBy, searchValue));
+                .add(Restrictions.eq(searchBy, searchValue));
             Object obj = criteria.uniqueResult();
-            HibernateUtil.commitTransaction();
 
             return (obj != null);
         } catch (HibernateException e) {
-            try {
-                HibernateUtil.rollbackTransaction();
-            } catch (InfrastructureException ie) {
-            }
-
-            throw e;
-        } finally {
-            try {
-                HibernateUtil.closeSession();
-            } catch (InfrastructureException he) {
-                throw he;
-            }
+            throw new InfrastructureException(e);
         }
     }
 
-    /*    
-     @Override
-     public <T> List<T> getAll() {
-     {	
-     try
-     {
-     Session sessao = HibernateUtil.getSession();
+/*    
+    @Override
+    public <T> List<T> getAll() {
+        {	
+            try
+            {
+                Session sessao = HibernateUtil.getSession();
 
-     return sessao.createQuery("from T_PROJECT order by id").list();
-     } catch (HibernateException e) {
-     throw new InfrastructureException(e);
-     }
-     }
-     }
-     */
+                return sessao.createQuery("from T_PROJECT order by id").list();
+            } catch (HibernateException e) {
+                throw new InfrastructureException(e);
+            }
+	}
+    }
+*/    
+    
 }

@@ -87,7 +87,7 @@ public class Versioning implements IVersioning{
             ConfigurationItem configItem = (ConfigurationItem)it.next();
             Revision ciRev = configItem.getRevision();
             VersionedItem vi;
-            if (configItem.isDir()){
+            if (configItem.getDir() == 1){
                 vi = configItemToVersionedDir(configItem);
             }
             else{
@@ -222,7 +222,7 @@ public class Versioning implements IVersioning{
             }
             
             ConfigurationItem ci = new ConfigurationItem(previous.getNumber()+1,
-                    projectName,"",type, true,vd.getSize(),previous,null,revision);
+                    projectName,"",type, 1,vd.getSize(),previous,null,revision);
             
             versionedDirToConfigItem(vd,ci,false);
             
@@ -257,8 +257,12 @@ public class Versioning implements IVersioning{
         Project project = new Project(projectName);
         try{
             User user = userDAO.getByUserName(userName);
-            project.addUser(user);
+            //project.addUser(user);
             projectDAO.add(project);
+            ProjectUser pu = new ProjectUser(project.getId(),user.getId());
+            pu.setPermission(11111);
+            projectUserDAO.add(pu);
+            project.addUser(user);
             boolean success = (new File(dirPath+projectName)).mkdirs();
             if (!success) {
                 throw new VersioningCanNotCreateDirException();
@@ -268,11 +272,10 @@ public class Versioning implements IVersioning{
             Date date = new Date();
             Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
             revisionDAO.add(revision);
-            ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',true,vd.getSize(),null,null,revision);
-            
-            versionedDirToConfigItem(vd,ci,true);
+            ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',1,vd.getSize(),null,null,revision);
             
             configItemDAO.add(ci);
+            versionedDirToConfigItem(vd,ci,true);
             
             //verificar se vai ser atualizado no banco automaticamente
             //e se precisa mesmo fazer isso
@@ -295,7 +298,7 @@ public class Versioning implements IVersioning{
             }
             
             if (first){
-                ci = new ConfigurationItem(1, vi.getName(), hash, 'A', vi.isDir(),
+                ci = new ConfigurationItem(1, vi.getName(), hash, 'A', vi.isDir()?1:0,
                         vi.getSize(), null, null, father.getRevision());
             }
             else{
@@ -304,6 +307,7 @@ public class Versioning implements IVersioning{
                 ci = new ConfigurationItem();
             }
             
+            configItemDAO.add(ci);
             if (vi.isDir()){
                 versionedDirToConfigItem((VersionedDir)vi,ci,first);
             }
