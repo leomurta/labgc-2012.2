@@ -119,12 +119,13 @@ public class Client implements IClient {
     }
     
 
-     public  List<VersionedItem> status() throws ApplicationException
+     public VersionedItem status() throws ApplicationException
     {  
-        List<VersionedItem> stat = new ArrayList<VersionedItem>();
+       
         
+        VersionedItem item = workspace.status(); 
         
-        return stat;
+        return item;
     }
 
     public void checkout(String revision) throws ApplicationException {

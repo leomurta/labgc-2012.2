@@ -245,8 +245,6 @@ public class VersionedItems {
      * @throws ApplicationException 
      */
     private void writeVersionedFile(VersionedFile vfile, File root) throws IOException, ApplicationException {
-        System.out.println("writeVersionedFile - start");
-        
         File newfile = new File(root, vfile.getName() );
         newfile.createNewFile();
         
@@ -256,8 +254,7 @@ public class VersionedItems {
         fileWriter.write(content);
         fileWriter.close();
         newfile.setLastModified(vfile.getLastChangedTime().getTime());
-        this.notifyObservers(vfile.getName() );
-         System.out.println("writeVersionedFile - end");
+        this.notifyObservers(newfile.getAbsolutePath());
     }
 
     //observers
