@@ -82,7 +82,7 @@ public interface IWorkspace extends IObservable{
 
     public boolean resolve(String file);
     
-    public List<VersionedItem> status()throws ApplicationException;
+    public VersionedItem status()throws ApplicationException;
 
     public void update(VersionedItem files);
 

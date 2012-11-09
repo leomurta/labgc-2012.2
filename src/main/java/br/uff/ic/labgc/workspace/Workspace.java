@@ -269,7 +269,7 @@ public class Workspace implements IWorkspace {
     
     public boolean release() {
         throw new UnsupportedOperationException("Not supported yet.");
-
+        //VRF se tem commit pendente para poder deletar WS
     }
     
     public boolean resolve(String file) {
@@ -277,7 +277,7 @@ public class Workspace implements IWorkspace {
 
     }
     
-    public List<VersionedItem> status()
+    public VersionedItem status()
             throws WorkspaceException {
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
@@ -309,7 +309,7 @@ public class Workspace implements IWorkspace {
         }
         String dir01 = LocalRepo + File.separator + ".labgc" + File.separator + "espelho.r";
         String dir02 = LocalRepo;
-        List<VersionedItem> lItem;
+        VersionedItem lItem;
         lItem = compareDir(dir01, dir02);
         return lItem;
     }
@@ -426,7 +426,7 @@ public class Workspace implements IWorkspace {
 
     // Primitiva de comparação de diretórios espelho x projeto
 
-    private List<VersionedItem> compareDir(String dir1, String dir2) {
+    private VersionedItem compareDir(String dir1, String dir2) {
         List<File> strDir1 = new ArrayList<File>();
         List<File> strDir2 = new ArrayList<File>();
 
@@ -493,9 +493,9 @@ public class Workspace implements IWorkspace {
                 lItem.add(item);
             }
         }
-
-
-        return lItem;
+        VersionedDir result=new VersionedDir();
+        result.addItem(lItem);
+        return result;
     }
 
     // Primitiva de cópia de diretórios
