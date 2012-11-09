@@ -6,6 +6,9 @@ package br.uff.ic.labgc.workspace;
 
 import br.uff.ic.labgc.core.IObservable;
 import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.ApplicationException;
+import br.uff.ic.labgc.exception.WorkspaceException;
+import java.util.List;
 
 /**
  *
@@ -15,37 +18,71 @@ public interface IWorkspace extends IObservable{
     
     
     // Método de propriedade
-    public void setParam(String key, String value);
-   
-    public String getParam(String key);
+    public void setParam(String key, String value) throws ApplicationException;
     
-    public String getHost(); 
+   /**
+     * metodo para pegar o valor de um parametro salvo
+     *
+     * @param key, chave do parametro salvo
+     * @return
+     */
+    public String getParam(String key)throws ApplicationException;
     
-    public String getProject(); 
+    /**
+     * retorna valor do hostname guardado na criacao do workspace
+     *
+     * @return
+     */
+    public String getHost()throws ApplicationException; 
     
-    public String getRevision();
+    /**
+     * retorna o valor do relacionado ao repositorio do projeto no servidor.
+     * Valor adicionado na criacao do workspace
+     *
+     * @return
+     */
+    public String getProject()throws ApplicationException; 
+    
+    /**
+     * retorna o valor do relacionado ao repositorio do projeto no servidor.
+     * Valor adicionado na criacao do workspace
+     *
+     * @return
+     */
+    public String getRevision()throws ApplicationException;
         
-    public void setRevision(String revision);
+    public void setRevision(String revision)throws ApplicationException;
     
     
     //Métodos de verificação do WS
+    /**
+     * verifica a possibilidade de criar um workspace, retorna true ou false
+     *
+     * @return
+     */
     public boolean canCreate();
     
     public boolean isWorkspace();
-    
-    public void createWorkspace(String hostname, String repository, VersionedItem items);
+        /**
+     *
+     * @param hostname
+     * @param repository
+     * @param items
+     * @throws ApplicationException
+     */
+    public void createWorkspace(String hostname, String repository, VersionedItem items)throws ApplicationException;
     
     
     //Funcionalidades da WS
-    public boolean revert(String file);
+    public boolean revert(String file)throws ApplicationException;
     
-    public boolean revert();
+    public boolean revert()throws ApplicationException;
     
     public boolean release();
 
     public boolean resolve(String file);
     
-    public VersionedItem status();
+    public List<VersionedItem> status()throws ApplicationException;
 
     public void update(VersionedItem files);
 
