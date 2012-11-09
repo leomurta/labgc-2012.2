@@ -9,7 +9,7 @@
         </id>     
         <property name="name" column="name" type="string" not-null="true" unique="true"/>
         <set name="projectUsers" order-by="PROJEC_ID" inverse="true" cascade="all-delete-orphan">
-            <key column="USER_ID"/>
+            <key column="PROJEC_ID"/>
             <one-to-many class="br.uff.ic.labgc.storage.ProjectUser"/>
         </set>
     </class>

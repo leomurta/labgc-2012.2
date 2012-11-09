@@ -60,7 +60,7 @@ public class Versioning implements IVersioning{
     private static RevisionDAO revisionDAO = new RevisionDAO();
     private static ConfigurationItemDAO configItemDAO = new ConfigurationItemDAO();
     
-    public static String dirPath = "..//..//repositorio//";
+    public static String dirPath = "../../repositorio/";
 
     public Versioning() {
     }
@@ -151,7 +151,6 @@ public class Versioning implements IVersioning{
     public byte[] getVersionedFileContent (String hash, String token) throws VersioningException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         String projName = pu.getProject().getName();
-        //Path path = Paths.get(dirPath+projName+"/"+hashToPath(hash));
         File path = new File(dirPath+projName+"/"+hashToPath(hash));
         try {
             return getBytesFromFile(path);
@@ -298,7 +297,6 @@ public class Versioning implements IVersioning{
             ProjectUser pu = new ProjectUser(project.getId(),user.getId());
             pu.setPermission(11111);
             projectUserDAO.add(pu);
-            project.addUser(user);
             boolean success = (new File(dirPath+projectName)).mkdirs();
             if (!success) {
                 throw new VersioningCanNotCreateDirException();
@@ -309,9 +307,8 @@ public class Versioning implements IVersioning{
             Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
             revisionDAO.add(revision);
             ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',1,vd.getSize(),null,null,revision);
-            
-            configItemDAO.add(ci);
             versionedDirToConfigItem(vd,ci,true);
+            configItemDAO.add(ci);
             
             //verificar se vai ser atualizado no banco automaticamente
             //e se precisa mesmo fazer isso
@@ -319,7 +316,8 @@ public class Versioning implements IVersioning{
             return revision.getNumber();
             
         }catch (ObjectNotFoundException e) {
-             throw new VersioningUserNotFoundException();   
+             Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, null, e);
+             throw new VersioningUserNotFoundException(e);   
         }
        
     }

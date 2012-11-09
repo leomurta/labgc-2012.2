@@ -26,4 +26,12 @@ public class VersioningUserNotFoundException extends VersioningException {
     public VersioningUserNotFoundException(String msg) {
         super(msg);
     }
+    
+    public VersioningUserNotFoundException(String message, Exception ex) {
+        super(message, ex);
+    }
+    
+    public VersioningUserNotFoundException(Exception ex) {
+        super(ex);
+    }
 }

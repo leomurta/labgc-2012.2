@@ -9,6 +9,7 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
+import br.uff.ic.labgc.storage.ConfigurationItemDAO;
 import br.uff.ic.labgc.storage.Project;
 import br.uff.ic.labgc.storage.ProjectDAO;
 import br.uff.ic.labgc.storage.ProjectUser;
@@ -40,9 +41,10 @@ import static org.junit.Assert.*;
  * @author jokerfvd
  */
 public class VersioningTest {
-    private static Versioning versioning = new Versioning();
+    private static Versioning versioning = new Versioning("repositorio/");
     private static ProjectDAO projectDAO = new ProjectDAO();
     private static RevisionDAO revisionDAO = new RevisionDAO();
+    private static ConfigurationItemDAO configItemDAO = new ConfigurationItemDAO();
     private static ProjectUserDAO projectUserDAO = new ProjectUserDAO();
     private static UserDAO userDAO = new UserDAO();
     
@@ -197,7 +199,7 @@ public class VersioningTest {
         
         vd.addItem(vf);
         User user = userDAO.getByUserName("username1");
-        versioning.addFirstRevision(vd, user.getUsername());
+        String revNum = versioning.addFirstRevision(vd, user.getUsername());
         //HibernateUtil.commitTransaction();
         Project project = projectDAO.getByName("projeto10");
         assertNotNull(project);
@@ -205,7 +207,11 @@ public class VersioningTest {
         //removendo diretorio criado
         FileUtils.deleteDirectory(new File(Versioning.dirPath +vd.getName()));
         
-        Revision rev = revisionDAO.getByProjectAndNumber(project.getId(), "1.0");
+        Revision rev = revisionDAO.getByProjectAndNumber(project.getId(), revNum);
+        ConfigurationItem ci = rev.getConfigItem();
+        ci.setRevision(null);
+        rev.setConfigItem(null);
+        configItemDAO.remove(ci);
         revisionDAO.remove(rev);
         projectUserDAO.remove(project.getId(),user.getId());
         projectDAO.remove(project);

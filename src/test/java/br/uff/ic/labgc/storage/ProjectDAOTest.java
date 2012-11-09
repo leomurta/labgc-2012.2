@@ -20,6 +20,8 @@ import static org.junit.Assert.*;
  */
 public class ProjectDAOTest implements IDAOTest{
     private static ProjectDAO projectDAO = new ProjectDAO();
+    private static UserDAO userDAO = new UserDAO();
+    private static ProjectUserDAO projectUserDAO = new ProjectUserDAO();
     
     public ProjectDAOTest() {
     }
@@ -125,5 +127,20 @@ public class ProjectDAOTest implements IDAOTest{
         result = projectDAO.exist(old);
         assertEquals(false, result);
         projectDAO.remove(project);
+    }
+    
+    @Test
+    public void testAddUser() {
+        System.out.println("addUser");
+        Project project = new Project("Projeto 2");
+        projectDAO.add(project);
+        User user = new User("name1", "username2", "pass2");
+        userDAO.add(user);
+        ProjectUser pu = new ProjectUser(project.getId(),user.getId());
+        projectUserDAO.add(pu);
+        
+        projectUserDAO.remove(pu);
+        projectDAO.remove(project);
+        
     }
 }
