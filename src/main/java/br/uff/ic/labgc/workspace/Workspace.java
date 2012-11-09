@@ -25,32 +25,33 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 /**
  *
  * @author vyctorh
  */
 public class Workspace implements IObservable {
 
-    private String LocalRepo; 
+    private String LocalRepo;
     private IObserver observer;
-    private final String PROPERTIES_FILE = "labgc.properties";
-    private final String PROPERTY_REVISION = "revision";
-    private final String PROPERTY_HOST = "hostname";
-    private final String PROPERTY_PROJECT = "repository";
-    private final String WS_FOLDER = ".labgc";
-    private final String ESPELHO = "espelho.r";
+    private String PROPERTIES_FILE = "labgc.properties";
+    private String PROPERTY_REVISION = "revision";
+    private String PROPERTY_HOST = "hostname";
+    private String PROPERTY_PROJECT = "repository";
+    private String WS_FOLDER = ".labgc";
+    private String ESPELHO = "espelho.r";
 
     public Workspace(String LocalRepo) {
         this.LocalRepo = LocalRepo; //caminho do projeto gravado na WS
     }
 
     //Métodos de propriedades
-    public void setParam(String key, String value)
-            throws WorkspaceException {
+    public void setParam(String key, String value)throws WorkspaceException {
+        if(key == null)
+            throw new WorkspaceException("Valor de chave nula");
+        if(value == null)
+            throw new WorkspaceException("Valor de valor nulo");
         setProperty(key, value);
     }
-    
 
     /**
      * metodo para pegar o valor de um parametro salvo
@@ -58,11 +59,11 @@ public class Workspace implements IObservable {
      * @param key, chave do parametro salvo
      * @return
      */
-    public String getParam(String key)
-            throws WorkspaceException {
-            
+    public String getParam(String key) throws WorkspaceException {
+        if(key == null)
+            throw new WorkspaceException("Valor de chave nula");
         return getProperty(key);
-        
+
     }
 
     /**
@@ -83,6 +84,7 @@ public class Workspace implements IObservable {
     public String getProject() throws WorkspaceException {
         return getProperty(PROPERTY_PROJECT);
     }
+
     /**
      * retorna o valor do relacionado ao repositorio do projeto no servidor.
      * Valor adicionado na criacao do workspace
@@ -93,11 +95,13 @@ public class Workspace implements IObservable {
         return getProperty(PROPERTY_REVISION);
     }
 
-     public void setRevision(String revision) throws WorkspaceException{
+    public void setRevision(String revision) throws WorkspaceException {
+        if(revision == null) 
+            throw new WorkspaceException("Valor de revisao nula");
         setProperty(PROPERTY_REVISION, revision);
     }
-    
-    private void setProperty(String chave, String valor) throws WorkspaceException{
+
+    private void setProperty(String chave, String valor) throws WorkspaceException {
         File vcs = new File(this.LocalRepo, WS_FOLDER);
         File file = new File(vcs, PROPERTIES_FILE);
         Properties properties = new Properties();
@@ -119,9 +123,17 @@ public class Workspace implements IObservable {
                 throw new WorkspaceException("nao foi possivel criar");
             }
         }
+
+        properties.setProperty(chave,valor);
+        try {
+            properties.store(new FileOutputStream(file), null);
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException("nao foi possivel gravar");
+        }
     }
-    
-    private String getProperty (String chave) throws WorkspaceException{
+
+    private String getProperty(String chave) throws WorkspaceException {
         File vcs = new File(this.LocalRepo, WS_FOLDER);
         File file = new File(vcs, PROPERTIES_FILE);
 
@@ -137,10 +149,9 @@ public class Workspace implements IObservable {
         }
 
         return properties.getProperty(chave);
-    
+
     }
-    
-    
+
     /**
      *
      * @param file
@@ -169,215 +180,210 @@ public class Workspace implements IObservable {
         throw new UnsupportedOperationException("Not supported yet.");
 
     }
-    
-    // primitiva de listar diretório e colocar em array de File
-    
 
-  private List<File> listingDir(File startDir) 
-          throws FileNotFoundException {
-    List<File> result = new ArrayList<File>(); //cria coleção
-    File[] strDir = startDir.listFiles();
-    List<File> str = Arrays.asList(strDir); //transforma em coleção
-    for(File file : str) {
-      if ( ! file.isFile() ) {
-        List<File> deeperList = listingDir(file);
-        result.addAll(deeperList);
-      }else{
-          result.add(file);
-      }
-    }
-    return result;
-  }
- private List<File> listingDirNotEspelho(File startDir) 
-          throws FileNotFoundException {
-    List<File> result = new ArrayList<File>(); //cria coleção
-    // filtro para não entrar no diretorio de controle
-    FilenameFilter filter = new FilenameFilter() { 
-        @Override
-        public boolean accept(File dir, String name) {
-        if (!name.endsWith(".labgc")) {
-            return true;
-        }       
-            return false;
+    // primitiva de listar diretório e colocar em array de File
+    private List<File> listingDir(File startDir)
+            throws FileNotFoundException {
+        List<File> result = new ArrayList<File>(); //cria coleção
+        File[] strDir = startDir.listFiles();
+        List<File> str = Arrays.asList(strDir); //transforma em coleção
+        for (File file : str) {
+            if (!file.isFile()) {
+                List<File> deeperList = listingDir(file);
+                result.addAll(deeperList);
+            } else {
+                result.add(file);
+            }
         }
-    }; // fim filtro
-    
-    File[] strDir = startDir.listFiles(filter);
-    List<File> str = Arrays.asList(strDir); //transforma em coleção
-    for(File file : str) {
-      if ( ! file.isFile() ) {
-        List<File> deeperList = listingDir(file);
-        result.addAll(deeperList);
-      }else{
-          result.add(file);
-      }
+        return result;
     }
-    return result;
-  }  
-    
+
+    private List<File> listingDirNotEspelho(File startDir)
+            throws FileNotFoundException {
+        List<File> result = new ArrayList<File>(); //cria coleção
+        // filtro para não entrar no diretorio de controle
+        FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (!name.endsWith(".labgc")) {
+                    return true;
+                }
+                return false;
+            }
+        }; // fim filtro
+
+        File[] strDir = startDir.listFiles(filter);
+        List<File> str = Arrays.asList(strDir); //transforma em coleção
+        for (File file : str) {
+            if (!file.isFile()) {
+                List<File> deeperList = listingDir(file);
+                result.addAll(deeperList);
+            } else {
+                result.add(file);
+            }
+        }
+        return result;
+    }
+
     // Primitiva de comparação de diretórios espelho x projeto
-   public  void compareDir(String dir1, String dir2, List<File> lDirM, List<File> lDirD, List<File> lDirA) throws FileNotFoundException {
+    public void compareDir(String dir1, String dir2, List<File> lDirM, List<File> lDirD, List<File> lDirA) throws FileNotFoundException {
         List<File> strDir1 = new ArrayList<File>();
-        List<File> strDir2= new ArrayList<File>();
-        
-        String repo=LocalRepo;
-        Path baseDir = Paths.get(repo+File.separator+".labgc"+File.separator+"espelho.r");
-        int countdir=baseDir.getNameCount();
+        List<File> strDir2 = new ArrayList<File>();
+
+        String repo = LocalRepo;
+        Path baseDir = Paths.get(repo + File.separator + ".labgc" + File.separator + "espelho.r");
+        int countdir = baseDir.getNameCount();
         int max;
-        File dir=new File(dir1);
-        strDir1=listingDir(dir);
-        
+        File dir = new File(dir1);
+        strDir1 = listingDir(dir);
+
         // compara se teve modificação e "deleção"
-        for (File f : strDir1) { 
+        for (File f : strDir1) {
             baseDir = Paths.get(f.getPath());
-            max=baseDir.getNameCount();
-            Path relativeDir=baseDir.subpath(countdir, max);
-            File d=relativeDir.toFile();
-            File file2=new File(LocalRepo+File.separator,d.toString());
-            if(f.lastModified()<file2.lastModified()){ //se foi modificado
-                lDirM.add (file2);
+            max = baseDir.getNameCount();
+            Path relativeDir = baseDir.subpath(countdir, max);
+            File d = relativeDir.toFile();
+            File file2 = new File(LocalRepo + File.separator, d.toString());
+            if (f.lastModified() < file2.lastModified()) { //se foi modificado
+                lDirM.add(file2);
             }
             if (!file2.exists()) { //se foi deletado
-                lDirD.add (file2);
-            } 
-        }
-        baseDir = Paths.get(dir2);
-        countdir=baseDir.getNameCount();
-        File dir02 = new File(dir2);
-        strDir2=listingDirNotEspelho(dir02);
-        for (File f : strDir2) { 
-            baseDir = Paths.get(f.getPath());
-            max=baseDir.getNameCount();
-            Path relativeDir=baseDir.subpath(countdir, max);
-            File d=relativeDir.toFile();
-            File file2=new File(LocalRepo+File.separator,d.toString());
-            if (!file2.exists()) {  //se foi adicionado
-                lDirA.add (f);
+                lDirD.add(file2);
             }
         }
-}
-   
-    public  List<VersionedItem> compareDir(String dir1, String dir2) throws FileNotFoundException {
+        baseDir = Paths.get(dir2);
+        countdir = baseDir.getNameCount();
+        File dir02 = new File(dir2);
+        strDir2 = listingDirNotEspelho(dir02);
+        for (File f : strDir2) {
+            baseDir = Paths.get(f.getPath());
+            max = baseDir.getNameCount();
+            Path relativeDir = baseDir.subpath(countdir, max);
+            File d = relativeDir.toFile();
+            File file2 = new File(LocalRepo + File.separator, d.toString());
+            if (!file2.exists()) {  //se foi adicionado
+                lDirA.add(f);
+            }
+        }
+    }
+
+    public List<VersionedItem> compareDir(String dir1, String dir2) throws FileNotFoundException {
         List<File> strDir1 = new ArrayList<File>();
-        List<File> strDir2= new ArrayList<File>();
-        
+        List<File> strDir2 = new ArrayList<File>();
+
         List<VersionedItem> lItem = new ArrayList<VersionedItem>();
-        String repo=LocalRepo;
-        Path baseDir = Paths.get(repo+File.separator+".labgc"+File.separator+"espelho.r");
-        int countdir=baseDir.getNameCount();
+        String repo = LocalRepo;
+        Path baseDir = Paths.get(repo + File.separator + ".labgc" + File.separator + "espelho.r");
+        int countdir = baseDir.getNameCount();
         int max;
-        File dir=new File(dir1);
-        strDir1=listingDir(dir);
-        
+        File dir = new File(dir1);
+        strDir1 = listingDir(dir);
+
         // compara se teve modificação e "deleção"
-        for (File f : strDir1) 
-        { 
+        for (File f : strDir1) {
             VersionedItem item;
             baseDir = Paths.get(f.getPath());
-            max=baseDir.getNameCount();
-            Path relativeDir=baseDir.subpath(countdir, max);
-            File d=relativeDir.toFile();
-            File file2=new File(LocalRepo+File.separator,d.toString());
-            if(f.lastModified()<file2.lastModified())
-            { //se foi modificado
-                
-                if(file2.isDirectory())
+            max = baseDir.getNameCount();
+            Path relativeDir = baseDir.subpath(countdir, max);
+            File d = relativeDir.toFile();
+            File file2 = new File(LocalRepo + File.separator, d.toString());
+            if (f.lastModified() < file2.lastModified()) { //se foi modificado
+
+                if (file2.isDirectory()) {
                     item = new VersionedDir();
-                else
+                } else {
                     item = new VersionedFile();
-                
+                }
+
                 item.setName(file2.getName());
                 item.setStatus(EVCSConstants.MODIFIED);
-                lItem.add (item);
+                lItem.add(item);
             }
-            if (!file2.exists()) 
-            { //se foi deletado
-                
-                if(file2.isDirectory())
+            if (!file2.exists()) { //se foi deletado
+
+                if (file2.isDirectory()) {
                     item = new VersionedDir();
-                else
+                } else {
                     item = new VersionedFile();
-                
+                }
+
                 item.setName(file2.getName());
                 item.setStatus(EVCSConstants.DELETED);
-                lItem.add (item);
-            } 
-        }
-        baseDir = Paths.get(dir2);
-        countdir=baseDir.getNameCount();
-        File dir02 = new File(dir2);
-        strDir2=listingDirNotEspelho(dir02);
-        for (File f : strDir2) 
-        { 
-            VersionedItem item;
-            baseDir = Paths.get(f.getPath());
-            max=baseDir.getNameCount();
-            Path relativeDir=baseDir.subpath(countdir, max);
-            File d=relativeDir.toFile();
-            File file2=new File(LocalRepo+File.separator,d.toString());
-            if (!file2.exists()) 
-            {  
-                if(f.isDirectory())
-                    item = new VersionedDir();
-                else
-                    item = new VersionedFile();
-                //se foi adicionado
-                item.setName(f.getName());
-                lItem.add (item);
+                lItem.add(item);
             }
         }
-        
-        
+        baseDir = Paths.get(dir2);
+        countdir = baseDir.getNameCount();
+        File dir02 = new File(dir2);
+        strDir2 = listingDirNotEspelho(dir02);
+        for (File f : strDir2) {
+            VersionedItem item;
+            baseDir = Paths.get(f.getPath());
+            max = baseDir.getNameCount();
+            Path relativeDir = baseDir.subpath(countdir, max);
+            File d = relativeDir.toFile();
+            File file2 = new File(LocalRepo + File.separator, d.toString());
+            if (!file2.exists()) {
+                if (f.isDirectory()) {
+                    item = new VersionedDir();
+                } else {
+                    item = new VersionedFile();
+                }
+                //se foi adicionado
+                item.setName(f.getName());
+                lItem.add(item);
+            }
+        }
+
+
         return lItem;
-}
+    }
 
     // Primitiva de cópia de diretórios
     void copyDir(File src, File dest)
-    	throws IOException{
-     	if(src.isDirectory()){
+            throws IOException {
+        if (src.isDirectory()) {
             //cria se diretório não existe
-            if(!dest.exists()){
+            if (!dest.exists()) {
                 dest.mkdir();
             }
             /* Filtro de diretório
              * 
              * FilenameFilter filter = new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    if (!name.endsWith("CVS")) {
-                        // if (name.endsWith(".txt")) {
-                        return true;
-                    }       
-                        return false;
-                    }
-                };
+             public boolean accept(File dir, String name) {
+             if (!name.endsWith("CVS")) {
+             // if (name.endsWith(".txt")) {
+             return true;
+             }       
+             return false;
+             }
+             };
              * 
              */
-            
-           //pega conteúdo do diretório
-           String files[] = src.list();
-           for (String file : files) {
+
+            //pega conteúdo do diretório
+            String files[] = src.list();
+            for (String file : files) {
                 File srcFile = new File(src, file);
-    		File destFile = new File(dest, file);
-    		//cópia recursiva
+                File destFile = new File(dest, file);
+                //cópia recursiva
 //    		copydir(srcFile,destFile);
             }
- 
-        }else{
+
+        } else {
             //copia arquivos
             FileInputStream fisOrigem = new FileInputStream(src);
             FileOutputStream fisDestino = new FileOutputStream(dest);
-    	    FileChannel fcOrigem = fisOrigem.getChannel();
+            FileChannel fcOrigem = fisOrigem.getChannel();
             FileChannel fcDestino = fisDestino.getChannel();
             // Transfere todo o volume para o arquivo de cópia com o número de bytes do arquivo original
             fcOrigem.transferTo(0, fcOrigem.size(), fcDestino);
             // Fecha
             fisOrigem.close();
             fisDestino.close();
-    	    
+
         }
     }
-
-    
 
     boolean copy(File origem, File destino, boolean overwrite)
             throws FileNotFoundException, IOException {
@@ -413,21 +419,19 @@ public class Workspace implements IObservable {
     }
 
     //comandos de diretorio
-    
     // Apagar diretório e subdiretórios
-    
     public static boolean deleteDir(File dir) {
-    if (dir.isDirectory()) {
-      String[] children = dir.list();
-      for (int i = 0; i < children.length; i++) {
-        boolean success = deleteDir(new File(dir, children[i]));
-        if (!success) {
-          return false;
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
         }
-      }
+        return dir.delete();
     }
-    return dir.delete();
-  }
 
     boolean add(File file)
             throws IOException {
@@ -435,36 +439,35 @@ public class Workspace implements IObservable {
 
     }
 
-   /*
-    * Testa se é um subDir de um Dir
-    * base tem que ser um diretorio
-    * child pode ser um arquivo com caminho completo
-    */
-  public boolean isSubDir(File baseDir, File child)
-      throws IOException {
-      baseDir = baseDir.getCanonicalFile();
-      child = child.getCanonicalFile();
+    /*
+     * Testa se é um subDir de um Dir
+     * base tem que ser um diretorio
+     * child pode ser um arquivo com caminho completo
+     */
+    public boolean isSubDir(File baseDir, File child)
+            throws IOException {
+        baseDir = baseDir.getCanonicalFile();
+        child = child.getCanonicalFile();
 
-      File parentFile = child;
-      while (parentFile != null) {
-          if (baseDir.equals(parentFile)) {
-              return true;
-          }
-          parentFile = parentFile.getParentFile();
-      }
-      return false;
-  }
-    
-    
+        File parentFile = child;
+        while (parentFile != null) {
+            if (baseDir.equals(parentFile)) {
+                return true;
+            }
+            parentFile = parentFile.getParentFile();
+        }
+        return false;
+    }
+
     public boolean revert(String fileOrDir)
-    throws  WorkspaceException {
-        
+            throws WorkspaceException {
+
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
-        File target= new File(fileOrDir);
+        File target = new File(fileOrDir);
         try {
             // testa se o caminho está dentro do repositório
-            if (! isSubDir(parent, target)){
+            if (!isSubDir(parent, target)) {
                 throw new WorkspaceRepNaoExisteException("ERRO: Alvo não está no repositório.");
             }
         } catch (IOException ex) {
@@ -501,53 +504,50 @@ public class Workspace implements IObservable {
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
         }
         // testa se for arquivo copia por cima
-        
-            //extrair caminho relativo à baseDir (parent)
-            Path baseDir = Paths.get(parent.toString());
-            Path targetDir=Paths.get(target.toString());
-            int countdir=baseDir.getNameCount();
-            int max=targetDir.getNameCount();
-            Path relativeDir=targetDir.subpath(countdir, max);
-            File d=relativeDir.toFile();
-            //adicionar caminho relativo ao espelho
-            File file2=new File(diretorio1+File.separator,d.toString());
-            //buscar o arquivo origem no espelho - testar se existe.
-            if (!file2.exists()){
-                throw new WorkspaceException("ERRO: Não existe arquivo no espelho.");
-            }else{
-                if (target.isFile()){
-                try 
-                {
+
+        //extrair caminho relativo à baseDir (parent)
+        Path baseDir = Paths.get(parent.toString());
+        Path targetDir = Paths.get(target.toString());
+        int countdir = baseDir.getNameCount();
+        int max = targetDir.getNameCount();
+        Path relativeDir = targetDir.subpath(countdir, max);
+        File d = relativeDir.toFile();
+        //adicionar caminho relativo ao espelho
+        File file2 = new File(diretorio1 + File.separator, d.toString());
+        //buscar o arquivo origem no espelho - testar se existe.
+        if (!file2.exists()) {
+            throw new WorkspaceException("ERRO: Não existe arquivo no espelho.");
+        } else {
+            if (target.isFile()) {
+                try {
                     copy(file2, target, true);
-                } 
-                catch (FileNotFoundException ex) 
-                {
-                   throw new WorkspaceException("File not found.");
-                } 
-                catch (IOException ex) 
-                {
-                     throw new WorkspaceException("IO Exception.");
+                } catch (FileNotFoundException ex) {
+                     Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new WorkspaceException("File not found.");
+                } catch (IOException ex) {
+                    Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new WorkspaceException("IO Exception.");
                 }
-                }else{// diretório
-                   if (!deleteDir(target)){
-                        throw new WorkspaceException("ERRO: Não foi possível limpar WorkSpace.");
-                    }
-                    try {
-                        copyDir (file2, target);
-                    } catch (IOException ex) {
-                        Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-                        throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
-                    }  
+            } else {// diretório
+                if (!deleteDir(target)) {
+                    throw new WorkspaceException("ERRO: Não foi possível limpar WorkSpace.");
+                }
+                try {
+                    copyDir(file2, target);
+                } catch (IOException ex) {
+                    Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
                 }
             }
+        }
         return true;
     }
-    
-public boolean revert()
-throws  WorkspaceException {
+
+    public boolean revert()
+            throws WorkspaceException {
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
-       
+
         if (!parent.exists()) {
             throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
         }
@@ -575,31 +575,36 @@ throws  WorkspaceException {
         if (!achou) {
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
         }
-        if (!deleteDir(parent)){
+        if (!deleteDir(parent)) {
             throw new WorkspaceException("ERRO: Não foi possível limpar WorkSpace.");
         }
         try {
-             copyDir (diretorio1, parent);
-             /*        stDir = diretorio1.listFiles();
-            // copia os arquivos
-            for (File file : stDir) {
-                String name = file.getName();
-                copy(file, new File(diretorio + "\\" + name), true);
-            }*/
+            copyDir(diretorio1, parent);
+            /*        stDir = diretorio1.listFiles();
+             // copia os arquivos
+             for (File file : stDir) {
+             String name = file.getName();
+             copy(file, new File(diretorio + "\\" + name), true);
+             }*/
         } catch (IOException ex) {
-                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
-        } 
-    // se tudo deu certo   
-    return true;
-}
-    
-public  void status(List<File> lDirM, List<File> lDirD, List<File> lDirA) 
-        throws IOException, WorkspaceException {
-    
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
+        }
+        // se tudo deu certo   
+        return true;
+    }
+    /**
+     *
+     * @return
+     * @throws IOException
+     * @throws WorkspaceException
+     */
+    public List<VersionedItem> status()
+            throws IOException, WorkspaceException {
+
         File local = new File(LocalRepo);
         File parent = new File(local.getParent());
-       
+
         if (!parent.exists()) {
             throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
 
@@ -629,55 +634,14 @@ public  void status(List<File> lDirM, List<File> lDirD, List<File> lDirA)
         if (!achou) {
             throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
         }
-        String dir01=LocalRepo+File.separator+".labgc"+File.separator+"espelho.r";
-        String dir02=LocalRepo;
-        compareDir(dir01, dir02, lDirM, lDirD, lDirA);
-}
+        String dir01 = LocalRepo + File.separator + ".labgc" + File.separator + "espelho.r";
+        String dir02 = LocalRepo;
 
-public  List<VersionedItem> statusVersionedItem() 
-        throws IOException, WorkspaceException {
-    
-        File local = new File(LocalRepo);
-        File parent = new File(local.getParent());
-       
-        if (!parent.exists()) {
-            throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
-
-        }
-        File diretorio1 = new File(local + File.separator + ".labgc");
-
-        // testa se existe o diretorio de versionamento
-        if (!diretorio1.exists()) {
-            throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
-
-        }
-        // procura pelo espelho 
-        File[] stDir = diretorio1.listFiles();
-        boolean achou = false;
-        for (File file : stDir) 
-        {
-            String name = file.getName();
-            String extensao = name.substring(name.lastIndexOf("."), name.length());
-            int pos = name.lastIndexOf(".");
-            if (pos > 0) {
-                name = name.substring(0, pos);
-            }
-            if (name == "espelho") {
-//                diretorio1 = new File(diretorio + File.separator + name + extensao);
-                achou = true;
-            }
-        }
-        if (!achou) {
-            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
-        }
-        String dir01=LocalRepo+File.separator+".labgc"+File.separator+"espelho.r";
-        String dir02=LocalRepo;
-        
         List<VersionedItem> lItem;
-        lItem  = compareDir(dir01, dir02);
-        
+        lItem = compareDir(dir01, dir02);
+
         return lItem;
-}
+    }
 
     public boolean release() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -692,39 +656,37 @@ public  List<VersionedItem> statusVersionedItem()
 // Cria esqueleto da WorkSpace
 // diretorio = diretorio completo do projeto, versao=versao do projeto
 // repositorio=caminho do repositorio, login=usuario
-    
     public void createWorkspace(String hostname, String repository, VersionedItem items)
             throws ApplicationException {
 
         //pega os items, grava os arquivos no disco e 
         //grava a pasta de controle dentro da pasta do projeto
-        
+
         File local = new File(LocalRepo);
         File controle = new File(local, WS_FOLDER);
         File espelho = new File(controle, ESPELHO);
-        
+
         local.mkdir();
         controle.mkdir();
         espelho.mkdir();
         
-        IObserver observer = new IObserver() {
-
-                    @Override
-                    public void sendNotify(String path) {
-                        notifyObservers(path);
-                    }
-                };
-        
-        
-        VersionedItems.write(local, ((VersionedDir)items).getContainedItens(),new IObserver[]{observer});
-        VersionedItems.write(espelho, ((VersionedDir)items).getContainedItens());
-        
-        setProperty(PROPERTY_PROJECT,repository);
+        setProperty(PROPERTY_PROJECT, repository);
         setProperty(PROPERTY_HOST, hostname);
         setRevision(items.getLastChangedRevision());
+        
+        IObserver observer = new IObserver() {
+            @Override
+            public void sendNotify(String path) {
+                notifyObservers(path);
+            }
+        };
+
+
+        VersionedItems.write(local, ((VersionedDir) items).getContainedItens(), new IObserver[]{observer});
+        VersionedItems.write(espelho, ((VersionedDir) items).getContainedItens());
+
+        
     }
-
-
 
     /**
      * verifica a possibilidade de criar um workspace, retorna true ou false
@@ -741,12 +703,10 @@ public  List<VersionedItem> statusVersionedItem()
         }
         return false;
     }
-    
+
     /*
      * setParam - coloca em um arquivo um par chave/valor
      */
-
-
     /**
      * verifica se o localRepo e um workspace valido e inicializado
      *
@@ -806,35 +766,32 @@ public  List<VersionedItem> statusVersionedItem()
             this.observer.sendNotify(msg);
         }
     }
-    
-    private VersionedItem fileToVersionedItem(File file){
+
+    private VersionedItem fileToVersionedItem(File file) {
         VersionedItem result = null;
-        
-        if (file.isDirectory()){
+
+        if (file.isDirectory()) {
             File[] stDir = file.listFiles();
             result = new VersionedDir();
-           for (File files : stDir) { //for (int i = 0; i < stdir.length; i++){File files = stdir[i];
-                ((VersionedDir)result).addItem(fileToVersionedItem(files));
+
+            for (File files : stDir) { //for (int i = 0; i < stdir.length; i++){File files = stdir[i];
+
+                ((VersionedDir) result).addItem(fileToVersionedItem(files));
             }
-        }else{
+        } else {
             result = new VersionedFile();
             result.setLastChangedTime(new Date(file.lastModified()));
             result.setName(file.getName());
             try {
-                ((VersionedFile)result).setContent(Files.readAllBytes(file.toPath()));
+                ((VersionedFile) result).setContent(Files.readAllBytes(file.toPath()));
             } catch (IOException ex) {
                 Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         return result;
     }
-    
-    
-    //implementar para o cliente
 
-    public VersionedItem status() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    //implementar para o cliente
 
     public VersionedItem diff(String file, String version) {
         throw new UnsupportedOperationException("Not yet implemented");
@@ -847,8 +804,4 @@ public  List<VersionedItem> statusVersionedItem()
     public VersionedItem commit() {
         throw new UnsupportedOperationException("Not yet implemented");
     }
-
-   
-   
-    
 } //End

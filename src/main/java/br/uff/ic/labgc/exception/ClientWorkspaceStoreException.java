@@ -9,5 +9,9 @@ package br.uff.ic.labgc.exception;
  * @author proto
  */
 public class ClientWorkspaceStoreException  extends ClientException{
+
+    public ClientWorkspaceStoreException(String message) {
+        super(message);
+    }
     
 }

@@ -14,6 +14,8 @@ import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -56,7 +58,8 @@ public class VersionedItems {
             vi.checkDir(dir);
             vi.canRead(dir);
             return vi.readFiles(dir, exclusions, content);
-        } catch (IOException e) {
+        } catch (IOException ex) {
+            Logger.getLogger(VersionedItems.class.getName()).log(Level.SEVERE, null, ex);
             throw new ApplicationException("Ocorreu um erro na leitura dos arquivos");
         }
     }
@@ -201,18 +204,19 @@ public class VersionedItems {
      * @throws ApplicationException 
      */
     private void writeFiles(File dir, List<VersionedItem> items) throws ApplicationException {
-
         for (VersionedItem item : items) {
             if (item.isDir()) {
                 try {
                     this.writeVersionedDir((VersionedDir) item, dir);
-                } catch (IOException e) {
+                } catch (IOException ex) {
+                    Logger.getLogger(VersionedItems.class.getName()).log(Level.SEVERE, null, ex);
                     throw new ApplicationException("Não foi possivel criar o diretório "+item.getName());
                 }
             } else {
                 try {
                     this.writeVersionedFile((VersionedFile) item, dir);
-                } catch (IOException e) {
+                } catch (IOException ex) {
+                    Logger.getLogger(VersionedItems.class.getName()).log(Level.SEVERE, null, ex);
                     throw new ApplicationException("Não foi possivel gravar o arquivo "+item.getName());
                 }
             }
@@ -241,14 +245,19 @@ public class VersionedItems {
      * @throws ApplicationException 
      */
     private void writeVersionedFile(VersionedFile vfile, File root) throws IOException, ApplicationException {
-        File newfile = new File(root, vfile.getName());
+        System.out.println("writeVersionedFile - start");
+        
+        File newfile = new File(root, vfile.getName() );
         newfile.createNewFile();
+        
         byte[] content = vfile.getContent();
+                
         FileOutputStream fileWriter = new FileOutputStream(newfile);
         fileWriter.write(content);
         fileWriter.close();
         newfile.setLastModified(vfile.getLastChangedTime().getTime());
-        this.notifyObservers(newfile.getPath());
+        this.notifyObservers(vfile.getName() );
+         System.out.println("writeVersionedFile - end");
     }
 
     //observers
