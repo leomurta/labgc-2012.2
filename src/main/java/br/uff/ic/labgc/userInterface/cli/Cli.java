@@ -3,6 +3,7 @@ import br.uff.ic.labgc.client.Client;
 import br.uff.ic.labgc.client.IClient;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.IObserver;
+import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ClientException;
@@ -440,10 +441,10 @@ public class Cli
              
              m_IClient = new Client(strItemPath);
              
-             List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
+             VersionedItem status = new VersionedDir(); 
              try 
              {
-                listItem = m_IClient.status();
+                status = m_IClient.status();
                 //Collections.sort(listItem, compare);
              } 
              catch (ApplicationException ex) 
@@ -451,6 +452,9 @@ public class Cli
                 //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
                  System.out.println(ex.getMessage());
              }
+             
+             VersionedDir dir = (VersionedDir) status;           
+             List<VersionedItem> listItem = dir.getContainedItens();
              
              for (VersionedItem v : listItem)
              {
