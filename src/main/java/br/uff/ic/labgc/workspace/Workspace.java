@@ -537,6 +537,7 @@ public class Workspace implements IWorkspace {
             FileChannel fcDestino = fisDestino.getChannel();
             // Transfere todo o volume para o arquivo de cópia com o número de bytes do arquivo original
             fcOrigem.transferTo(0, fcOrigem.size(), fcDestino);
+            dest.setLastModified(src.lastModified());
             // Fecha
             fisOrigem.close();
             fisDestino.close();
