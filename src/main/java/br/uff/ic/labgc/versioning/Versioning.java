@@ -28,9 +28,11 @@ import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,7 +60,7 @@ public class Versioning implements IVersioning{
     private static RevisionDAO revisionDAO = new RevisionDAO();
     private static ConfigurationItemDAO configItemDAO = new ConfigurationItemDAO();
     
-    public static String dirPath = "repositorio/";
+    public static String dirPath = "..//..//repositorio//";
 
     public Versioning() {
     }
@@ -149,13 +151,47 @@ public class Versioning implements IVersioning{
     public byte[] getVersionedFileContent (String hash, String token) throws VersioningException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         String projName = pu.getProject().getName();
-        Path path = Paths.get(dirPath+projName+"/"+hashToPath(hash));
-        byte bytes[];
+        //Path path = Paths.get(dirPath+projName+"/"+hashToPath(hash));
+        File path = new File(dirPath+projName+"/"+hashToPath(hash));
         try {
-            bytes = Files.readAllBytes(path);
+            return getBytesFromFile(path);
         } catch (IOException ex) {
-            throw new VersioningIOException(ex.getMessage());
+            Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, null, ex);
+            throw new VersioningIOException("nao foi possivel ler o conteudo do arquivo");
         }
+    }
+    public static byte[] getBytesFromFile(File file) throws IOException {
+        InputStream is = new FileInputStream(file);
+    
+        // Get the size of the file
+        long length = file.length();
+    
+        if (length > Integer.MAX_VALUE) {
+            // File is too large
+        }
+    
+        // Create the byte array to hold the data
+        byte[] bytes = new byte[(int)length];
+    
+        // Read in the bytes
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+               && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+            offset += numRead;
+        }
+    
+        // Ensure all the bytes have been read in
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file "+file.getName());
+        }
+    
+        // Close the input stream and return bytes
+        is.close();
+        
+        String value = new String(bytes);
+        
+        
         
         return bytes;
     }
