@@ -179,11 +179,10 @@ public class Cli
         
         if(cmd.hasOption("revert")) 
         {
-           String fileName = cmd.getOptionValue("revert");
-           //String path = System.getProperty("user.dir");
-           
-           System.out.println("Coming soon revert from file or directory "+fileName);
-           
+           //String fileName = cmd.getOptionValue("revert");
+           String [] revertArg = cmd.getOptionValues("revert");
+           runRevert(revertArg);
+          
             return;
         }
         
@@ -493,6 +492,30 @@ public class Cli
      }
      
     
+      private void runRevert(String [] revertArg)
+      {
+             
+          String strItemPath=invocationPath;
+          if(revertArg.length>0)
+            strItemPath += revertArg[0];
+             
+             m_IClient = new Client(strItemPath);
+        try 
+        {
+            if(!m_IClient.revert())
+            {
+               System.out.println("Error");
+               return;
+            }
+        } 
+        catch (ApplicationException ex) 
+        {
+            System.out.println(ex.getMessage());
+        }
+            
+            System.out.println("Revert success");
+                     
+      }
     
     
 }
