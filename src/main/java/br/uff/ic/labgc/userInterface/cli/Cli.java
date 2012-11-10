@@ -19,6 +19,7 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.cli.*;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.derby.tools.sysinfo;
 
 /**
@@ -57,8 +58,8 @@ public class Cli {
                 .create("checkout"));
 
         m_options.addOption(OptionBuilder.withDescription("Revert modfications on a especific file or files in a directory")
-                .hasArg()
-                .withArgName("FILENAME OR PATH")
+                .hasOptionalArg()
+                .withArgName("FILENAME OR PATH (OPTIONAL)")
                 .create("revert"));
 
         m_options.addOption(OptionBuilder.withDescription("Make login")
@@ -67,8 +68,8 @@ public class Cli {
                 .create("login"));
 
         m_options.addOption(OptionBuilder.withDescription("Get the status of a item or path")
-                .hasArgs()
-                .withArgName("ITEM(OPTIONAL)")
+                .hasOptionalArg()
+                .withArgName("ITEM (OPTIONAL)")
                 .create("status"));
 
         m_options.addOption(OptionBuilder.withLongOpt("m")
@@ -79,7 +80,7 @@ public class Cli {
 
 
         m_options.addOption(OptionBuilder.withDescription("Log of the latest revisions")
-                .hasArgs()
+                .hasOptionalArg()
                 .withArgName("ITEM(OPTIONAL)")
                 .create("log"));
     }
@@ -122,6 +123,11 @@ public class Cli {
     public void run(String[] args) throws ParseException, ClientWorkspaceUnavailableException {
 
         //CommandLineParser parser = new PosixParser();
+        
+        /*args = new String[2];
+        args[0]="-revert";
+        args[1]="asas";*/
+        
         CommandLineParser parser = new GnuParser();
         addOptions();
         Messages msg = new Messages();
@@ -159,7 +165,8 @@ public class Cli {
         if(cmd.hasOption("revert")) 
         {
            //String fileName = cmd.getOptionValue("revert");
-           String [] revertArg = cmd.getOptionValues("revert");
+           String [] revertArg= null;
+           revertArg = cmd.getOptionValues("revert");
            runRevert(revertArg);
           
             return;
@@ -172,8 +179,10 @@ public class Cli {
             return;
         }
 
-        if (cmd.hasOption("status")) {
-            String[] statusArg = cmd.getOptionValues("status");
+        if (cmd.hasOption("status")) 
+        {
+            String[] statusArg = null;
+            statusArg = cmd.getOptionValues("status");
             runStatus(statusArg);
 
             return;
@@ -188,8 +197,9 @@ public class Cli {
 
 
         if (cmd.hasOption("log")) {
-            String[] logtArg = cmd.getOptionValues("log");
-            runLog(logtArg);
+            String[] logArg= null; 
+            logArg = cmd.getOptionValues("log");
+            runLog(logArg);
 
             return;
         }
@@ -350,20 +360,27 @@ public class Cli {
 
     private void runCommit(String[] commitArgs) {
 
-        if (commitArgs.length > 0) {
+        if (commitArgs.length > 0) 
+        {
 
             String strCommitPath = invocationPath;
             String strMessage = commitArgs[0];
 
             m_IClient = new Client(strCommitPath);
             registerObserver();
-            try {
+            try 
+            {
                 m_IClient.commit(strMessage);
-            } catch (ApplicationException ex) {
+            } 
+            catch (ApplicationException ex)
+            {
                 System.out.println(ex.getMessage());
+                return;
             }
 
-        } else {
+        } 
+        else 
+        {
             System.out.println("The amount of arguments is insufficient (" + commitArgs.length + ").");
         }
 
@@ -372,80 +389,99 @@ public class Cli {
     private void runStatus(String[] statusArg) {
 
         String strItemPath = invocationPath;
-        if (statusArg.length > 0) {
-            strItemPath += statusArg[0];
+        if(statusArg!=null)
+        {
+            if (statusArg.length > 0) 
+            {
+                strItemPath += statusArg[0];
+            }
         }
-
         m_IClient = new Client(strItemPath);
 
         VersionedItem status = new VersionedDir();
-        try {
+        try 
+        {
             status = m_IClient.status();
             //Collections.sort(listItem, compare);
-        } catch (ApplicationException ex) {
+        } 
+        catch (ApplicationException ex) 
+        {
             //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println(ex.getMessage());
+            return;
         }
 
         VersionedDir dir = (VersionedDir) status;
         List<VersionedItem> listItem = dir.getContainedItens();
 
-        for (VersionedItem v : listItem) {
+        for (VersionedItem v : listItem) 
+        {
             System.out.println(v.getName() + "    " + getStatus(v.getStatus()));
         }
 
     }
 
-    private void runLog(String[] logArg) {
+    private void runLog(String[] logArg) 
+    {
 
         String strItemPath = invocationPath;
-        if (logArg.length > 0) {
-            strItemPath += logArg[0];
-             
-             m_IClient = new Client(strItemPath);
-             
-             List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
-             try 
-             {
-                listItem = m_IClient.log();
-                //Collections.sort(listItem, compare);
-             } 
-             catch (ApplicationException ex) 
-             {
-                //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
-                 System.out.println(ex.getMessage());
-             }
-             
-             for (VersionedItem v : listItem)
-             {
-                  
-             } 
+        
+        if(logArg != null)
+        {
+            if (logArg.length > 0)
+                strItemPath += logArg[0];
+        }    
+        m_IClient = new Client(strItemPath);
+
+        List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
+        try 
+        {
+           listItem = m_IClient.log();
+           //Collections.sort(listItem, compare);
+        } 
+        catch (ApplicationException ex) 
+        {
+            //Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println(ex.getMessage());
+        }
+
+        for (VersionedItem v : listItem)
+        {
+
+        } 
          
      }
      
     
-      private void runRevert(String [] revertArg)
+      private void runRevert(String[] revertArg)
       {
              
           String strItemPath=invocationPath;
-          if(revertArg.length>0)
-            strItemPath += revertArg[0];
-             
-             m_IClient = new Client(strItemPath);
+          
+          if(revertArg!=null)
+          {    
+            if(revertArg.length>0)
+            {
+                strItemPath += revertArg[0];
+                //System.out.println(strItemPath);
+            }
+          } 
+          m_IClient = new Client(strItemPath);
         try 
         {
-            if(!m_IClient.revert())
+            if(!(m_IClient.revert()))
             {
-               System.out.println("Error");
+               System.out.println("The revert operation could not be completed");
                return;
             }
         } 
         catch (ApplicationException ex) 
         {
             System.out.println(ex.getMessage());
+            return;
         }
             
-            System.out.println("Revert success");
+        System.out.println("Revert operation completed successfully");
                      
       }
     
