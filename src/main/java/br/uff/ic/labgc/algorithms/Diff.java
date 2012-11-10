@@ -7,6 +7,7 @@ import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncompatibleItensException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -17,14 +18,14 @@ public class Diff {
     // OUTPUT DELTA
     // <- Não definido ainda ! ->
     //
-    private final static byte EOL = (System.lineSeparator()).getBytes()[0];
-    private final static byte EOF = (System.lineSeparator()).getBytes()[0];
+    private final static byte EOL = (new String("\n")).getBytes()[0];
+    private final static byte EOF = (new String("\n")).getBytes()[0];
 
     public static void main(String args[]) throws ApplicationException {
         byte[] testeA;
         byte[] testeB;
-        String teste2 = "B" + '\n' + "C" + '\n';
-        String teste3 = "B" + '\n' + "A" + '\n';
+        String teste2 = "B" + '\n' + "C";
+        String teste3 = "B" + '\n' + "A";
 
         testeA = teste2.getBytes();
         testeB = teste3.getBytes();
@@ -36,7 +37,7 @@ public class Diff {
     }
 
     public static byte[] run(VersionedItem file1, VersionedItem file2) throws ApplicationException, IncompatibleItensException {
-        
+
         if (isFile(file1) && isFile(file2)) {
             return diff_archives( ((VersionedFile)file1).getContent(), ((VersionedFile)file2).getContent() );
         } else {
@@ -184,6 +185,37 @@ public class Diff {
         }
         return true;
     }
+    
+    private static byte[] lcs_dir(List<VersionedItem> seq1, List<VersionedItem> seq2) {
+        
+        if (!isNull(seq1) && !isNull(seq2)) {
+            byte[] fline_seq1 = getFline(seq1); // Identifica primeira linha seq1
+            byte[] fline_seq2 = getFline(seq2); // Identifica segunda  linha seq2
+
+            byte[] new_seq1 = delFline(fline_seq1, seq1); // Remove primeiras linhas das sequências
+            byte[] new_seq2 = delFline(fline_seq2, seq2);
+
+            if (hasDiff(fline_seq1, fline_seq2)) {
+                // Chamar duas frentes de LCS
+                byte[] lcs1 = lcs(new_seq1, seq2);
+                byte[] lcs2 = lcs(seq1, new_seq2);
+
+                // Verifica qual das duas frentes possui maior sequência comum
+                // Retorna
+                if (countLines(lcs1) >= countLines(lcs2)) {
+                    return lcs1;
+                } else {
+                    return lcs2;
+                }
+            } else {
+                return addFline(fline_seq1, lcs(new_seq1, new_seq2));
+            }
+
+        } else {
+            return new byte[0];
+        }
+
+    }
 
     // Finalizado
     private static byte[] lcs(byte[] seq1, byte[] seq2) {
@@ -251,7 +283,7 @@ public class Diff {
 
         if (seq.length != 0) {
             int i = 0;
-            while (Byte.compare(seq[i++], EOL) != 0);
+            while (Byte.compare(seq[i++], EOL) != 0 && i+1 <= seq.length);
             byte[] retorno = new byte[i];
 
             for (int j = 0; j < i; j++) {
