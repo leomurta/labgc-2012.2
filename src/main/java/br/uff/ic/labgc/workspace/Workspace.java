@@ -43,8 +43,8 @@ public class Workspace implements IWorkspace {
     public Workspace(String LocalRepo) {
         this.workspaceDir = LocalRepo; //caminho do projeto gravado na WS
     }
-
-    //Métodos de propriedades
+    
+    // <editor-fold defaultstate="collapsed" desc="Propriedades do Workspace">
     public void setParam(String key, String value)throws WorkspaceException {
         if(key == null)
             throw new WorkspaceException("Valor de chave nula");
@@ -77,9 +77,60 @@ public class Workspace implements IWorkspace {
             throw new WorkspaceException("Valor de revisao nula");
         setProperty(PROPERTY_REVISION, revision);
     }
+    
+    //primitivas locais para os Métodos de propriedades
+    private void setProperty(String chave, String valor) throws WorkspaceException {
+        File vcs = new File(this.workspaceDir, WS_FOLDER);
+        File file = new File(vcs, PROPERTIES_FILE);
+        Properties properties = new Properties();
+        if (file.exists()) {
+            FileInputStream fis;
+            try {
+                fis = new FileInputStream(file);
+                properties.load(fis);
+                fis.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WorkspaceException("nao foi possivel abrir arquivo de propriedades");
+            }
+        } else {
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WorkspaceException("nao foi possivel criar");
+            }
+        }
 
-//Métodos de verificação do WS
+        properties.setProperty(chave,valor);
+        try {
+            properties.store(new FileOutputStream(file), null);
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException("nao foi possivel gravar");
+        }
+    }
 
+    private String getProperty(String chave) throws WorkspaceException {
+        File vcs = new File(this.workspaceDir, WS_FOLDER);
+        File file = new File(vcs, PROPERTIES_FILE);
+
+        Properties properties = new Properties();
+        FileInputStream fi;
+        try {
+            fi = new FileInputStream(file);
+            properties.load(fi);
+            fi.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
+            throw new WorkspaceException("Erro ao manipular o arquivo de parametro");
+        }
+
+        return properties.getProperty(chave);
+    }
+    // </editor-fold>    
+    
+    // <editor-fold defaultstate="collapsed" desc="Métodos de verificação do WS">
     public boolean canCreate() {
         try {
             File file = new File(this.workspaceDir);
@@ -124,15 +175,13 @@ public class Workspace implements IWorkspace {
                 notifyObservers(path);
             }
         };
-
-
+        
         VersionedItems.write(local, ((VersionedDir) items).getContainedItens(), new IObserver[]{observer});
         VersionedItems.write(espelho, ((VersionedDir) items).getContainedItens());
-
-        
     }
-
-//Funcionalidades da WS
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="Funcionalidades da WS">
     public boolean revert(String fileOrDir)
             throws WorkspaceException {
 
@@ -278,36 +327,22 @@ public class Workspace implements IWorkspace {
     }
     
     public VersionedItem status()
-            throws WorkspaceException {
+            throws ApplicationException {
         File local = new File(workspaceDir);
-        File parent = new File(local.getParent());
-        if (!parent.exists()) {
-            throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
-        }
-        File metadataDir = new File(local + File.separator + ".labgc");
-        // testa se existe o diretorio de versionamento
-        if (!metadataDir.exists()) {
-            throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
-        }
-        // procura pelo espelho 
-        File[] stDir = metadataDir.listFiles();
-        boolean achou = false;
-        for (File file : stDir) {
-            String name = file.getName();
-            String extensao = name.substring(name.lastIndexOf("."), name.length());
-            if (name.startsWith("espelho")) {
-//                diretorio1 = new File(diretorio + File.separator + name + extensao);
-                achou = true;
-                break;
-            }
-        }
-        if (!achou) {
-            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
-        }
-        String espelhoDir = workspaceDir + File.separator + ".labgc" + File.separator + "espelho.r";
-        VersionedItem lItem;
-        lItem = compareDir(espelhoDir, workspaceDir);
-        return lItem;
+        File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
+        
+        VersionedDir root = new VersionedDir(); 
+        VersionedDir working = new VersionedDir();
+        VersionedDir pristine = new VersionedDir();
+                
+        String exclusions[] = {WS_FOLDER};
+        working.addItem(VersionedItems.read(local, exclusions, false));//false nao le o conteudo
+        pristine.addItem(VersionedItems.read(mirror, false));
+        
+        root.addItem(VersionedItems.diff(pristine.getContainedItens(), working.getContainedItens()));
+        
+        return root;
+        
     }
 
     public void update(VersionedItem files) {
@@ -323,58 +358,8 @@ public class Workspace implements IWorkspace {
     public VersionedItem diff(String file, String version) {
         throw new UnsupportedOperationException("Not yet implemented");
     }
-     
-    //primitivas locais para os Métodos de propriedades
-    private void setProperty(String chave, String valor) throws WorkspaceException {
-        File vcs = new File(this.workspaceDir, WS_FOLDER);
-        File file = new File(vcs, PROPERTIES_FILE);
-        Properties properties = new Properties();
-        if (file.exists()) {
-            FileInputStream fis;
-            try {
-                fis = new FileInputStream(file);
-                properties.load(fis);
-                fis.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WorkspaceException("nao foi possivel abrir arquivo de propriedades");
-            }
-        } else {
-            try {
-                file.createNewFile();
-            } catch (IOException ex) {
-                Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-                throw new WorkspaceException("nao foi possivel criar");
-            }
-        }
-
-        properties.setProperty(chave,valor);
-        try {
-            properties.store(new FileOutputStream(file), null);
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("nao foi possivel gravar");
-        }
-    }
-
-    private String getProperty(String chave) throws WorkspaceException {
-        File vcs = new File(this.workspaceDir, WS_FOLDER);
-        File file = new File(vcs, PROPERTIES_FILE);
-
-        Properties properties = new Properties();
-        FileInputStream fi;
-        try {
-            fi = new FileInputStream(file);
-            properties.load(fi);
-            fi.close();
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("Erro ao manipular o arquivo de parametro");
-        }
-
-        return properties.getProperty(chave);
-
-    }
+     // </editor-fold>
+    
  
     // primitivas locais de manipulação de diretório e arquivos
     private List<File> listingDir(File startDir)

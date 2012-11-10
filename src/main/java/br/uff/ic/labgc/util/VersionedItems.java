@@ -67,7 +67,30 @@ public class VersionedItems {
             throw new ApplicationException("Ocorreu um erro na leitura do arquivo");
         }
     }
-
+    /**
+     * Método para a leitura de arquivos do disco transformando para
+     * VersionedItem
+     *
+     * @param dir diretório root onde os dados iniciarão a leitura
+     * @return Retorna uma lista de VersionedItem
+     * @throws ApplicationException
+     */
+    public static List<VersionedItem> read(final File dir) throws ApplicationException {
+        return VersionedItems.read(dir, null, true);
+    }
+    /**
+     * Método para a leitura de arquivos do disco transformando para
+     * VersionedItem
+     *
+     * @param dir diretório root onde os dados iniciarão a leitura
+     * @param content valor booleano que define se o conteúdo será coletado ou
+     * não - false para coletar apenas metadados
+     * @return Retorna uma lista de VersionedItem
+     * @throws ApplicationException
+     */
+    public static List<VersionedItem> read(final File dir, boolean content) throws ApplicationException {
+        return VersionedItems.read(dir, null, content);
+    }
     /**
      * Método para a leitura de arquivos do disco transformando para
      * VersionedItem
@@ -492,12 +515,17 @@ public class VersionedItems {
     private VersionedFile compareVersionedFile(VersionedFile pristine, VersionedFile working) {
 
         VersionedFile file = working;
-
-        if (pristine.getHash().hashCode() != working.getHash().hashCode()
-                || pristine.getSize() != working.getSize()
-                || !pristine.getLastChangedTime().equals(working.getLastChangedTime())) {
-
-
+          
+        if (!pristine.getLastChangedTime().equals(working.getLastChangedTime()) ||
+                (
+                (pristine.hasContent() && working.hasContent())&&
+                    (
+                     pristine.getHash().hashCode() != working.getHash().hashCode() ||
+                     pristine.getSize() != working.getSize()
+                    )
+                )
+            ){               
+            
             file = this.applyDiff(pristine, working);
 
             file.setStatus(EVCSConstants.MODIFIED);
