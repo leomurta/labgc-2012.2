@@ -36,7 +36,7 @@ public class Diff {
     }
 
     public static byte[] run(VersionedItem file1, VersionedItem file2) throws ApplicationException, IncompatibleItensException {
-
+        
         if (isFile(file1) && isFile(file2)) {
             return diff_archives( ((VersionedFile)file1).getContent(), ((VersionedFile)file2).getContent() );
         } else {
@@ -158,14 +158,15 @@ public class Diff {
         if (linhas_add.size() > 0) {
             //System.out.println("A " + (j - 1) + " " + linhas_add.size());
             retorno += "A " + (j - 1) + " " + linhas_add.size() + '\n';
-        }
-        for( int s = 0; s < linhas_add.size(); s++ ){
-            //System.out.println(linhas_add.get(s));
-            retorno += linhas_add.get(s);
-            if( s + 1 == linhas_add.size() ){
-                retorno += '\n';
+            for( int s = 0; s < linhas_add.size(); s++ ){
+                //System.out.println(linhas_add.get(s));
+                retorno += linhas_add.get(s);
+                if( s + 1 == linhas_add.size() ){
+                    retorno += '\n';
+                }
             }
         }
+
 
         return retorno.getBytes();
     }
