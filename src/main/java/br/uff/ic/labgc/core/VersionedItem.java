@@ -14,7 +14,7 @@ import java.util.Date;
  *
  * @author Cristiano
  */
-public abstract class VersionedItem implements Serializable {
+public abstract class VersionedItem implements Serializable, Comparable<VersionedItem> {
 
     private static final long serialVersionUID = 8608395561823655106L;
     /**
@@ -177,4 +177,37 @@ public abstract class VersionedItem implements Serializable {
      * @return true para diretorio e false para arquivo
      */
     public abstract boolean isDir();
+
+    @Override
+    public int hashCode() {
+        return this.name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj)
+            return true;
+        
+        if(obj == null)
+            return false;
+        
+        if(getClass() != obj.getClass())
+            return false;
+        
+        VersionedItem item = (VersionedItem) obj;
+        
+        if(this.isDir() != item.isDir())
+            return false;
+        
+        if(this.hashCode() != item.hashCode())
+            return false;
+        
+        return true;
+    }
+
+    @Override
+    public int compareTo(VersionedItem item) {
+        return this.name.compareTo(item.name);
+    }
+    
 }
