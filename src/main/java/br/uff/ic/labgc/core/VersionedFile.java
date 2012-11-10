@@ -112,7 +112,16 @@ public class VersionedFile extends VersionedItem implements Serializable {
             Logger.getLogger(VersionedFile.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+    
+    public boolean hasContent(){
+        return (this.content != null);
+    }
+    
+    public void releaseContent(){
+        this.content = null;
+        this.size = 0;
+    }
+    
     //TODO passar a versão na qual o diff deve ser aplicado
     public void setDiffContent(byte[] content) {
         this.content = content;
