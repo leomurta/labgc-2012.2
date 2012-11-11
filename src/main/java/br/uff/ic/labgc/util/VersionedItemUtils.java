@@ -4,12 +4,14 @@
  */
 package br.uff.ic.labgc.util;
 
+import br.uff.ic.labgc.algorithms.Diff;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.IObserver;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
+import br.uff.ic.labgc.exception.IncompatibleItensException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -23,14 +25,14 @@ import org.apache.commons.io.FileUtils;
  *
  * @author Felipe
  */
-public class VersionedItems {
+public class VersionedItemUtils {
 
     IObserver[] observers;
 
-    private VersionedItems() {
+    private VersionedItemUtils() {
     }
 
-    private VersionedItems(IObserver[] observers) {
+    private VersionedItemUtils(IObserver[] observers) {
         this.observers = observers;
     }
 
@@ -58,12 +60,12 @@ public class VersionedItems {
      */
     public static VersionedFile readFile(final File file, boolean content) throws ApplicationException {
         try {
-            VersionedItems vi = new VersionedItems();
+            VersionedItemUtils vi = new VersionedItemUtils();
             vi.checkFile(file);
             vi.canRead(file);
             return vi.readFileToVersionedFile(file, content);
         } catch (IOException ex) {
-            Logger.getLogger(VersionedItems.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(VersionedItemUtils.class.getName()).log(Level.SEVERE, null, ex);
             throw new ApplicationException("Ocorreu um erro na leitura do arquivo");
         }
     }
@@ -76,7 +78,7 @@ public class VersionedItems {
      * @throws ApplicationException
      */
     public static List<VersionedItem> read(final File dir) throws ApplicationException {
-        return VersionedItems.read(dir, null, true);
+        return VersionedItemUtils.read(dir, null, true);
     }
     /**
      * Método para a leitura de arquivos do disco transformando para
@@ -89,7 +91,7 @@ public class VersionedItems {
      * @throws ApplicationException
      */
     public static List<VersionedItem> read(final File dir, boolean content) throws ApplicationException {
-        return VersionedItems.read(dir, null, content);
+        return VersionedItemUtils.read(dir, null, content);
     }
     /**
      * Método para a leitura de arquivos do disco transformando para
@@ -101,7 +103,7 @@ public class VersionedItems {
      * @throws ApplicationException
      */
     public static List<VersionedItem> read(final File dir, String[] exclusions) throws ApplicationException {
-        return VersionedItems.read(dir, exclusions, true);
+        return VersionedItemUtils.read(dir, exclusions, true);
     }
 
     /**
@@ -117,12 +119,12 @@ public class VersionedItems {
      */
     public static List<VersionedItem> read(final File dir, String[] exclusions, boolean content) throws ApplicationException {
         try {
-            VersionedItems vi = new VersionedItems();
+            VersionedItemUtils vi = new VersionedItemUtils();
             vi.checkDir(dir);
             vi.canRead(dir);
             return vi.readFiles(dir, exclusions, content);
         } catch (IOException ex) {
-            Logger.getLogger(VersionedItems.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(VersionedItemUtils.class.getName()).log(Level.SEVERE, null, ex);
             throw new ApplicationException("Ocorreu um erro na leitura dos arquivos");
         }
     }
@@ -137,7 +139,7 @@ public class VersionedItems {
     public static void write(final File dir, VersionedFile item) throws ApplicationException {
         List<VersionedItem> items = new ArrayList<VersionedItem>();
         items.add(item);
-        VersionedItems.write(dir, items);
+        VersionedItemUtils.write(dir, items);
     }
 
     /**
@@ -148,7 +150,7 @@ public class VersionedItems {
      * @throws ApplicationException
      */
     public static void write(final File dir, List<VersionedItem> items) throws ApplicationException {
-        VersionedItems.write(dir, items, null);
+        VersionedItemUtils.write(dir, items, null);
     }
 
     /**
@@ -160,7 +162,7 @@ public class VersionedItems {
      * @throws ApplicationException
      */
     public static void write(final File dir, List<VersionedItem> items, IObserver[] observers) throws ApplicationException {
-        VersionedItems vi = new VersionedItems(observers);
+        VersionedItemUtils vi = new VersionedItemUtils(observers);
         vi.checkDir(dir);
         vi.canWrite(dir);
         vi.writeFiles(dir, items);
@@ -172,8 +174,8 @@ public class VersionedItems {
      * @param working copia a ser checada
      * @return VersionedFile
      */
-    public static VersionedFile diff(VersionedFile pristine, VersionedFile working) {
-        VersionedItems vi = new VersionedItems();
+    public static VersionedFile diff(VersionedFile pristine, VersionedFile working) throws ApplicationException {
+        VersionedItemUtils vi = new VersionedItemUtils();
         return vi.compareVersionedFile(pristine, working);
     }
     
@@ -183,8 +185,8 @@ public class VersionedItems {
      * @param working copia a ser checada
      * @return lista de VersionedItem
      */
-    public static List<VersionedItem> diff(List<VersionedItem> pristine, List<VersionedItem> working) {
-        VersionedItems vi = new VersionedItems();
+    public static List<VersionedItem> diff(List<VersionedItem> pristine, List<VersionedItem> working) throws ApplicationException {
+        VersionedItemUtils vi = new VersionedItemUtils();
         return vi.compareVersionedItems(pristine, working);
     }
 
@@ -329,14 +331,14 @@ public class VersionedItems {
                 try {
                     this.writeVersionedDir((VersionedDir) item, dir);
                 } catch (IOException ex) {
-                    Logger.getLogger(VersionedItems.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(VersionedItemUtils.class.getName()).log(Level.SEVERE, null, ex);
                     throw new ApplicationException("Não foi possivel criar o diretório " + item.getName());
                 }
             } else {
                 try {
                     this.writeVersionedFile((VersionedFile) item, dir);
                 } catch (IOException ex) {
-                    Logger.getLogger(VersionedItems.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(VersionedItemUtils.class.getName()).log(Level.SEVERE, null, ex);
                     throw new ApplicationException("Não foi possivel gravar o arquivo " + item.getName());
                 }
             }
@@ -388,7 +390,7 @@ public class VersionedItems {
      * @param working copia do usuario
      * @return uma lista de VersionedItem
      */
-    private List<VersionedItem> compareVersionedItems(List<VersionedItem> pristine, List<VersionedItem> working) {
+    private List<VersionedItem> compareVersionedItems(List<VersionedItem> pristine, List<VersionedItem> working) throws ApplicationException {
         VersionedDir root = new VersionedDir();
 
         List<VersionedItem> modified = this.checkModified(pristine, working);
@@ -456,7 +458,7 @@ public class VersionedItems {
      * @param working Lista de VersionedItem da copia de trabalho do usuario
      * @return Lista de VersionedItem
      */
-    private List<VersionedItem> checkModified(List<VersionedItem> pristine, List<VersionedItem> working) {
+    private List<VersionedItem> checkModified(List<VersionedItem> pristine, List<VersionedItem> working) throws ApplicationException {
         List<VersionedItem> pris = this.<VersionedItem>intersection(pristine, working);
         List<VersionedItem> work = this.<VersionedItem>intersection(working, pristine);
 
@@ -490,7 +492,7 @@ public class VersionedItems {
      * @param working VersionedDir modificado pelo usuario
      * @return Retorna um VersionedDir
      */
-    private VersionedDir compareVersionedDir(VersionedDir pristine, VersionedDir working) {
+    private VersionedDir compareVersionedDir(VersionedDir pristine, VersionedDir working) throws ApplicationException {
         VersionedDir root = new VersionedDir();
 
         if (!pristine.getLastChangedTime().equals(working.getLastChangedTime())
@@ -512,7 +514,7 @@ public class VersionedItems {
      * @return retorna o VersionedFile com o conteudo definido pelo usuario ou
      * diff dele com a versao do espelho
      */
-    private VersionedFile compareVersionedFile(VersionedFile pristine, VersionedFile working) {
+    private VersionedFile compareVersionedFile(VersionedFile pristine, VersionedFile working) throws ApplicationException {
 
         VersionedFile file = working;
           
@@ -546,8 +548,10 @@ public class VersionedItems {
      * @param working VerisonedFile modificado pelo usuario
      * @return retorna o VersionedFile com o diff no conteudo
      */
-    private VersionedFile applyDiff(VersionedFile pristine, VersionedFile working) {//chamar algoritmo de diff aqui
+    private VersionedFile applyDiff(VersionedFile pristine, VersionedFile working) throws ApplicationException {//chamar algoritmo de diff aqui
         if (pristine.hasContent() && working.hasContent()) {
+            working.setDiffContent(Diff.run(pristine, working));
+            working.setDiff(true);
             return working;
         } else {
             return working;

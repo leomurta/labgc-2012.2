@@ -10,7 +10,7 @@ import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
 import br.uff.ic.labgc.exception.WorkspaceRepNaoExisteException;
-import br.uff.ic.labgc.util.VersionedItems;
+import br.uff.ic.labgc.util.VersionedItemUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -176,8 +176,8 @@ public class Workspace implements IWorkspace {
             }
         };
         
-        VersionedItems.write(local, ((VersionedDir) items).getContainedItens(), new IObserver[]{observer});
-        VersionedItems.write(espelho, ((VersionedDir) items).getContainedItens());
+        VersionedItemUtils.write(local, ((VersionedDir) items).getContainedItens(), new IObserver[]{observer});
+        VersionedItemUtils.write(espelho, ((VersionedDir) items).getContainedItens());
     }
     // </editor-fold>
     
@@ -336,10 +336,10 @@ public class Workspace implements IWorkspace {
         VersionedDir pristine = new VersionedDir();
                 
         String exclusions[] = {WS_FOLDER};
-        working.addItem(VersionedItems.read(local, exclusions, false));//false nao le o conteudo
-        pristine.addItem(VersionedItems.read(mirror, false));
+        working.addItem(VersionedItemUtils.read(local, exclusions, false));//false nao le o conteudo
+        pristine.addItem(VersionedItemUtils.read(mirror, false));
         
-        root.addItem(VersionedItems.diff(pristine.getContainedItens(), working.getContainedItens()));
+        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
         
         return root;
         

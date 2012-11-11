@@ -8,6 +8,6 @@ package br.uff.ic.labgc.exception;
  *
  * @author Raphael Evangelista
  */
-public class IncompatibleItensException extends Exception {
+public class IncompatibleItensException extends ApplicationException {
     
 }
