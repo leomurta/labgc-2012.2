@@ -307,9 +307,10 @@ public class VersionedItemUtils {
         VersionedFile newfile = new VersionedFile();
         newfile.setName(file.getName());
         newfile.setLastChangedTime(new Date(file.lastModified()));
-
-        if (content) {
-            newfile.setContent(FileUtils.readFileToByteArray(file));
+        newfile.setContent(FileUtils.readFileToByteArray(file));
+        
+        if (!content) {
+            newfile.releaseContent();
         }
 
         return newfile;
@@ -518,18 +519,11 @@ public class VersionedItemUtils {
 
         VersionedFile file = working;
           
-        if (!pristine.getLastChangedTime().equals(working.getLastChangedTime()) ||
-                (
-                (pristine.hasContent() && working.hasContent())&&
-                    (
-                     pristine.getHash().hashCode() != working.getHash().hashCode() ||
-                     pristine.getSize() != working.getSize()
-                    )
-                )
-            ){               
+        if (!pristine.getHash().equals(working.getHash())){
             
-            file = this.applyDiff(pristine, working);
-
+            if(pristine.hasContent() && working.hasContent()) {
+                file = this.applyDiff(pristine, working);
+            }
             file.setStatus(EVCSConstants.MODIFIED);
         } else {
             VersionedDir root = new VersionedDir();
