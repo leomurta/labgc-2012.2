@@ -519,16 +519,15 @@ public class VersionedItemUtils {
 
         VersionedFile file = working;
           
-        if (!pristine.getHash().equals(working.getHash())){
-            
+        if (pristine.getHash().equals(working.getHash())){
+            VersionedDir root = new VersionedDir();
+            root.addItem(file);
+            releaseContent(root.getContainedItens(), EVCSConstants.UNMODIFIED);
+        } else {
             if(pristine.hasContent() && working.hasContent()) {
                 file = this.applyDiff(pristine, working);
             }
             file.setStatus(EVCSConstants.MODIFIED);
-        } else {
-            VersionedDir root = new VersionedDir();
-            root.addItem(file);
-            releaseContent(root.getContainedItens(), EVCSConstants.UNMODIFIED);
         }
 
         return file;
