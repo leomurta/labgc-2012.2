@@ -62,6 +62,7 @@ public class ConfigurationItemDAOTest implements IDAOTest{
     /**
      * Test of getByHash method, of class ConfigurationItemDAO.
      */
+/*
     @Test
     public void testGetByHash() {
         System.out.println("getByHash");
@@ -70,6 +71,7 @@ public class ConfigurationItemDAOTest implements IDAOTest{
         assertNotNull(result);
         assertEquals(10, result.getSize());
     }
+*/    
 
     @Override
     @Test
@@ -131,5 +133,16 @@ public class ConfigurationItemDAOTest implements IDAOTest{
         ConfigurationItem ciagain = configItemDAO.get(1);
         assertEquals(newsize, ciagain.getSize());
         ci.setSize(oldsize);
+    }
+    
+    @Test
+    public void testGetByValuesAnParent(){
+        System.out.println("getByValuesAnParent");
+        String hash = "vnfdovh9e0h0";
+        String name = "arquivo1.txt";
+        int parentId = 1;
+        int isDir = 0;
+        ConfigurationItem result = configItemDAO.getByValuesAnParent(name,hash,parentId,isDir);
+        assertNotNull(result);
     }
 }
