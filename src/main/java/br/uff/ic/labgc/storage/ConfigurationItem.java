@@ -6,6 +6,7 @@ package br.uff.ic.labgc.storage;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -124,6 +125,27 @@ public class ConfigurationItem extends DBClass{
 
     public void setPrevious(ConfigurationItem previous) {
         this.previous = previous;
+    }
+    
+    public void removeFKs(){
+        ConfigurationItem previous = this.getPrevious();
+        ConfigurationItem next = this.getNext();
+        if (previous != null){
+            previous.setNext(null);
+        }
+        if (next != null){
+            next.setPrevious(null);
+        }
+        if (type != 'U'){// diferente de unmodified
+            for (Iterator it = children.iterator(); it.hasNext(); ){
+                ConfigurationItem ci = (ConfigurationItem)it.next();
+                    ci.removeFKs();
+            }
+        }
+        else{
+            //fazedo isso para o revemo não remover esses filhos
+            setChildren(null);
+        }
     }
     
 }

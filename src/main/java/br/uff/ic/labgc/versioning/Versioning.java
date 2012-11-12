@@ -60,7 +60,7 @@ public class Versioning implements IVersioning{
     private static RevisionDAO revisionDAO = new RevisionDAO();
     private static ConfigurationItemDAO configItemDAO = new ConfigurationItemDAO();
     
-    public static String dirPath = "..//..//repositorio//";
+    public static String dirPath = "../../repositorio/";
 
     public Versioning() {
     }
@@ -151,7 +151,6 @@ public class Versioning implements IVersioning{
     public byte[] getVersionedFileContent (String hash, String token) throws VersioningException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         String projName = pu.getProject().getName();
-        //Path path = Paths.get(dirPath+projName+"/"+hashToPath(hash));
         File path = new File(dirPath+projName+"/"+hashToPath(hash));
         try {
             return getBytesFromFile(path);
@@ -187,12 +186,7 @@ public class Versioning implements IVersioning{
         }
     
         // Close the input stream and return bytes
-        is.close();
-        
-        String value = new String(bytes);
-        
-        
-        
+        is.close();    
         return bytes;
     }
     
@@ -208,6 +202,21 @@ public class Versioning implements IVersioning{
         num++;
         String rev = revision.substring(0,pos).concat(Integer.toString(num));
         return rev;
+    }
+    
+    private char toMyStatus(int status){
+        switch (status) {
+                case EVCSConstants.ADDED:
+                    return 'A';
+                case EVCSConstants.DELETED:
+                    return 'D';
+                case EVCSConstants.MODIFIED:
+                    return 'M';
+                case EVCSConstants.UNMODIFIED:
+                    return 'U';
+                default:
+                   return 'U';
+            }
     }
     
     /*
@@ -236,41 +245,20 @@ public class Versioning implements IVersioning{
             Date date = new Date();
             Revision revision = new Revision(date, vd.getCommitMessage(), newHeadRevision, pu.getUser(), pu.getProject());
             revisionDAO.add(revision);
-            //TODO Duval, o status vem como int, passar para char
             ConfigurationItem previous = currRevision.getConfigItem();
-            char type;
-            switch (vd.getStatus()) {
-                case EVCSConstants.ADDED:
-                    type = 'A';
-                    break;
-                case EVCSConstants.DELETED:
-                    type = 'D';
-                    break;
-                case EVCSConstants.MODIFIED:
-                    type = 'M';
-                    break;  
-                case EVCSConstants.UNMODIFIED:
-                    type = 'U';
-                    break;  
-                default:
-                   type = 'U';
-                    break;
-            }
-            
+            char type = toMyStatus(vd.getStatus());
             ConfigurationItem ci = new ConfigurationItem(previous.getNumber()+1,
-                    projectName,"",type, 1,vd.getSize(),previous,null,revision);
-            
+                    projectName,"",type, 1,vd.getSize(),null,previous,revision);
             versionedDirToConfigItem(vd,ci,false);
-            
+            previous.setNext(ci);
             configItemDAO.add(ci);
-            
-            //verificar se vai ser atualizado no banco automaticamente
-            //e se precisa mesmo fazer isso
+            //TODO escrever arquivos
+
             revision.setConfigItem(ci);
             return revision.getNumber();
             
         }catch (ObjectNotFoundException e) {
-             throw new VersioningUserNotFoundException();   
+             throw new VersioningException("Objeto não encontrado", e);   
         }
     }
     
@@ -298,7 +286,6 @@ public class Versioning implements IVersioning{
             ProjectUser pu = new ProjectUser(project.getId(),user.getId());
             pu.setPermission(11111);
             projectUserDAO.add(pu);
-            project.addUser(user);
             boolean success = (new File(dirPath+projectName)).mkdirs();
             if (!success) {
                 throw new VersioningCanNotCreateDirException();
@@ -309,17 +296,16 @@ public class Versioning implements IVersioning{
             Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
             revisionDAO.add(revision);
             ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',1,vd.getSize(),null,null,revision);
-            
-            configItemDAO.add(ci);
             versionedDirToConfigItem(vd,ci,true);
+            configItemDAO.add(ci);
+            //TODO escrever arquivos
             
-            //verificar se vai ser atualizado no banco automaticamente
-            //e se precisa mesmo fazer isso
             revision.setConfigItem(ci);
             return revision.getNumber();
             
         }catch (ObjectNotFoundException e) {
-             throw new VersioningUserNotFoundException();   
+             Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, null, e);
+             throw new VersioningUserNotFoundException(e);   
         }
        
     }
@@ -327,23 +313,42 @@ public class Versioning implements IVersioning{
     private void versionedDirToConfigItem(VersionedDir vd, ConfigurationItem father, boolean first){
         for (Iterator<VersionedItem> it = vd.getContainedItens().iterator(); it.hasNext(); ){
             VersionedItem vi = it.next();
-            ConfigurationItem ci;
-            String hash = "";
-            if (!vi.isDir()){
-                hash = ((VersionedFile)vi).getHash();
-            }
-            
+            ConfigurationItem ci = null;
+            String hash = vi.isDir()?null:((VersionedFile)vi).getHash();
+     
             if (first){
                 ci = new ConfigurationItem(1, vi.getName(), hash, 'A', vi.isDir()?1:0,
                         vi.getSize(), null, null, father.getRevision());
             }
             else{
-                //TODO DUVAL
-                //NAO EH PRIMEIRA REVISAO
-                ci = new ConfigurationItem();
+                ConfigurationItem previous = null;
+                switch (vi.getStatus()){
+                    case EVCSConstants.ADDED:
+                        ci = new ConfigurationItem(1, vi.getName(), hash, 'A', vi.isDir()?1:0,
+                        vi.getSize(), null, null, father.getRevision());
+                        configItemDAO.add(ci);
+                        break;
+                    case EVCSConstants.DELETED:
+                        previous = configItemDAO.getByValuesAnParent(vi.getName(),hash,father.getPrevious().getId(),vi.isDir()?1:0);
+                        ci = new ConfigurationItem(previous.getNumber()+1, vi.getName(), 
+                                hash, 'D', vi.isDir()?1:0,0, null, previous, father.getRevision());
+                        previous.setNext(ci);
+                        configItemDAO.add(ci);
+                        break;
+                    case EVCSConstants.MODIFIED:
+                        //hash changed
+                        previous = configItemDAO.getByValuesAnParent(vi.getName(),null,father.getPrevious().getId(),vi.isDir()?1:0);
+                        ci = new ConfigurationItem(previous.getNumber()+1, vi.getName(), 
+                                hash, 'M', vi.isDir()?1:0,vi.getSize(), null, previous, father.getRevision());
+                        previous.setNext(ci);
+                        configItemDAO.add(ci);
+                        break;
+                    case EVCSConstants.UNMODIFIED:
+                        ci = configItemDAO.getByValuesAnParent(vi.getName(),hash,father.getPrevious().getId(),vi.isDir()?1:0);
+                        break;
+                }
             }
             
-            configItemDAO.add(ci);
             if (vi.isDir()){
                 versionedDirToConfigItem((VersionedDir)vi,ci,first);
             }

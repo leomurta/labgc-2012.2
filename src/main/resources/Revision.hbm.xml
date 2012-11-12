@@ -12,7 +12,7 @@
         <property name="number" column="number" type="string" not-null="true"/>
         <many-to-one name="user" column="user_id" class="br.uff.ic.labgc.storage.User" not-null="true"/>
         <many-to-one name="project" column="project_id" class="br.uff.ic.labgc.storage.Project" not-null="true"/>
-        <many-to-one name="configItem" column="config_item_id" class="br.uff.ic.labgc.storage.ConfigurationItem"/>
+        <many-to-one name="configItem" column="config_item_id" class="br.uff.ic.labgc.storage.ConfigurationItem" lazy="false" cascade="all"/>
         
     </class>
 </hibernate-mapping>

@@ -34,6 +34,10 @@ public class ProjectUserDAO {
             throw new InfrastructureException(e);
         }
     }
+    
+    public ProjectUserId add(int projId, int userId) {
+        return add(new ProjectUser(projId,userId));
+    }
 
     public void update(ProjectUser projectUser) {
         try {
