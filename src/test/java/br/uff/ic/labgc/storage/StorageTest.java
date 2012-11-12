@@ -5,6 +5,7 @@
 package br.uff.ic.labgc.storage;
 
 import br.uff.ic.labgc.core.VersionedDir;
+import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.versioning.Versioning;
@@ -151,4 +152,20 @@ public class StorageTest {
         }catch (StorageObjectAlreadyExistException e){} 
     }
     
+    @Test
+    public void testAddUser() throws StorageException{
+        System.out.println("addUser");
+        String userName = "novo";
+        storage.addUser("novo", userName, "novo");
+        
+        User user = userDAO.getByUserName(userName);
+        userDAO.remove(user);
+        
+        userName = "username1";
+        try{
+            storage.addUser("novo", userName, "novo");
+            fail("StorageObjectAlreadyExistException expected");
+        }catch (StorageObjectAlreadyExistException e){}
+    }
+            
 }

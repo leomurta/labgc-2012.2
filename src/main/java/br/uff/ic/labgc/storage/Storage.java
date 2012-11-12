@@ -50,6 +50,14 @@ public class Storage {
 
     public Storage() {
     }
+    
+    public void addUser(String name, String username, String password) throws StorageObjectAlreadyExistException{
+        if (userDAO.exist(username)){
+            throw new StorageObjectAlreadyExistException("Usuário "+username+" já existe");
+        }
+        User user = new User(name, username, password);
+        userDAO.add(user);
+    }
 
     public void addProject(String projName, String userName) throws StorageException {
         addProject(projName, userName, null);
