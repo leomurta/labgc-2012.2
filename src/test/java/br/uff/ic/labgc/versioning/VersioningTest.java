@@ -280,32 +280,56 @@ public class VersioningTest {
     /**
      * Test of getLastLogs method, of class Versioning.
      */
-    //@Test
-    public void testGetLastLogs_String() {
+    @Test
+    public void testGetLastLogs() throws Exception {
+        try{
         System.out.println("getLastLogs");
-        String token = "";
-        Versioning instance = new Versioning();
-        List expResult = null;
-        List result = instance.getLastLogs(token);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        String token = "nvfdovhfdoivbiofdvf";
 
-    /**
-     * Test of getLastLogs method, of class Versioning.
-     */
-    //@Test
-    public void testGetLastLogs_int_String() {
-        System.out.println("getLastLogs");
-        int num = 0;
-        String token = "";
-        Versioning instance = new Versioning();
-        List expResult = null;
-        List result = instance.getLastLogs(num, token);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        VersionedDir vd = new VersionedDir();
+        vd.setAuthor("Autor10");
+        vd.setCommitMessage("msg10");
+        vd.setName("projeto10");
+        vd.setStatus(EVCSConstants.MODIFIED);
+        vd.setLastChangedRevision("1.0");
+        versioning.addRevision(vd, token);
+        
+        VersionedDir vd1 = new VersionedDir();
+        vd1.setAuthor("Autor11");
+        vd1.setCommitMessage("msg11");
+        vd1.setName("projeto11");
+        vd1.setStatus(EVCSConstants.MODIFIED);
+        vd1.setLastChangedRevision("1.1");
+        versioning.addRevision(vd1, token);
+        
+        VersionedDir vd2 = new VersionedDir();
+        vd2.setAuthor("Autor12");
+        vd2.setCommitMessage("msg12");
+        vd2.setName("projeto12");
+        vd2.setStatus(EVCSConstants.MODIFIED);
+        vd2.setLastChangedRevision("1.2");
+        versioning.addRevision(vd2, token);
+        
+        List result = versioning.getLastLogs(token);
+        assertEquals(4, result.size());
+        
+ //*       
+        //deleting
+        Project project = projectDAO.get(1);
+        Revision revision = revisionDAO.getByProjectAndNumber(project.getId(), "1.3");
+        revisionDAO.removeRemovingFKs(revision);
+        revision = revisionDAO.getByProjectAndNumber(project.getId(), "1.2");
+        revisionDAO.removeRemovingFKs(revision);
+        revision = revisionDAO.getByProjectAndNumber(project.getId(), "1.1");
+        revisionDAO.removeRemovingFKs(revision);
+   
+//*/ 
+        }
+        catch(Exception e){	
+            HibernateUtil.rollbackTransaction();
+            HibernateUtil.closeSession();
+            throw e;
+        }
     }
     
     @Test

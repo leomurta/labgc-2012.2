@@ -218,6 +218,21 @@ public class Versioning implements IVersioning{
             }
     }
     
+    private int toTheirsStatus(char status){
+        switch (status){
+            case 'A':
+                return EVCSConstants.ADDED;
+            case 'D':
+                return EVCSConstants.DELETED;
+            case 'M':
+                return EVCSConstants.MODIFIED;    
+            case 'U':
+                return EVCSConstants.UNMODIFIED; 
+            default:
+                return EVCSConstants.UNMODIFIED;
+        }
+    }
+    
     /*
      * no caso de não estar sendo usado o diff, temos os status para saber o que
      * foi modificado
@@ -357,7 +372,7 @@ public class Versioning implements IVersioning{
             vd.setLastChangedRevision(ci.getRevision().getNumber());
             vd.setLastChangedTime(ci.getRevision().getDate());
             vd.setName(ci.getName());
-            //vd.setStatus();
+            vd.setStatus(toTheirsStatus(ci.getType()));
             list.add(vd);
             ci = ci.getPrevious();
             if (ci == null){
