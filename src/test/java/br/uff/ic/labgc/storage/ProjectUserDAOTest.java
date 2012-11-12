@@ -152,7 +152,7 @@ public class ProjectUserDAOTest implements IDAOTest{
         System.out.println("get");
         int userId = 1;
         int projId = 1;
-        ProjectUser result = projectUserDAO.get(userId, projId);
+        ProjectUser result = projectUserDAO.get(projId, userId);
         assertNotNull(result);
     }
 

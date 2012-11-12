@@ -247,7 +247,8 @@ public class VersioningTest {
         rev.setConfigItem(null);
         configItemDAO.remove(ci);
         revisionDAO.remove(rev);
-        projectUserDAO.remove(project.getId(),user.getId());
+        ProjectUser pu = new ProjectUser(project.getId(),user.getId());
+        projectUserDAO.remove(pu);
         projectDAO.remove(project);
         
 //*        

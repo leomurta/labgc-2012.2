@@ -5,6 +5,8 @@
 package br.uff.ic.labgc.storage;
 
 import br.uff.ic.labgc.core.VersionedDir;
+import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
+import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.versioning.Versioning;
 import java.lang.reflect.Method;
 import org.junit.After;
@@ -20,6 +22,9 @@ import static org.junit.Assert.*;
  */
 public class StorageTest {
     private static Storage storage = new Storage("repositorio/");
+    private static ProjectUserDAO projectUserDAO = new ProjectUserDAO();
+    private static UserDAO userDAO = new UserDAO();
+    private static ProjectDAO projectDAO = new ProjectDAO();
     
     public StorageTest() {
     }
@@ -34,10 +39,18 @@ public class StorageTest {
     
     @Before
     public void setUp() {
+        HibernateUtil.beginTransaction();
     }
     
     @After
     public void tearDown() {
+        try{
+            HibernateUtil.commitTransaction();
+        }
+        catch(Exception e){	
+            HibernateUtil.rollbackTransaction();
+            HibernateUtil.closeSession();
+        }
     }
 
     /**
@@ -118,4 +131,24 @@ public class StorageTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
+    
+    @Test
+    public void testAddUserToProject() throws Exception {
+        System.out.println("addUserToProject");
+        
+        User user = new User("novo", "novo", "novo");
+        userDAO.add(user);
+        Project project = projectDAO.get(1);
+        storage.addUserToProject(project.getName(),user.getUsername());
+        ProjectUser pu = projectUserDAO.get(project.getId(), user.getId());
+        projectUserDAO.remove(pu);
+        userDAO.remove(user);
+   
+        try{
+            User user1 = userDAO.get(1);
+            storage.addUserToProject(project.getName(), user1.getUsername());
+            fail("StorageObjectAlreadyExistException expected");
+        }catch (StorageObjectAlreadyExistException e){} 
+    }
+    
 }

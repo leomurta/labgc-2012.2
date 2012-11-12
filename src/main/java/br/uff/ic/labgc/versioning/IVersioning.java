@@ -14,7 +14,7 @@ import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
-import br.uff.ic.labgc.exception.StorageProjectAlreadyExistException;
+import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
 import br.uff.ic.labgc.exception.StorageUserNotFoundException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.io.FileNotFoundException;

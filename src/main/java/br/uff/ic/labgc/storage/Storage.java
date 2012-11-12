@@ -11,7 +11,7 @@ import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.StorageCanNotCreateDirException;
-import br.uff.ic.labgc.exception.StorageProjectAlreadyExistException;
+import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
 import br.uff.ic.labgc.exception.StorageUserNotFoundException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import br.uff.ic.labgc.versioning.Versioning;
@@ -54,10 +54,21 @@ public class Storage {
     public void addProject(String projName, String userName) throws StorageException {
         addProject(projName, userName, null);
     }
+    
+    public void addUserToProject(String projectName, String userName) throws StorageException{
+        Project project = projectDAO.getByName(projectName);
+        User user = userDAO.getByUserName(userName);
+        ProjectUser pu = new ProjectUser(project.getId(), user.getId());
+        if (projectUserDAO.exist(pu.getId())){
+            throw new StorageObjectAlreadyExistException("Usuário "+userName+" já esta no projeto "+projectName);
+        }
+        pu.setPermission(11111);
+        projectUserDAO.add(pu);
+    }
 
     protected void addProject(String projName, String userName, ConfigurationItem ci) throws StorageException {
         if (projectDAO.exist(projName)) {
-            throw new StorageProjectAlreadyExistException();
+            throw new StorageObjectAlreadyExistException("Projeto "+projName+" já existe");
         }
 
         Project project = new Project(projName);

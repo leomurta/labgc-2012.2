@@ -15,7 +15,7 @@ import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
-import br.uff.ic.labgc.exception.StorageProjectAlreadyExistException;
+import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
 import br.uff.ic.labgc.exception.StorageUserNotFoundException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
 import br.uff.ic.labgc.storage.ConfigurationItemDAO;
@@ -145,7 +145,7 @@ public class Versioning implements IVersioning{
             throw new IncorrectPasswordException();
         }
         Project project = projectDAO.getByName(projectName);
-        ProjectUser pu = projectUserDAO.get(user.getId(), project.getId());
+        ProjectUser pu = projectUserDAO.get(project.getId(), user.getId());
         if (pu.getToken().isEmpty()){
             pu.generateToken();
         }
