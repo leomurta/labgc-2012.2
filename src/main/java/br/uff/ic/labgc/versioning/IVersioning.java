@@ -7,13 +7,15 @@ package br.uff.ic.labgc.versioning;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
-import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
+import br.uff.ic.labgc.exception.StorageCanNotCreateDirException;
+import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
-import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
-import br.uff.ic.labgc.exception.VersioningUserNotFoundException;
+import br.uff.ic.labgc.exception.StorageProjectAlreadyExistException;
+import br.uff.ic.labgc.exception.StorageUserNotFoundException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -55,7 +57,7 @@ public interface IVersioning {
     
     public List<VersionedDir> getLastLogs(int num, String token);
     
-    public String addRevision(VersionedDir vd, String token) throws VersioningException;
+    public String addRevision(VersionedDir vd, String token) throws ApplicationException;
     
     /**
      * realiza o import. Nao dava pra usar o nome import
@@ -63,5 +65,5 @@ public interface IVersioning {
      * @param project
      * @param user 
      */
-    public String addFirstRevision(VersionedDir vd, String userName) throws VersioningException;
+    public void addFirstRevision(VersionedDir vd, String userName) throws ApplicationException;
 }

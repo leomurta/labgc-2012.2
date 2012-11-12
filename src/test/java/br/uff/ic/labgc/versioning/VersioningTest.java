@@ -17,6 +17,7 @@ import br.uff.ic.labgc.storage.ProjectUser;
 import br.uff.ic.labgc.storage.ProjectUserDAO;
 import br.uff.ic.labgc.storage.Revision;
 import br.uff.ic.labgc.storage.RevisionDAO;
+import br.uff.ic.labgc.storage.Storage;
 import br.uff.ic.labgc.storage.User;
 import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
@@ -42,7 +43,7 @@ import static org.junit.Assert.*;
  * @author jokerfvd
  */
 public class VersioningTest {
-    private static Versioning versioning = new Versioning("repositorio/");
+    private static Versioning versioning = new Versioning();
     private static ProjectDAO projectDAO = new ProjectDAO();
     private static RevisionDAO revisionDAO = new RevisionDAO();
     private static ConfigurationItemDAO configItemDAO = new ConfigurationItemDAO();
@@ -50,6 +51,7 @@ public class VersioningTest {
     private static UserDAO userDAO = new UserDAO();
     
     public VersioningTest() {
+        Storage.setDirPath("repositorio/");
     }
     
     @BeforeClass
@@ -74,33 +76,6 @@ public class VersioningTest {
             HibernateUtil.rollbackTransaction();
             HibernateUtil.closeSession();
         }
-    }
-
-    /**
-     * Test of getDirPath method, of class Versioning.
-     */
-    //@Test
-    public void testGetDirPath() {
-        System.out.println("getDirPath");
-        Versioning instance = new Versioning();
-        String expResult = "";
-        String result = instance.getDirPath();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setDirPath method, of class Versioning.
-     */
-    //@Test
-    public void testSetDirPath() {
-        System.out.println("setDirPath");
-        String dirPath = "";
-        Versioning instance = new Versioning();
-        instance.setDirPath(dirPath);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -197,6 +172,22 @@ public class VersioningTest {
         vf3.setStatus(EVCSConstants.DELETED);
         vd.addItem(vf3);
         
+        VersionedFile vf4 = new VersionedFile();
+        vf4.setAuthor(vd.getAuthor());
+        vf4.setCommitMessage(vd.getCommitMessage());
+        vf4.setName("arquivo11.txt");
+        vf4.setContent("lambdalambda".getBytes());
+        vf4.setStatus(EVCSConstants.ADDED);
+        vd.addItem(vf4);
+        
+        VersionedFile vf5 = new VersionedFile();
+        vf5.setAuthor(vd.getAuthor());
+        vf5.setCommitMessage(vd.getCommitMessage());
+        vf5.setName("arquivo12.txt");
+        vf5.setContent("lambdalambda".getBytes());
+        vf5.setStatus(EVCSConstants.ADDED);
+        vd.addItem(vf5);
+        
         String token = "nvfdovhfdoivbiofdvf";
         String expResult = "1.1";
         String result = versioning.addRevision(vd, token);
@@ -212,6 +203,7 @@ public class VersioningTest {
         catch (Exception e){
             HibernateUtil.rollbackTransaction();
             HibernateUtil.closeSession();
+            Logger.getLogger(Storage.class.getName()).log(Level.SEVERE, null, e);
             fail();
         }
     }
@@ -237,16 +229,17 @@ public class VersioningTest {
         vd.addItem(vf);
         
         //removendo diretorio se existente
-        FileUtils.deleteDirectory(new File(Versioning.dirPath +vd.getName()));
+        FileUtils.deleteDirectory(new File(Storage.getDirPath() +vd.getName()));
         
         User user = userDAO.getByUserName("username1");
-        String revNum = versioning.addFirstRevision(vd, user.getUsername());
+        versioning.addFirstRevision(vd, user.getUsername());
+        String revNum = EVCSConstants.FIRST_REVISION;
         //HibernateUtil.commitTransaction();
         Project project = projectDAO.getByName("projeto10");
         assertNotNull(project);
         
         //removendo diretorio criado
-        FileUtils.deleteDirectory(new File(Versioning.dirPath +vd.getName()));
+        FileUtils.deleteDirectory(new File(Storage.getDirPath() +vd.getName()));
         
         Revision rev = revisionDAO.getByProjectAndNumber(project.getId(), revNum);
         ConfigurationItem ci = rev.getConfigItem();
@@ -371,20 +364,6 @@ public class VersioningTest {
         //o get(0) cada hora retorna um diferente, entao eh melhor nao testa
         //assertEquals(vf.getName(), child1.getName());
         //assertEquals(vf.getHash(), child1.getHash());
-    }
-    
-    @Test 
-    public void testHashToPath() throws Exception{
-        System.out.println("hashToPath");
-        Class[] param = new Class[1];	
-	param[0] = String.class;
-        Method method;    
-        method = Versioning.class.getDeclaredMethod("hashToPath", param);
-        method.setAccessible(true);
-        
-        String hash = "aaabbbbbbbbb";
-        String path = (String)method.invoke(versioning, hash);
-        assertEquals("aaa/bbbbbbbbb", path);
     }
     
     @Test 

@@ -26,4 +26,12 @@ public class VersioningIOException extends VersioningException {
     public VersioningIOException(String msg) {
         super(msg);
     }
+    
+    public VersioningIOException(String message, Exception ex) {
+        super(message, ex);
+    }
+    
+    public VersioningIOException(Exception ex) {
+        super(ex);
+    }
 }

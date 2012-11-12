@@ -15,6 +15,11 @@ public interface EVCSConstants {
      */
     public static final String REVISION_HEAD = "-1";
     
+    /**
+     * Identifica a primeira revisão criada de um projeto
+     */
+    public static final String FIRST_REVISION = "1.0";
+    
     /*
      * Identifica a quantidade de msgs default que o log retornará
      */
