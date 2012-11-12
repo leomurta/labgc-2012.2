@@ -348,7 +348,7 @@ public class Versioning implements IVersioning{
      */
     @Override
     public VersionedDir updateRevision(String revNum, String revTo, String token) throws VersioningException {
-        return getRevision(EVCSConstants.REVISION_HEAD, token);
+        return getRevision(revTo, token);
     }
     
     public List<VersionedDir> getLastLogs(String token){
