@@ -141,6 +141,7 @@ public class ProjectDAOTest implements IDAOTest{
         
         projectUserDAO.remove(pu);
         projectDAO.remove(project);
+        userDAO.remove(user);
         
     }
 }

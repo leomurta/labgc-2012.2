@@ -8,23 +8,23 @@ package br.uff.ic.labgc.exception;
  *
  * @author jokerfvd
  */
-public class VersioningCanNotCreateDirException extends VersioningException {
+public class StorageCanNotCreateDirException extends StorageException {
 
     /**
      * Creates a new instance of
-     * <code>VersioningCanNotCreateDirException</code> without detail message.
+     * <code>StorageCanNotCreateDirException</code> without detail message.
      */
-    public VersioningCanNotCreateDirException() {
+    public StorageCanNotCreateDirException() {
     }
 
     /**
      * Constructs an instance of
-     * <code>VersioningCanNotCreateDirException</code> with the specified detail
+     * <code>StorageCanNotCreateDirException</code> with the specified detail
      * message.
      *
      * @param msg the detail message.
      */
-    public VersioningCanNotCreateDirException(String msg) {
+    public StorageCanNotCreateDirException(String msg) {
         super(msg);
     }
 }

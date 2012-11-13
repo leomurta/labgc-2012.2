@@ -8,13 +8,15 @@ import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
-import br.uff.ic.labgc.exception.VersioningCanNotCreateDirException;
+import br.uff.ic.labgc.exception.StorageCanNotCreateDirException;
+import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
-import br.uff.ic.labgc.exception.VersioningProjectAlreadyExistException;
-import br.uff.ic.labgc.exception.VersioningUserNotFoundException;
+import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
+import br.uff.ic.labgc.exception.StorageUserNotFoundException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
 import br.uff.ic.labgc.storage.ConfigurationItemDAO;
 import br.uff.ic.labgc.storage.Project;
@@ -23,6 +25,7 @@ import br.uff.ic.labgc.storage.ProjectUser;
 import br.uff.ic.labgc.storage.ProjectUserDAO;
 import br.uff.ic.labgc.storage.Revision;
 import br.uff.ic.labgc.storage.RevisionDAO;
+import br.uff.ic.labgc.storage.Storage;
 import br.uff.ic.labgc.storage.User;
 import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
@@ -59,22 +62,24 @@ public class Versioning implements IVersioning{
     private static ProjectUserDAO projectUserDAO = new ProjectUserDAO();
     private static RevisionDAO revisionDAO = new RevisionDAO();
     private static ConfigurationItemDAO configItemDAO = new ConfigurationItemDAO();
+    private static MyStorage storage = new MyStorage();
     
-    public static String dirPath = "../../repositorio/";
+    private static class MyStorage extends Storage { 
+        @Override
+        protected void addProject(String projName, String userName, ConfigurationItem ci) throws StorageException{
+            super.addProject(projName, userName, ci);
+        }
+        protected String hashToPath(String hash){
+            return super.hashToPath(hash);
+        }
+        protected void storeFiles(VersionedDir father, String projName) throws ApplicationException {
+            super.storeFiles(father, projName);
+        }
+    }
+    
+    //public static String dirPath = "../../repositorio/";
 
     public Versioning() {
-    }
-    
-    public Versioning(String dirPath) {
-        this.dirPath = dirPath;
-    }
-    
-    public String getDirPath() {
-        return dirPath;
-    }
-
-    public void setDirPath(String dirPath) {
-        this.dirPath = dirPath;
     }
 
     @Override
@@ -140,7 +145,7 @@ public class Versioning implements IVersioning{
             throw new IncorrectPasswordException();
         }
         Project project = projectDAO.getByName(projectName);
-        ProjectUser pu = projectUserDAO.get(user.getId(), project.getId());
+        ProjectUser pu = projectUserDAO.get(project.getId(), user.getId());
         if (pu.getToken().isEmpty()){
             pu.generateToken();
         }
@@ -151,12 +156,12 @@ public class Versioning implements IVersioning{
     public byte[] getVersionedFileContent (String hash, String token) throws VersioningException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         String projName = pu.getProject().getName();
-        File path = new File(dirPath+projName+"/"+hashToPath(hash));
+        File path = new File(Storage.getDirPath()+projName+"/"+storage.hashToPath(hash));
         try {
             return getBytesFromFile(path);
         } catch (IOException ex) {
             Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, null, ex);
-            throw new VersioningIOException("nao foi possivel ler o conteudo do arquivo");
+            throw new VersioningIOException("nao foi possivel ler o conteudo do arquivo",ex);
         }
     }
     public static byte[] getBytesFromFile(File file) throws IOException {
@@ -190,12 +195,6 @@ public class Versioning implements IVersioning{
         return bytes;
     }
     
-    private String hashToPath(String hash){
-        String path;
-        path = hash.substring(0, 3)+"/"+hash.substring(3);
-        return path;
-    }
-    
     private String incrementRevision(String revision){
         int pos = revision.lastIndexOf(".")+1;
         int num = Integer.parseInt(revision.substring(pos));
@@ -219,6 +218,21 @@ public class Versioning implements IVersioning{
             }
     }
     
+    private int toTheirsStatus(char status){
+        switch (status){
+            case 'A':
+                return EVCSConstants.ADDED;
+            case 'D':
+                return EVCSConstants.DELETED;
+            case 'M':
+                return EVCSConstants.MODIFIED;    
+            case 'U':
+                return EVCSConstants.UNMODIFIED; 
+            default:
+                return EVCSConstants.UNMODIFIED;
+        }
+    }
+    
     /*
      * no caso de não estar sendo usado o diff, temos os status para saber o que
      * foi modificado
@@ -226,7 +240,7 @@ public class Versioning implements IVersioning{
      * atualizar
      */
     @Override
-    public synchronized String addRevision(VersionedDir vd, String token) throws VersioningException{
+    public synchronized String addRevision(VersionedDir vd, String token) throws ApplicationException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         String projectName = pu.getProject().getName();
         
@@ -252,7 +266,8 @@ public class Versioning implements IVersioning{
             versionedDirToConfigItem(vd,ci,false);
             previous.setNext(ci);
             configItemDAO.add(ci);
-            //TODO escrever arquivos
+            
+            storage.storeFiles(vd, projectName);
 
             revision.setConfigItem(ci);
             return revision.getNumber();
@@ -272,42 +287,14 @@ public class Versioning implements IVersioning{
      * @param user 
      */
     @Override
-    public String addFirstRevision(VersionedDir vd, String userName) throws VersioningException{
+    public void addFirstRevision(VersionedDir vd, String userName) throws ApplicationException{
         String projectName = vd.getName();
-        if (projectDAO.exist(projectName)){
-            throw new VersioningProjectAlreadyExistException();
-        }
+        ConfigurationItem ci=null;
+        storage.addProject(projectName, userName,ci);
         
-        Project project = new Project(projectName);
-        try{
-            User user = userDAO.getByUserName(userName);
-            //project.addUser(user);
-            projectDAO.add(project);
-            ProjectUser pu = new ProjectUser(project.getId(),user.getId());
-            pu.setPermission(11111);
-            projectUserDAO.add(pu);
-            boolean success = (new File(dirPath+projectName)).mkdirs();
-            if (!success) {
-                throw new VersioningCanNotCreateDirException();
-            }
-            
-            //criar revisão 0
-            Date date = new Date();
-            Revision revision = new Revision(date, "revision 1.0", "1.0", user, project);
-            revisionDAO.add(revision);
-            ConfigurationItem ci = new ConfigurationItem(1,projectName,"",'A',1,vd.getSize(),null,null,revision);
-            versionedDirToConfigItem(vd,ci,true);
-            configItemDAO.add(ci);
-            //TODO escrever arquivos
-            
-            revision.setConfigItem(ci);
-            return revision.getNumber();
-            
-        }catch (ObjectNotFoundException e) {
-             Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, null, e);
-             throw new VersioningUserNotFoundException(e);   
-        }
-       
+        versionedDirToConfigItem(vd,ci,true);
+        configItemDAO.add(ci);
+        storage.storeFiles(vd, projectName);
     }
     
     private void versionedDirToConfigItem(VersionedDir vd, ConfigurationItem father, boolean first){
@@ -361,7 +348,7 @@ public class Versioning implements IVersioning{
      */
     @Override
     public VersionedDir updateRevision(String revNum, String revTo, String token) throws VersioningException {
-        return getRevision(EVCSConstants.REVISION_HEAD, token);
+        return getRevision(revTo, token);
     }
     
     public List<VersionedDir> getLastLogs(String token){
@@ -385,7 +372,7 @@ public class Versioning implements IVersioning{
             vd.setLastChangedRevision(ci.getRevision().getNumber());
             vd.setLastChangedTime(ci.getRevision().getDate());
             vd.setName(ci.getName());
-            //vd.setStatus();
+            vd.setStatus(toTheirsStatus(ci.getType()));
             list.add(vd);
             ci = ci.getPrevious();
             if (ci == null){
