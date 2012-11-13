@@ -11,7 +11,10 @@ import br.uff.ic.labgc.exception.ClientException;
 import br.uff.ic.labgc.exception.ClientLoginRequiredException;
 import br.uff.ic.labgc.exception.ClientWorkspaceUnavailableException;
 import br.uff.ic.labgc.userInterface.common.Messages;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -74,7 +77,7 @@ public class Cli {
 
         m_options.addOption(OptionBuilder.withLongOpt("m")
                 .withDescription("Commit the changes made")
-                .hasArgs(0)
+                .hasOptionalArg()
                 .withArgName("COMMIT_MESSAGE")
                 .create("commit"));
 
@@ -189,7 +192,8 @@ public class Cli {
         }
 
         if (cmd.hasOption("commit")) {
-            String[] commitArg = cmd.getOptionValues("commit");
+            String[] commitArg = null;
+            commitArg = cmd.getOptionValues("commit");
             runCommit(commitArg);
 
             return;
@@ -358,15 +362,37 @@ public class Cli {
         return true;
     }
 
-    private void runCommit(String[] commitArgs) {
-
-        if (commitArgs.length > 0) 
+    private void runCommit(String[] commitArgs) 
+    {
+        
+        String strItemPath = invocationPath;
+        String strMessage="";
+        if(commitArgs!=null)
         {
-
-            String strCommitPath = invocationPath;
-            String strMessage = commitArgs[0];
-
-            m_IClient = new Client(strCommitPath);
+            if (commitArgs.length > 0) 
+            {
+                strItemPath += commitArgs[0];
+            }
+            
+            if (commitArgs.length > 1) 
+            {
+                strMessage += commitArgs[1];
+            }
+            else
+            {
+                System.out.println("Please, enter the commit message\n");
+                BufferedReader in = new BufferedReader(new InputStreamReader(System.in));   
+                try 
+                {
+                    strMessage = in.readLine();
+                } 
+                catch (IOException ex) 
+                {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        
+            m_IClient = new Client(strItemPath);
             registerObserver();
             try 
             {
@@ -377,11 +403,11 @@ public class Cli {
                 System.out.println(ex.getMessage());
                 return;
             }
-
-        } 
+        
+        }
         else 
         {
-            System.out.println("The amount of arguments is insufficient (" + commitArgs.length + ").");
+            System.out.println("The amount of arguments is insufficient (0).");
         }
 
     }
