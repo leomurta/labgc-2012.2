@@ -208,23 +208,10 @@ public class Workspace implements IWorkspace {
             throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
 
         }
-        // procura pelo espelho 
-        File[] stDir = diretorio1.listFiles();
-        boolean achou = false;
-        for (File file : stDir) {
-            String name = file.getName();
-            String extensao = name.substring(name.lastIndexOf("."), name.length());
-            int pos = name.lastIndexOf(".");
-            if (pos > 0) {
-                name = name.substring(0, pos);
-            }
-            if (name == "espelho") {
-                diretorio1 = new File(diretorio1 + File.separator + name + extensao);
-                achou = true;
-            }
-        }
-        if (!achou) {
-            throw new WorkspaceEpelhoNaoExisteException("ERRO54: Não existe espelho.");
+        // procura pelo espelho
+        diretorio1 = new File(local + File.separator + WS_FOLDER +File.separator + ESPELHO);
+        if (new File(diretorio1.getAbsolutePath()+ESPELHO).exists()) {
+            throw new WorkspaceEpelhoNaoExisteException("ERRO1: Não existe espelho.");
         }
         // testa se for arquivo copia por cima
         //extrair caminho relativo à baseDir (parent)
@@ -240,7 +227,7 @@ public class Workspace implements IWorkspace {
         if (!file2.exists()) {
             throw new WorkspaceException("ERRO: Não existe arquivo no espelho.");
         } else {
-            if (target.isFile()) {
+            if (target.isFile()) { //grava direto por cima
                 try {
                     copy(file2, target, true);
                 } catch (FileNotFoundException ex) {
@@ -268,8 +255,7 @@ public class Workspace implements IWorkspace {
     public boolean revert()
             throws ApplicationException {
         File local = new File(workspaceDir);
-
-        File diretorio1 = new File(local + File.separator + WS_FOLDER +File.separator + ESPELHO);
+        File diretorio1 = new File(local + File.separator + WS_FOLDER );
 
         // testa se existe o diretorio de versionamento
         if (!diretorio1.exists()) {
@@ -277,7 +263,7 @@ public class Workspace implements IWorkspace {
         }
         // procura pelo espelho 
        
-        
+        diretorio1 = new File(local + File.separator + WS_FOLDER +File.separator + ESPELHO);
         if (new File(diretorio1.getAbsolutePath()+ESPELHO).exists()) {
             throw new WorkspaceEpelhoNaoExisteException("ERRO1: Não existe espelho.");
         }
@@ -331,8 +317,23 @@ public class Workspace implements IWorkspace {
         throw new UnsupportedOperationException("Not yet implemented");
     }
     
-    public VersionedItem commit() {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public VersionedItem commit() 
+        throws ApplicationException {
+        File local = new File(workspaceDir);
+        File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
+        
+        VersionedDir root = new VersionedDir(); 
+        VersionedDir working = new VersionedDir();
+        VersionedDir pristine = new VersionedDir();
+                
+        String exclusions[] = {WS_FOLDER};
+        working.addItem(VersionedItemUtils.read(local, exclusions));//false nao le o conteudo
+        pristine.addItem(VersionedItemUtils.read(mirror));
+        
+        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
+        
+        return root;
+        
     }
     
     //implementar para o cliente
