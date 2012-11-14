@@ -360,7 +360,7 @@ public class Cli {
 
     private void runCommit(String[] commitArgs) {
 
-        if (commitArgs.length > 0) 
+        if( commitArgs != null && commitArgs.length > 0) 
         {
 
             String strCommitPath = invocationPath;
@@ -388,14 +388,14 @@ public class Cli {
 
     private void runStatus(String[] statusArg) {
 
-        String strItemPath = invocationPath;
+        String strItemPath = invocationPath;System.out.println(invocationPath);
         if(statusArg!=null)
         {
             if (statusArg.length > 0) 
             {
                 strItemPath += statusArg[0];
             }
-        }
+        }System.out.println(strItemPath);
         m_IClient = new Client(strItemPath);
 
         VersionedItem status = new VersionedDir();
@@ -456,17 +456,16 @@ public class Cli {
       private void runRevert(String[] revertArg)
       {
              
-          String strItemPath=invocationPath;
-          
-          if(revertArg!=null)
-          {    
-            if(revertArg.length>0)
+        String strItemPath = invocationPath;
+        if(revertArg!=null)
+        {
+            if (revertArg.length > 0) 
             {
                 strItemPath += revertArg[0];
-                //System.out.println(strItemPath);
             }
-          } 
-          m_IClient = new Client(strItemPath);
+        }
+
+        m_IClient = new Client(strItemPath);
         try 
         {
             if(!(m_IClient.revert()))

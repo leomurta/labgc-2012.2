@@ -224,7 +224,7 @@ public class Workspace implements IWorkspace {
             }
         }
         if (!achou) {
-            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
+            throw new WorkspaceEpelhoNaoExisteException("ERRO54: Não existe espelho.");
         }
         // testa se for arquivo copia por cima
         //extrair caminho relativo à baseDir (parent)
@@ -266,52 +266,34 @@ public class Workspace implements IWorkspace {
     }
 
     public boolean revert()
-            throws WorkspaceException {
+            throws ApplicationException {
         File local = new File(workspaceDir);
-        File parent = new File(local.getParent());
 
-        if (!parent.exists()) {
-            throw new WorkspaceDirNaoExisteException("ERRO: Diretório inexistente.");
-        }
-        File diretorio1 = new File(local + File.separator + ".labgc");
+        File diretorio1 = new File(local + File.separator + WS_FOLDER +File.separator + ESPELHO);
 
         // testa se existe o diretorio de versionamento
         if (!diretorio1.exists()) {
             throw new WorkspaceRepNaoExisteException("ERRO: Não existe repositório.");
         }
         // procura pelo espelho 
-        File[] stDir = diretorio1.listFiles();
-        boolean achou = false;
-        for (File file : stDir) {
-            String name = file.getName();
-            String extensao = name.substring(name.lastIndexOf("."), name.length());
-            int pos = name.lastIndexOf(".");
-            if (pos > 0) {
-                name = name.substring(0, pos);
-            }
-            if (name == "espelho") {
-                diretorio1 = new File(diretorio1 + File.separator + name + extensao);
-                achou = true;
-            }
+       
+        
+        if (new File(diretorio1.getAbsolutePath()+ESPELHO).exists()) {
+            throw new WorkspaceEpelhoNaoExisteException("ERRO1: Não existe espelho.");
         }
-        if (!achou) {
-            throw new WorkspaceEpelhoNaoExisteException("ERRO: Não existe espelho.");
-        }
-        if (!deleteDir(parent)) {
+        if (deleteDir(local)) {
             throw new WorkspaceException("ERRO: Não foi possível limpar WorkSpace.");
         }
-        try {
-            copyDir(diretorio1, parent);
-            /*        stDir = diretorio1.listFiles();
-             // copia os arquivos
-             for (File file : stDir) {
-             String name = file.getName();
-             copy(file, new File(diretorio + "\\" + name), true);
-             }*/
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-            throw new WorkspaceException("Não foi possivel gravar arquivos no disco");
-        }
+        
+        
+        
+        VersionedDir pristine = new VersionedDir();
+                
+        String exclusions[] = {WS_FOLDER};
+        pristine.addItem(VersionedItemUtils.read(diretorio1));
+        
+        VersionedItemUtils.write(local,pristine.getContainedItens());
+        
         // se tudo deu certo   
         return true;
     }
@@ -552,8 +534,17 @@ public class Workspace implements IWorkspace {
     }
 
     private static boolean deleteDir(File dir) {
+        FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (!name.endsWith(".labgc")) {
+                    return true;
+                }
+                return false;
+            }
+        }; 
         if (dir.isDirectory()) {
-            String[] children = dir.list();
+            String[] children = dir.list(filter);
             for (int i = 0; i < children.length; i++) {
                 boolean success = deleteDir(new File(dir, children[i]));
                 if (!success) {
