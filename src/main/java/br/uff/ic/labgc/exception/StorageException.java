@@ -26,4 +26,12 @@ public class StorageException extends ApplicationException {
     public StorageException(String msg) {
         super(msg);
     }
+    
+    public StorageException(String message, Exception ex) {
+        super(message, ex);
+    }
+    
+    public StorageException(Exception ex) {
+        super(ex);
+    }
 }

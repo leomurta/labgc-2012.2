@@ -63,4 +63,9 @@ public class RevisionDAO extends DAO{
             throw new InfrastructureException(e);
         }      
     }
+    
+    public void removeRemovingFKs(Revision revision){
+        revision.getConfigItem().removeFKs();
+        remove(revision);
+    }
 }

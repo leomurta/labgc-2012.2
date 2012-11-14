@@ -8,22 +8,23 @@ package br.uff.ic.labgc.exception;
  *
  * @author jokerfvd
  */
-public class VersioningUserNotFoundException extends VersioningException {
+public class StorageCanNotCreateDirException extends StorageException {
 
     /**
      * Creates a new instance of
-     * <code>VersioningUserNotFoundException</code> without detail message.
+     * <code>StorageCanNotCreateDirException</code> without detail message.
      */
-    public VersioningUserNotFoundException() {
+    public StorageCanNotCreateDirException() {
     }
 
     /**
      * Constructs an instance of
-     * <code>VersioningUserNotFoundException</code> with the specified detail message.
+     * <code>StorageCanNotCreateDirException</code> with the specified detail
+     * message.
      *
      * @param msg the detail message.
      */
-    public VersioningUserNotFoundException(String msg) {
+    public StorageCanNotCreateDirException(String msg) {
         super(msg);
     }
 }

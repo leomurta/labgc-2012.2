@@ -34,6 +34,10 @@ public class ProjectUserDAO {
             throw new InfrastructureException(e);
         }
     }
+    
+    public ProjectUserId add(int projId, int userId) {
+        return add(new ProjectUser(projId,userId));
+    }
 
     public void update(ProjectUser projectUser) {
         try {
@@ -69,10 +73,12 @@ public class ProjectUserDAO {
             throw new InfrastructureException(e);
         }
     }
-    
+
+/*    
     public void remove(int projId, int userId) {
         remove(new ProjectUser(projId,userId));
     }
+*/ 
 
     public ProjectUser get(ProjectUserId projectUserId) {
         try {
@@ -90,8 +96,8 @@ public class ProjectUserDAO {
         }
     }
     
-    public ProjectUser get(int userId, int projId) {
-        ProjectUserId pui = new ProjectUserId(userId, projId);
+    public ProjectUser get(int projId, int userId) {
+        ProjectUserId pui = new ProjectUserId(projId, userId);
         ProjectUser pu = get(pui);
         return pu;
     }
@@ -109,6 +115,17 @@ public class ProjectUserDAO {
             }
 
             return pu;
+        } catch (HibernateException e) {
+            throw new InfrastructureException(e);
+        }
+    }
+     
+     public boolean exist(ProjectUserId projectUserId) 
+            throws ObjectNotFoundException{
+        try {
+            Session sessao = HibernateUtil.getSession();
+            ProjectUser pu = (ProjectUser) sessao.get(ProjectUser.class, projectUserId);
+            return (pu != null);
         } catch (HibernateException e) {
             throw new InfrastructureException(e);
         }

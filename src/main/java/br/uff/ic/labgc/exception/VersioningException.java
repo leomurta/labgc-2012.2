@@ -26,4 +26,12 @@ public class VersioningException extends ApplicationException {
     public VersioningException(String msg) {
         super(msg);
     }
+    
+    public VersioningException(String message, Exception ex) {
+        super(message, ex);
+    }
+    
+    public VersioningException(Exception ex) {
+        super(ex);
+    }
 }

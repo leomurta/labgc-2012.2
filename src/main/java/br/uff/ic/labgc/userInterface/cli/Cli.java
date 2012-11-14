@@ -367,6 +367,7 @@ public class Cli {
         
         String strItemPath = invocationPath;
         String strMessage="";
+        
         if(commitArgs!=null)
         {
             if (commitArgs.length > 0) 
@@ -493,21 +494,21 @@ public class Cli {
             }
           } 
           m_IClient = new Client(strItemPath);
-        try 
-        {
+          try 
+          {
             if(!(m_IClient.revert()))
             {
                System.out.println("The revert operation could not be completed");
                return;
             }
-        } 
-        catch (ApplicationException ex) 
-        {
+          } 
+          catch (ApplicationException ex) 
+          {
             System.out.println(ex.getMessage());
             return;
-        }
+          }
             
-        System.out.println("Revert operation completed successfully");
+          System.out.println("Revert operation completed successfully");
                      
       }
     

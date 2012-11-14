@@ -119,7 +119,6 @@ public class VersionedFile extends VersionedItem implements Serializable {
     
     public void releaseContent(){
         this.content = null;
-        this.size = 0;
     }
     
     //TODO passar a versão na qual o diff deve ser aplicado

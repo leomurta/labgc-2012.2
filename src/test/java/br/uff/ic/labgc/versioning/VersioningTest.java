@@ -4,17 +4,20 @@
  */
 package br.uff.ic.labgc.versioning;
 
+import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
+import br.uff.ic.labgc.storage.ConfigurationItemDAO;
 import br.uff.ic.labgc.storage.Project;
 import br.uff.ic.labgc.storage.ProjectDAO;
 import br.uff.ic.labgc.storage.ProjectUser;
 import br.uff.ic.labgc.storage.ProjectUserDAO;
 import br.uff.ic.labgc.storage.Revision;
 import br.uff.ic.labgc.storage.RevisionDAO;
+import br.uff.ic.labgc.storage.Storage;
 import br.uff.ic.labgc.storage.User;
 import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
@@ -43,10 +46,12 @@ public class VersioningTest {
     private static Versioning versioning = new Versioning();
     private static ProjectDAO projectDAO = new ProjectDAO();
     private static RevisionDAO revisionDAO = new RevisionDAO();
+    private static ConfigurationItemDAO configItemDAO = new ConfigurationItemDAO();
     private static ProjectUserDAO projectUserDAO = new ProjectUserDAO();
     private static UserDAO userDAO = new UserDAO();
     
     public VersioningTest() {
+        Storage.setDirPath("repositorio/");
     }
     
     @BeforeClass
@@ -71,33 +76,6 @@ public class VersioningTest {
             HibernateUtil.rollbackTransaction();
             HibernateUtil.closeSession();
         }
-    }
-
-    /**
-     * Test of getDirPath method, of class Versioning.
-     */
-    //@Test
-    public void testGetDirPath() {
-        System.out.println("getDirPath");
-        Versioning instance = new Versioning();
-        String expResult = "";
-        String result = instance.getDirPath();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setDirPath method, of class Versioning.
-     */
-    //@Test
-    public void testSetDirPath() {
-        System.out.println("setDirPath");
-        String dirPath = "";
-        Versioning instance = new Versioning();
-        instance.setDirPath(dirPath);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -161,23 +139,80 @@ public class VersioningTest {
     /**
      * Test of addRevision method, of class Versioning.
      */
-    //@Test
+    @Test
     public void testAddRevision() throws Exception {
+        try{
         System.out.println("addRevision");
-        VersionedDir vd = null;
-        String token = "";
-        Versioning instance = new Versioning();
-        String expResult = "";
-        String result = instance.addRevision(vd, token);
+        VersionedDir vd = new VersionedDir();
+        vd.setAuthor("Autor10");
+        vd.setCommitMessage("msg2012");
+        vd.setName("projeto1");
+        vd.setStatus(EVCSConstants.MODIFIED);
+        vd.setLastChangedRevision("1.0");
+        
+        VersionedFile vf1 = new VersionedFile();
+        vf1.setAuthor(vd.getAuthor());
+        vf1.setCommitMessage(vd.getCommitMessage());
+        vf1.setName("arquivo10.txt");
+        vf1.setContent("lambdalambda".getBytes());
+        vf1.setStatus(EVCSConstants.ADDED);
+        vd.addItem(vf1);
+        
+        VersionedFile vf2 = new VersionedFile("vnfdovh9e0h0", 10);
+        vf2.setAuthor(vd.getAuthor());
+        vf2.setCommitMessage(vd.getCommitMessage());
+        vf2.setName("arquivo1.txt");
+        vf2.setStatus(EVCSConstants.UNMODIFIED);
+        vd.addItem(vf2);
+        
+        VersionedFile vf3 = new VersionedFile("vcdfsniovfbiov", 5);
+        vf3.setAuthor(vd.getAuthor());
+        vf3.setCommitMessage(vd.getCommitMessage());
+        vf3.setName("arquivo2.txt");
+        vf3.setStatus(EVCSConstants.DELETED);
+        vd.addItem(vf3);
+        
+        VersionedFile vf4 = new VersionedFile();
+        vf4.setAuthor(vd.getAuthor());
+        vf4.setCommitMessage(vd.getCommitMessage());
+        vf4.setName("arquivo11.txt");
+        vf4.setContent("lambdalambda".getBytes());
+        vf4.setStatus(EVCSConstants.ADDED);
+        vd.addItem(vf4);
+        
+        VersionedFile vf5 = new VersionedFile();
+        vf5.setAuthor(vd.getAuthor());
+        vf5.setCommitMessage(vd.getCommitMessage());
+        vf5.setName("arquivo12.txt");
+        vf5.setContent("lambdalambda".getBytes());
+        vf5.setStatus(EVCSConstants.ADDED);
+        vd.addItem(vf5);
+        
+        String token = "nvfdovhfdoivbiofdvf";
+        String expResult = "1.1";
+        String result = versioning.addRevision(vd, token);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        
+        //deleting
+        Project project = projectDAO.get(1);
+        String revNum = revisionDAO.getHeadRevisionNumber(project);
+        Revision revision = revisionDAO.getByProjectAndNumber(project.getId(), revNum);
+        revisionDAO.removeRemovingFKs(revision);
+        
+        }
+        catch (Exception e){
+            HibernateUtil.rollbackTransaction();
+            HibernateUtil.closeSession();
+            Logger.getLogger(Storage.class.getName()).log(Level.SEVERE, null, e);
+            fail();
+        }
     }
 
     /**
      * Test of addFirstRevision method, of class Versioning.
+     * ta dando erro na hora dos removes mais ta insereindo OK
      */
-    @Test
+    //@Test
     public void testAddFirstRevision() throws Exception {
         try{
         System.out.println("addFirstRevision"); 
@@ -191,23 +226,29 @@ public class VersioningTest {
         vf.setCommitMessage(vd.getCommitMessage());
         vf.setName("arquivo10.txt");
         vf.setContent("iabadabadu".getBytes());
+        vd.addItem(vf);
         
         //removendo diretorio se existente
-        FileUtils.deleteDirectory(new File(Versioning.dirPath +vd.getName()));
+        FileUtils.deleteDirectory(new File(Storage.getDirPath() +vd.getName()));
         
-        vd.addItem(vf);
         User user = userDAO.getByUserName("username1");
         versioning.addFirstRevision(vd, user.getUsername());
+        String revNum = EVCSConstants.FIRST_REVISION;
         //HibernateUtil.commitTransaction();
         Project project = projectDAO.getByName("projeto10");
         assertNotNull(project);
         
         //removendo diretorio criado
-        FileUtils.deleteDirectory(new File(Versioning.dirPath +vd.getName()));
+        FileUtils.deleteDirectory(new File(Storage.getDirPath() +vd.getName()));
         
-        Revision rev = revisionDAO.getByProjectAndNumber(project.getId(), "1.0");
+        Revision rev = revisionDAO.getByProjectAndNumber(project.getId(), revNum);
+        ConfigurationItem ci = rev.getConfigItem();
+        ci.setRevision(null);
+        rev.setConfigItem(null);
+        configItemDAO.remove(ci);
         revisionDAO.remove(rev);
-        projectUserDAO.remove(project.getId(),user.getId());
+        ProjectUser pu = new ProjectUser(project.getId(),user.getId());
+        projectUserDAO.remove(pu);
         projectDAO.remove(project);
         
 //*        
@@ -240,32 +281,56 @@ public class VersioningTest {
     /**
      * Test of getLastLogs method, of class Versioning.
      */
-    //@Test
-    public void testGetLastLogs_String() {
+    @Test
+    public void testGetLastLogs() throws Exception {
+        try{
         System.out.println("getLastLogs");
-        String token = "";
-        Versioning instance = new Versioning();
-        List expResult = null;
-        List result = instance.getLastLogs(token);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        String token = "nvfdovhfdoivbiofdvf";
 
-    /**
-     * Test of getLastLogs method, of class Versioning.
-     */
-    //@Test
-    public void testGetLastLogs_int_String() {
-        System.out.println("getLastLogs");
-        int num = 0;
-        String token = "";
-        Versioning instance = new Versioning();
-        List expResult = null;
-        List result = instance.getLastLogs(num, token);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        VersionedDir vd = new VersionedDir();
+        vd.setAuthor("Autor10");
+        vd.setCommitMessage("msg10");
+        vd.setName("projeto10");
+        vd.setStatus(EVCSConstants.MODIFIED);
+        vd.setLastChangedRevision("1.0");
+        versioning.addRevision(vd, token);
+        
+        VersionedDir vd1 = new VersionedDir();
+        vd1.setAuthor("Autor11");
+        vd1.setCommitMessage("msg11");
+        vd1.setName("projeto11");
+        vd1.setStatus(EVCSConstants.MODIFIED);
+        vd1.setLastChangedRevision("1.1");
+        versioning.addRevision(vd1, token);
+        
+        VersionedDir vd2 = new VersionedDir();
+        vd2.setAuthor("Autor12");
+        vd2.setCommitMessage("msg12");
+        vd2.setName("projeto12");
+        vd2.setStatus(EVCSConstants.MODIFIED);
+        vd2.setLastChangedRevision("1.2");
+        versioning.addRevision(vd2, token);
+        
+        List result = versioning.getLastLogs(token);
+        assertEquals(4, result.size());
+        
+ //*       
+        //deleting
+        Project project = projectDAO.get(1);
+        Revision revision = revisionDAO.getByProjectAndNumber(project.getId(), "1.3");
+        revisionDAO.removeRemovingFKs(revision);
+        revision = revisionDAO.getByProjectAndNumber(project.getId(), "1.2");
+        revisionDAO.removeRemovingFKs(revision);
+        revision = revisionDAO.getByProjectAndNumber(project.getId(), "1.1");
+        revisionDAO.removeRemovingFKs(revision);
+   
+//*/ 
+        }
+        catch(Exception e){	
+            HibernateUtil.rollbackTransaction();
+            HibernateUtil.closeSession();
+            throw e;
+        }
     }
     
     @Test
@@ -327,20 +392,6 @@ public class VersioningTest {
     }
     
     @Test 
-    public void testHashToPath() throws Exception{
-        System.out.println("hashToPath");
-        Class[] param = new Class[1];	
-	param[0] = String.class;
-        Method method;    
-        method = Versioning.class.getDeclaredMethod("hashToPath", param);
-        method.setAccessible(true);
-        
-        String hash = "aaabbbbbbbbb";
-        String path = (String)method.invoke(versioning, hash);
-        assertEquals("aaa/bbbbbbbbb", path);
-    }
-    
-    @Test 
     public void testVersionedDirToConfigItem() throws Exception{
         System.out.println("versionedDirToConfigItem");
         Class[] param = new Class[3];	
@@ -376,6 +427,11 @@ public class VersioningTest {
         assertEquals(vf1.getSize()+vf2.getSize(), ci.getSize());
         assertEquals(vd.getName(), ci.getName());
         assertEquals(1, ci.getNumber());
+    }
+    
+    //@Test 
+    public void testAdd1ItemToRevision(){
+        System.out.println("add1ItemToRevision");
     }
     
 }

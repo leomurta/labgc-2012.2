@@ -8,24 +8,24 @@ package br.uff.ic.labgc.exception;
  *
  * @author jokerfvd
  */
-public class VersioningProjectAlreadyExistException extends VersioningException {
+public class StorageObjectAlreadyExistException extends StorageException {
 
     /**
      * Creates a new instance of
-     * <code>VersioningProjectAlreadyExistException</code> without detail
+     * <code>StorageObjectAlreadyExistException</code> without detail
      * message.
      */
-    public VersioningProjectAlreadyExistException() {
+    public StorageObjectAlreadyExistException() {
     }
 
     /**
      * Constructs an instance of
-     * <code>VersioningProjectAlreadyExistException</code> with the specified
+     * <code>StorageObjectAlreadyExistException</code> with the specified
      * detail message.
      *
      * @param msg the detail message.
      */
-    public VersioningProjectAlreadyExistException(String msg) {
+    public StorageObjectAlreadyExistException(String msg) {
         super(msg);
     }
 }
