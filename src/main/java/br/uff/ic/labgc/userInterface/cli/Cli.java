@@ -443,6 +443,8 @@ public class Cli {
 
         for (VersionedItem v : listItem) 
         {
+            if(v.getStatus()== EVCSConstants.UNMODIFIED)
+                continue;
             System.out.println(v.getName() + "    " + getStatus(v.getStatus()));
         }
 
