@@ -136,14 +136,10 @@ public class VersionedItemUtils {
      * @param item VersionedFile a ser gravado no disco
      * @throws ApplicationException
      */
-    public static void writeFile(final File dir, VersionedFile item) throws ApplicationException {
-        VersionedItemUtils vi = new VersionedItemUtils();
-        try {
-            vi.writeVersionedFile(item, dir);
-        } catch (IOException ex) {
-            Logger.getLogger(VersionedItemUtils.class.getName()).log(Level.SEVERE, null, ex);
-            throw new ApplicationException("Nao foi possivel gravar o arquivo");
-        }
+    public static void write(final File dir, VersionedFile item) throws ApplicationException {
+        List<VersionedItem> items = new ArrayList<VersionedItem>();
+        items.add(item);
+        VersionedItemUtils.write(dir, items);
     }
 
     /**
