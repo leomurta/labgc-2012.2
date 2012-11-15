@@ -24,8 +24,8 @@ public class Diff {
     public static void main(String args[]) throws ApplicationException {
         byte[] testeA;
         byte[] testeB;
-        String teste2 = "B" + '\n' + "C";
-        String teste3 = "B" + '\n' + "A";
+        String teste2 = "D" + '\n' + "Caramba !" + '\n' + "G" + '\n' + "M";
+        String teste3 = "Todos os papeis são amarelos" + '\n' + "Caramba !" + '\n' + "HTT" + '\n' + "I" + '\n' + "G" + '\n' + "TGG";
 
         testeA = teste2.getBytes();
         testeB = teste3.getBytes();
@@ -33,7 +33,7 @@ public class Diff {
         //teste = getFline(teste);
 
         //System.out.println("-->\n" + new String(lcs(testeA, testeB)));
-        System.out.println(new String(diff_archives(new byte[0], testeB)));
+        System.out.println(new String(diff_archives(testeA, testeB)));
     }
 
     public static byte[] run(VersionedItem file1, VersionedItem file2) throws ApplicationException, IncompatibleItensException {
@@ -53,11 +53,11 @@ public class Diff {
 
         byte[] delta_aux = delta;
 
-        while (getFline(delta_aux)[0] != EOF) {
+        //while (getFline(delta_aux)[0] != EOF) {
             // Comparação de Bytes
             // Se R, Remove
             // Se A, Adiciona
-        }
+        //}
 
         return null;
 
@@ -73,127 +73,70 @@ public class Diff {
         // PRIMEIRO CASO
         // REMOVE TODOS OS ARQUIVOS DE FILE1
         // ADICIONA TODOS OS ARQUIVOS DE FILE2
+
+        byte[] seq1 = file1.clone();
+        byte[] seq2 = file2.clone();
+        byte[] lcs1 = lcs(seq1, seq2);
         
-        byte[] seq_aux2 = file2.clone();
-        byte[] aux;
-        ArrayList<String> linhas_seq2 = new ArrayList<>();
-        if(file1.length != 0)
-            System.out.println("R " + "0" + " " + countLines(file1));
+        int i = 0;
+        int j = 0;
+        int h = 0;
+        int tam_seq1 = countLines(seq1);
+        int tam_seq2 = countLines(seq2);
         
-        while(!isNull(seq_aux2)){
-            aux = getFline(seq_aux2);
-            linhas_seq2.add(new String(del_line_wraps(aux)));
-            seq_aux2 = delFline(aux, seq_aux2);
+        ArrayList<String> lines_added = new ArrayList<>();
+        
+        // REGISTRA HASH SEGURO
+        ret += ("HASH_TESTE\n\n");
+        
+        while( !isNull(lcs1) ){
+            int i_aux = i;
+            if( hasDiff( del_line_wraps( get_first_line(seq1) ), del_line_wraps( get_first_line(lcs1) ) ) ){
+                while( hasDiff( del_line_wraps( get_first_line(seq1) ), del_line_wraps( get_first_line(lcs1) ) ) ){
+                    seq1 = del_first_sequence( get_first_line(seq1).length, seq1 );
+                    i++;
+                }
+                ret += ("R " + h + " " + i_aux + " " + (i-1) ) + '\n';
+            }
+            if( hasDiff( del_line_wraps( get_first_line(seq2) ), del_line_wraps( get_first_line(lcs1) ) ) ){
+                lines_added.removeAll(lines_added);
+                while( hasDiff( del_line_wraps( get_first_line(seq2) ), del_line_wraps( get_first_line(lcs1) ) ) ){
+                    lines_added.add( new String( del_line_wraps( get_first_line(seq2) ) ) );
+                    seq2 = del_first_sequence( get_first_line(seq2).length, seq2 );
+                    j++;
+                }
+                ret += ("A " + h + " " + lines_added.size() ) + '\n';
+                for( int r = 0; r < lines_added.size(); r++ ){
+                    ret += ( lines_added.get(r) ) + '\n';
+                }
+            }
+
+            seq1 = del_first_sequence( get_first_line(seq1).length, seq1 );
+            seq2 = del_first_sequence( get_first_line(seq2).length, seq2 );
+            lcs1 = del_first_sequence( get_first_line(lcs1).length, lcs1 );
+            i++;
+            j++;
+            h++;
         }
-        System.out.println("A " + "0" + " " + linhas_seq2.size());
-        for(int i = 0; i < linhas_seq2.size(); i++){
-            System.out.println(linhas_seq2.get(i));
+        
+        // REMOVE TODAS AS LINHAS APÓS LCS DA SEQ1
+        if( i <= tam_seq1 )
+            ret += ("R " + h + " " + i + " " + (tam_seq1-1) ) + '\n';
+        
+        // ADICIONA TODAS AS LINHAS APÓS LCS DA SEQ2
+        if( j <= tam_seq2 ){
+            lines_added.removeAll(lines_added);
+            while( !isNull(seq2) ){
+                lines_added.add( new String( del_line_wraps( get_first_line(seq2) ) ) );
+                seq2 = del_first_sequence( get_first_line(seq2).length, seq2 );
+            }
+            ret += ("A " + h + " " + lines_added.size() ) + '\n';
+            for( int r = 0; r < lines_added.size(); r++ ){
+                ret += ( lines_added.get(r) ) + '\n';
+            }
         }
 
         return ret.getBytes();
-        
-//        byte[] seq1 = file1.clone();
-//        byte[] seq2 = file2.clone();
-//        byte[] lcs = lcs(seq1, seq2);
-//        byte[] lcs2 = lcs.clone();
-//        
-//        byte[] final_file;
-//
-//        ArrayList<String> linhas_add = new ArrayList<>();
-//
-//        System.out.println("-------------");
-//        System.out.println("SEQ1---------");
-//        System.out.println(new String(seq1));
-//        System.out.println("SEQ2---------");
-//        System.out.println(new String(seq2));
-//        System.out.println("LCS----------");
-//        System.out.println(new String(lcs));
-//        System.out.println("-------------");
-//
-//        // Registra METADADOS dos arquivos que estão sendo diferenciados
-//        int i = 0;
-//        int j = 0;
-//        int h = 0;
-//        int k = 0;
-//        int tam_seq1 = countLines(seq1) + 1;
-//        int tam_seq2 = countLines(seq2);
-//        int fim = countLines(lcs) + 1;
-//
-//        //if( file1.getHash() != file2.getHash() ){
-//
-//        while (h <= fim || k <= fim) {
-//            if( h <= fim ){
-//            if (!hasDiff(getFline(seq1), getFline(lcs))) {
-//                seq1 = delFline(getFline(seq1), seq1);
-//            } else {
-//                // Remove da linha "i" até que seq1[i] == lcs[h]
-//                int i_aux = i;
-//                while (hasDiff(getFline(seq1), getFline(lcs)) && !isNull(seq1)) {
-//                    seq1 = delFline(getFline(seq1), seq1);
-//                    i++;
-//                }
-//                // R i_aux i
-//                //System.out.println("R " + i_aux + " " + (i - 1));
-//                retorno += "R " + i_aux + " " + (i - 1) + '\n';
-//            }
-//            i++;
-//            lcs = delFline(getFline(lcs), lcs);
-//            h++;
-//            }
-//            if( k <= fim ){
-//            if (!hasDiff(getFline(seq2), getFline(lcs2))) {
-//                seq2 = delFline(getFline(seq2), seq2);
-//            } else {
-//                // Remove da linha "i" até que seq1[i] == lcs[h]
-//                int j_aux = j;
-//                linhas_add.removeAll(linhas_add);
-//                while (hasDiff(getFline(seq2), getFline(lcs2)) && !isNull(seq2)) {
-//                    linhas_add.add(new String(getFline(seq2)));
-//                    seq2 = delFline(getFline(seq2), seq2);
-//                    j++;
-//                }
-//                seq2 = delFline(getFline(seq2), seq2);
-//                // R i_aux i
-//                //System.out.println("A " + j_aux + " " + linhas_add.size());
-//                retorno += "A " + j_aux + " " + linhas_add.size() + '\n';
-//                for (int z = 0; z < linhas_add.size(); z++) {
-//                    //System.out.print(linhas_add.get(z));
-//                    retorno += linhas_add.get(z);
-//                    if( z + 1 == linhas_add.size() ){
-//                        retorno += '\n';
-//                    }
-//                }
-//            }
-//            j++;
-//            lcs2 = delFline(getFline(lcs2), lcs2);
-//            k++;
-//            }
-//        }
-//
-//        if( (i-2) != (tam_seq1-1) ) {
-//            //System.out.println("R " + (i - 2) + " " + (tam_seq1-1));
-//            retorno += "R " + (i - 2) + " " + (tam_seq1-1) + '\n';
-//        }
-//        
-//        linhas_add.removeAll(linhas_add);
-//        while (!isNull(seq2)) {
-//            linhas_add.add(new String(getFline(seq2)));
-//            seq2 = delFline(getFline(seq2), seq2);
-//        }
-//        if (linhas_add.size() > 0) {
-//            //System.out.println("A " + (j - 1) + " " + linhas_add.size());
-//            retorno += "A " + (j - 1) + " " + linhas_add.size() + '\n';
-//            for( int s = 0; s < linhas_add.size(); s++ ){
-//                //System.out.println(linhas_add.get(s));
-//                retorno += linhas_add.get(s);
-//                if( s + 1 == linhas_add.size() ){
-//                    retorno += '\n';
-//                }
-//            }
-//        }
-//
-//
-//        return retorno.getBytes();
     }
 
     private static byte[] diff_directories(List<VersionedItem> dir1, List<VersionedItem> dir2) throws ApplicationException {
@@ -277,13 +220,13 @@ public class Diff {
     private static byte[] lcs(byte[] seq1, byte[] seq2) {
 
         if (!isNull(seq1) && !isNull(seq2)) {
-            byte[] fline_seq1 = getFline(seq1); // Identifica primeira linha seq1
-            byte[] fline_seq2 = getFline(seq2); // Identifica segunda  linha seq2
+            byte[] fline_seq1 = get_first_line(seq1); // Identifica primeira linha seq1
+            byte[] fline_seq2 = get_first_line(seq2); // Identifica segunda  linha seq2
 
-            byte[] new_seq1 = delFline(fline_seq1, seq1); // Remove primeiras linhas das sequências
-            byte[] new_seq2 = delFline(fline_seq2, seq2);
+            byte[] new_seq1 = del_first_sequence( fline_seq1.length, seq1); // Remove primeiras linhas das sequências
+            byte[] new_seq2 = del_first_sequence( fline_seq2.length, seq2);
 
-            if (hasDiff(fline_seq1, fline_seq2)) {
+            if (hasDiff( del_line_wraps( fline_seq1 ), del_line_wraps( fline_seq2 ) )) {
                 // Chamar duas frentes de LCS
                 byte[] lcs1 = lcs(new_seq1, seq2);
                 byte[] lcs2 = lcs(seq1, new_seq2);
@@ -307,42 +250,36 @@ public class Diff {
 
     // Finalizado
     private static boolean hasDiff(byte[] fline_seq1, byte[] fline_seq2) {
-        if (!(isNull(fline_seq1) && isNull(fline_seq2)) && fline_seq1.length == fline_seq2.length) {
+        if ( fline_seq1.length == fline_seq2.length) {
             for (int i = 0; i < fline_seq1.length; i++) {
-                if (Byte.compare(fline_seq1[i], fline_seq2[i]) != 0) {
+                if (Byte.compare(fline_seq1[i], fline_seq2[i]) != 0)
                     return true;
-                }
             }
+        } else {
+            return true;
         }
         return false;
     }
 
-    private static byte[] getAndDelFline(byte[] seq) {
-        byte[] retorno = getFline(seq);
-        seq = delFline(retorno, seq);
-        return retorno;
-    }
+    private static byte[] del_first_sequence(int first_seq_size, byte[] seq) {
 
-    private static byte[] delFline(byte[] fline_seq1, byte[] seq) {
+        byte[] retorno = new byte[seq.length - first_seq_size];
 
-        byte[] retorno = new byte[seq.length - fline_seq1.length];
-
-        for (int j = 0; j < retorno.length; j++) {
-            retorno[j] = seq[j + fline_seq1.length];
-        }
-
+        for (int j = 0; j < retorno.length; j++)
+            retorno[j] = seq[j + first_seq_size];
+        
         return retorno;
 
     }
 
-    private static byte[] getFline(byte[] seq) {
+    private static byte[] get_first_line(byte[] seq) {
 
         if (seq.length != 0) {
             int i = 0;
             while (Byte.compare(seq[i++], EOL) != 0 && i+1 <= seq.length);
             byte[] retorno = new byte[i];
 
-            for (int j = 0; j < i; j++) {
+            for (int j = 0; j < retorno.length; j++) {
                 retorno[j] = seq[j];
             }
 
