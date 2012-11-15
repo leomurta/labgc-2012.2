@@ -26,7 +26,7 @@ public class Merge
     
    private static boolean bConflict;
    
-   private static VersionedFile TwoWayMerge(VersionedFile mineVersion, VersionedFile theirsVersion) throws ApplicationException
+   public static VersionedFile TwoWayMerge(VersionedFile mineVersion, VersionedFile theirsVersion) throws ApplicationException
    {
        VersionedFile mergedVersion = new VersionedFile();
        bConflict = false;
