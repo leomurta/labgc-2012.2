@@ -64,23 +64,32 @@ public class Client implements IClient {
 
         workspace = new Workspace(systemDirectory + File.separator + repository);
     }
+    
+    
+    // Construtor para Comandos sem Workspace
+    public Client(String hostname) 
+    {
+        this.hostname = hostname;  
+    }
 
     /**
      * Construtor para acesso com area de trabalho(workspace) ja existente
      *
      * @param systemDirectory diretorio raiz da area de trabalho
      */
-    public Client(String systemDirectory) {
-
-        workspace = new Workspace(systemDirectory);
-        try {
-            this.hostname = workspace.getHost();
-            this.repository = workspace.getProject();
-        } catch (WorkspaceException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
+    
+//    public Client(String systemDirectory) 
+//    {
+//
+//        workspace = new Workspace(systemDirectory);
+//        try {
+//            this.hostname = workspace.getHost();
+//            this.repository = workspace.getProject();
+//        } catch (WorkspaceException ex) {
+//            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//    }
 
     //comandos para o servidor
     public VersionedItem commit(String message) throws ApplicationException{

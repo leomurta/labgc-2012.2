@@ -218,7 +218,7 @@ public class Diff {
 //    }
 
     // Finalizado
-    private static byte[] lcs(byte[] seq1, byte[] seq2) {
+    protected static byte[] lcs(byte[] seq1, byte[] seq2) {
 
         if (!isNull(seq1) && !isNull(seq2)) {
             byte[] fline_seq1 = getFline(seq1); // Identifica primeira linha seq1

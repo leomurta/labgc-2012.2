@@ -86,6 +86,13 @@ public class Cli {
                 .hasOptionalArg()
                 .withArgName("ITEM(OPTIONAL)")
                 .create("log"));
+        
+        
+        m_options.addOption(OptionBuilder.withLongOpt("n")
+                .withDescription("Create an empty project in  the repository")
+                .hasArg()
+                .withArgName("HOST NEW_PROJECT_NAME")
+                .create("create"));
     }
 
     private void dysplayHelp() {
@@ -207,6 +214,15 @@ public class Cli {
 
             return;
         }
+        
+        
+        if (cmd.hasOption("create")) 
+        {
+            String[] createArgs = cmd.getOptionValues("create");
+            runCreateProject(createArgs);
+
+            return;
+        }
 
         /*Option [] str =  cmd.getOptions();
          for (Option v : str)
@@ -260,7 +276,8 @@ public class Cli {
 
     private void runCheckOut(String[] checkArgs) {
 
-        if (checkArgs.length > 1) {
+        if (checkArgs.length > 1) 
+        {
             Messages msg = new Messages();
 
             String strUrl = checkArgs[0];
@@ -314,7 +331,9 @@ public class Cli {
                 return;
             }
 
-        } else {
+        } 
+        else 
+        {
             System.out.println("The amount of arguments is insufficient (" + checkArgs.length + ").");
         }
     }
@@ -512,6 +531,43 @@ public class Cli {
             
           System.out.println("Revert operation completed successfully");
                      
+      }
+      
+      
+      private void runCreateProject(String[] createArgs)
+      {
+           if (createArgs.length > 0) 
+           {
+                String strHost = createArgs[0];
+                
+                String strProjectName = "";
+                
+                if(createArgs.length > 1)
+                {
+                     strProjectName = createArgs[1];
+                }
+                else
+                {
+                    System.out.println("Please, enter project name\n");
+                    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));   
+                    try 
+                    {
+                        strProjectName = in.readLine();
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+                
+                m_IClient = new Client(strHost);
+                
+                //TODO Chamanr Método para Criacao de Método
+           }
+           else
+           {
+               System.out.println("The amount of arguments is insufficient ("+createArgs.length+").");   
+           }
       }
     
     
