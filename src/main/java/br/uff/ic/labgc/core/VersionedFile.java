@@ -47,6 +47,12 @@ public class VersionedFile extends VersionedItem implements Serializable {
      * Hash do item versionado
      */
     private String hash;
+    
+    
+    /**
+     * Indicaca se o item possui conflito  a ser resolvido
+     */
+    private boolean conflict;
 
     /**
      * Cria um item versionável, marcando seu atributo loaded como falso e
@@ -194,5 +200,19 @@ public class VersionedFile extends VersionedItem implements Serializable {
     @Override
     public boolean isDir() {
         return false;
+    }
+
+    /**
+     * @return the conflict
+     */
+    public boolean hasConflict() {
+        return conflict;
+    }
+
+    /**
+     * @param conflict the conflict to set
+     */
+    public void setConflict(boolean conflict) {
+        this.conflict = conflict;
     }
 }

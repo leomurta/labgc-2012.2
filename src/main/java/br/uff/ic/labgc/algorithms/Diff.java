@@ -184,40 +184,14 @@ public class Diff {
     private static boolean isFile(VersionedItem file1) {
         return !file1.isDir();
     }
-    
+
     private static byte[] lcs_dir(List<VersionedItem> seq1, List<VersionedItem> seq2) {
         return null;
-//        if (!isNull(seq1) && !isNull(seq2)) {
-//            byte[] fline_seq1 = getFline(seq1); // Identifica primeira linha seq1
-//            byte[] fline_seq2 = getFline(seq2); // Identifica segunda  linha seq2
-//
-//            byte[] new_seq1 = delFline(fline_seq1, seq1); // Remove primeiras linhas das sequências
-//            byte[] new_seq2 = delFline(fline_seq2, seq2);
-//
-//            if (hasDiff(fline_seq1, fline_seq2)) {
-//                // Chamar duas frentes de LCS
-//                byte[] lcs1 = lcs(new_seq1, seq2);
-//                byte[] lcs2 = lcs(seq1, new_seq2);
-//
-//                // Verifica qual das duas frentes possui maior sequência comum
-//                // Retorna
-//                if (countLines(lcs1) >= countLines(lcs2)) {
-//                    return lcs1;
-//                } else {
-//                    return lcs2;
-//                }
-//            } else {
-//                return addFline(fline_seq1, lcs(new_seq1, new_seq2));
-//            }
-//
-//        } else {
-//            return new byte[0];
-//        }
 
     }
-
+    
     // Finalizado
-    private static byte[] lcs(byte[] seq1, byte[] seq2) {
+    protected static byte[] lcs(byte[] seq1, byte[] seq2) {
 
         if (!isNull(seq1) && !isNull(seq2)) {
             byte[] fline_seq1 = get_first_line(seq1); // Identifica primeira linha seq1

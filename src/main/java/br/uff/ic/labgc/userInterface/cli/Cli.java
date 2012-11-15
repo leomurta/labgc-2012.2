@@ -11,7 +11,10 @@ import br.uff.ic.labgc.exception.ClientException;
 import br.uff.ic.labgc.exception.ClientLoginRequiredException;
 import br.uff.ic.labgc.exception.ClientWorkspaceUnavailableException;
 import br.uff.ic.labgc.userInterface.common.Messages;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -74,7 +77,7 @@ public class Cli {
 
         m_options.addOption(OptionBuilder.withLongOpt("m")
                 .withDescription("Commit the changes made")
-                .hasArgs(0)
+                .hasOptionalArg()
                 .withArgName("COMMIT_MESSAGE")
                 .create("commit"));
 
@@ -83,6 +86,13 @@ public class Cli {
                 .hasOptionalArg()
                 .withArgName("ITEM(OPTIONAL)")
                 .create("log"));
+        
+        
+        m_options.addOption(OptionBuilder.withLongOpt("n")
+                .withDescription("Create an empty project in  the repository")
+                .hasArg()
+                .withArgName("HOST NEW_PROJECT_NAME")
+                .create("create"));
     }
 
     private void dysplayHelp() {
@@ -189,7 +199,8 @@ public class Cli {
         }
 
         if (cmd.hasOption("commit")) {
-            String[] commitArg = cmd.getOptionValues("commit");
+            String[] commitArg = null;
+            commitArg = cmd.getOptionValues("commit");
             runCommit(commitArg);
 
             return;
@@ -200,6 +211,15 @@ public class Cli {
             String[] logArg= null; 
             logArg = cmd.getOptionValues("log");
             runLog(logArg);
+
+            return;
+        }
+        
+        
+        if (cmd.hasOption("create")) 
+        {
+            String[] createArgs = cmd.getOptionValues("create");
+            runCreateProject(createArgs);
 
             return;
         }
@@ -256,7 +276,8 @@ public class Cli {
 
     private void runCheckOut(String[] checkArgs) {
 
-        if (checkArgs.length > 1) {
+        if (checkArgs.length > 1) 
+        {
             Messages msg = new Messages();
 
             String strUrl = checkArgs[0];
@@ -310,7 +331,9 @@ public class Cli {
                 return;
             }
 
-        } else {
+        } 
+        else 
+        {
             System.out.println("The amount of arguments is insufficient (" + checkArgs.length + ").");
         }
     }
@@ -358,15 +381,38 @@ public class Cli {
         return true;
     }
 
-    private void runCommit(String[] commitArgs) {
-
-        if( commitArgs != null && commitArgs.length > 0) 
+    private void runCommit(String[] commitArgs) 
+    {
+        
+        String strItemPath = invocationPath;
+        String strMessage="";
+        
+        if(commitArgs!=null)
         {
-
-            String strCommitPath = invocationPath;
-            String strMessage = commitArgs[0];
-
-            m_IClient = new Client(strCommitPath);
+            if (commitArgs.length > 0) 
+            {
+                strItemPath += commitArgs[0];
+            }
+            
+            if (commitArgs.length > 1) 
+            {
+                strMessage += commitArgs[1];
+            }
+            else
+            {
+                System.out.println("Please, enter the commit message\n");
+                BufferedReader in = new BufferedReader(new InputStreamReader(System.in));   
+                try 
+                {
+                    strMessage = in.readLine();
+                } 
+                catch (IOException ex) 
+                {
+                    System.out.println(ex.getMessage());
+                }
+            }
+        
+            m_IClient = new Client(strItemPath);
             registerObserver();
             try 
             {
@@ -377,25 +423,25 @@ public class Cli {
                 System.out.println(ex.getMessage());
                 return;
             }
-
-        } 
+        
+        }
         else 
         {
-            System.out.println("The amount of arguments is insufficient (" + commitArgs.length + ").");
+            System.out.println("The amount of arguments is insufficient (0).");
         }
 
     }
 
     private void runStatus(String[] statusArg) {
 
-        String strItemPath = invocationPath;System.out.println(invocationPath);
+        String strItemPath = invocationPath;
         if(statusArg!=null)
         {
             if (statusArg.length > 0) 
             {
                 strItemPath += statusArg[0];
             }
-        }System.out.println(strItemPath);
+        }
         m_IClient = new Client(strItemPath);
 
         VersionedItem status = new VersionedDir();
@@ -416,6 +462,8 @@ public class Cli {
 
         for (VersionedItem v : listItem) 
         {
+            if(v.getStatus()== EVCSConstants.UNMODIFIED)
+                continue;
             System.out.println(v.getName() + "    " + getStatus(v.getStatus()));
         }
 
@@ -456,32 +504,70 @@ public class Cli {
       private void runRevert(String[] revertArg)
       {
              
-        String strItemPath = invocationPath;
-        if(revertArg!=null)
-        {
-            if (revertArg.length > 0) 
+          String strItemPath=invocationPath;
+          
+          if(revertArg!=null)
+          {    
+            if(revertArg.length>0)
             {
                 strItemPath += revertArg[0];
+                //System.out.println(strItemPath);
             }
-        }
-
-        m_IClient = new Client(strItemPath);
-        try 
-        {
+          } 
+          m_IClient = new Client(strItemPath);
+          try 
+          {
             if(!(m_IClient.revert()))
             {
                System.out.println("The revert operation could not be completed");
                return;
             }
-        } 
-        catch (ApplicationException ex) 
-        {
+          } 
+          catch (ApplicationException ex) 
+          {
             System.out.println(ex.getMessage());
             return;
-        }
+          }
             
-        System.out.println("Revert operation completed successfully");
+          System.out.println("Revert operation completed successfully");
                      
+      }
+      
+      
+      private void runCreateProject(String[] createArgs)
+      {
+           if (createArgs.length > 0) 
+           {
+                String strHost = createArgs[0];
+                
+                String strProjectName = "";
+                
+                if(createArgs.length > 1)
+                {
+                     strProjectName = createArgs[1];
+                }
+                else
+                {
+                    System.out.println("Please, enter project name\n");
+                    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));   
+                    try 
+                    {
+                        strProjectName = in.readLine();
+                    } 
+                    catch (IOException ex) 
+                    {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+                
+                m_IClient = new Client(strHost);
+                
+                //TODO Chamanr Método para Criacao de Método
+           }
+           else
+           {
+               System.out.println("The amount of arguments is insufficient ("+createArgs.length+").");   
+           }
       }
     
     
