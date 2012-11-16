@@ -55,7 +55,7 @@ public interface IVersioning {
     
     public byte[] getVersionedFileContent(String hash, String token) throws VersioningException;
     
-    public List<VersionedDir> getLastLogs(int num, String token);
+    public VersionedDir getLastLogs(int num, String token);
     
     public String addRevision(VersionedDir vd, String token) throws ApplicationException;
     

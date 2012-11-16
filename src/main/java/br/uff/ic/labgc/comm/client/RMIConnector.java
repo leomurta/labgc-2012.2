@@ -125,8 +125,8 @@ public class RMIConnector extends AbstractServer {
      * efetuar o log
      */
     @Override
-    public  List<VersionedItem> log(String token) throws ApplicationException {
-         List<VersionedItem> result = new ArrayList<VersionedItem>();
+    public VersionedItem log(String token) throws ApplicationException {
+         VersionedItem result = null;
         try {
             result = server.log(token);
         } catch (RemoteException ex) {

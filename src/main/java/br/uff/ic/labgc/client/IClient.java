@@ -20,10 +20,17 @@ public interface IClient extends IObservable{
     public VersionedItem commit(String message) throws ApplicationException;
     public VersionedItem update(String revision) throws ApplicationException;
     public VersionedItem diff(String file, String version) throws ApplicationException;
-    public  List<VersionedItem> log() throws ApplicationException;
+    public VersionedItem log() throws ApplicationException;
     public boolean resolve(String file) throws ApplicationException;
-    public VersionedItem status() throws ApplicationException;
     //implementados
+    
+    /**
+     * Método para verificar o estado do workspace, relacionando itens novos, itens removidos e itens modificados
+     * @return
+     * @throws ApplicationException 
+     */
+    public VersionedItem status() throws ApplicationException;
+    
     /**
      * Desfaz as alteracoes ainda nao comitadas do espaco de trabalho
      * @return
@@ -53,7 +60,47 @@ public interface IClient extends IObservable{
      * 
      */
     public boolean isLogged()throws ApplicationException;
-     
     
+    /**
+     * Método para verificar se existe um workspace
+     * @return 
+     */
+    public boolean hasWorkspace();
+    
+    /**
+     * ADM métodos
+     */
+    
+    /**
+     * ADM Método criar projeto
+     * @param repository nome do novo projeto/reopsitório
+     * @param user login do usuário
+     * @throws ApplicationException 
+     */
+    public void admCreateProject(String repository, String user)throws ApplicationException;
+    public void admDeleteProject()throws ApplicationException;
+    /**
+     * ADM método para criar usuário no servidor
+     * @param name displayname do usuario
+     * @param username login
+     * @param password senha
+     * @throws ApplicationException 
+     */
+    public void admCreateUser(String name, String username, String password)throws ApplicationException;
+    public void admDeleteUser()throws ApplicationException;
+    /**
+     * ADM Método para vincular um usuário existente a um projeto existente no servidor
+     * @param repository nome do repositório/projeto
+     * @param user login do usuário
+     * @throws ApplicationException 
+     */
+    public void admAddUserToProject(String repository, String user)throws ApplicationException;
+    public void admRemoveUserFromProject()throws ApplicationException;
+    /**
+     * ADM Método para criar um novo repositorio no servidor por envio de arquivos
+     * @param username nome do usuário
+     * @throws ApplicationException 
+     */
+    public void admCheckin(String username)throws ApplicationException;
 }
 

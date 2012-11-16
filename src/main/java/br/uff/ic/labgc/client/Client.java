@@ -10,7 +10,6 @@ import br.uff.ic.labgc.exception.*;
 import br.uff.ic.labgc.server.*;
 import br.uff.ic.labgc.workspace.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +48,7 @@ public class Client implements IClient {
      * nome do parametro que ir� guardar o token de autenticacao
      */
     private String AUTHENTICATION_TOKEN = "token";
-    
+
     /**
      * Construtor para acesso sem area de trabalho(workspace)
      *
@@ -64,12 +63,10 @@ public class Client implements IClient {
 
         workspace = new Workspace(systemDirectory + File.separator + repository);
     }
-    
-    
+
     // Construtor para Comandos sem Workspace
-    public Client(String hostname) 
-    {
-        this.hostname = hostname;  
+    public Client(String hostname) {
+        this.hostname = hostname;
     }
 
     /**
@@ -77,7 +74,6 @@ public class Client implements IClient {
      *
      * @param systemDirectory diretorio raiz da area de trabalho
      */
-    
 //    public Client(String systemDirectory) 
 //    {
 //
@@ -90,31 +86,30 @@ public class Client implements IClient {
 //        }
 //
 //    }
-
     //comandos para o servidor
-    public VersionedItem commit(String message) throws ApplicationException{
+    public VersionedItem commit(String message) throws ApplicationException {
         VersionedItem files = workspace.commit();
-        String revision = server.commit(files,message,loginToken);
+        String revision = server.commit(files, message, loginToken);
         workspace.setRevision(revision);
         return files;
     }
 
-    public VersionedItem update(String revision) throws ApplicationException{
+    public VersionedItem update(String revision) throws ApplicationException {
         String clientRevision = workspace.getRevision();
-        VersionedItem files = server.update(clientRevision, revision ,loginToken);
+        VersionedItem files = server.update(clientRevision, revision, loginToken);
         workspace.update(files);
         return files;
     }
 
-    public VersionedItem diff(String file, String version) throws ApplicationException{
-        return workspace.diff(file,version);
+    public VersionedItem diff(String file, String version) throws ApplicationException {
+        return workspace.diff(file, version);
     }
 
-    public List<VersionedItem> log() throws ApplicationException{
+    public VersionedItem log() throws ApplicationException {
         return server.log(loginToken);
     }
-    
-    public boolean resolve(String file) throws ApplicationException{
+
+    public boolean resolve(String file) throws ApplicationException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -122,18 +117,13 @@ public class Client implements IClient {
     public boolean revert() throws ApplicationException {
         return workspace.revert();
     }
-    
+
     public boolean revert(String file) throws ApplicationException {
         return workspace.revert(file);
     }
-    
 
-     public VersionedItem status() throws ApplicationException
-    {  
-       
-        
-        VersionedItem item = workspace.status(); 
-        
+    public VersionedItem status() throws ApplicationException {
+        VersionedItem item = workspace.status();
         return item;
     }
 
@@ -238,7 +228,6 @@ public class Client implements IClient {
 
     }
 
-
     /**
      * Recupera uma instancia de IServer;
      *
@@ -253,5 +242,41 @@ public class Client implements IClient {
                 throw new ClientServerNotAvailableException();
             }
         }
+    }
+
+    @Override
+    public boolean hasWorkspace() {
+        if(workspace == null)
+            return false;
+        
+        return workspace.isWorkspace();
+            
+    }
+    
+    public void admCreateProject(String repository, String user)throws ApplicationException{
+        this.getServer();
+        server.addProject(repository, user);
+    }
+    public void admDeleteProject()throws ApplicationException{
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    public void admCreateUser(String name, String username, String password)throws ApplicationException{
+        this.getServer();
+        server.addUser(name, username , password);
+    }
+    public void admDeleteUser()throws ApplicationException{
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    public void admAddUserToProject(String repository, String user)throws ApplicationException{
+        this.getServer();
+        server.addUserToProject(repository, user);
+    }
+    public void admRemoveUserFromProject()throws ApplicationException{
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    public void admCheckin(String username)throws ApplicationException{
+        throw new UnsupportedOperationException("Not supported yet.");
+//        VersionedItem item = new VersionedDir();
+//        server.checkin(item, username);
     }
 }

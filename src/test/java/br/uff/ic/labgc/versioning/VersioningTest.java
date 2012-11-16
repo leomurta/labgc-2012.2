@@ -311,8 +311,8 @@ public class VersioningTest {
         vd2.setLastChangedRevision("1.2");
         versioning.addRevision(vd2, token);
         
-        List result = versioning.getLastLogs(token);
-        assertEquals(4, result.size());
+        VersionedDir result = versioning.getLastLogs(token);
+        assertEquals(4, result.getContainedItens().size());
         
  //*       
         //deleting

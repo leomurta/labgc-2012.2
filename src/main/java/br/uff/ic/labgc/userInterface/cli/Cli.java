@@ -481,7 +481,7 @@ public class Cli {
         }    
         m_IClient = new Client(strItemPath);
 
-        List<VersionedItem> listItem = new ArrayList<VersionedItem>(); 
+        VersionedItem listItem = null; 
         try 
         {
            listItem = m_IClient.log();
@@ -493,10 +493,7 @@ public class Cli {
             System.out.println(ex.getMessage());
         }
 
-        for (VersionedItem v : listItem)
-        {
-
-        } 
+        
          
      }
      

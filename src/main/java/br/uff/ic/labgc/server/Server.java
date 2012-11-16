@@ -7,6 +7,7 @@ package br.uff.ic.labgc.server;
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.ServerException;
+import br.uff.ic.labgc.storage.Storage;
 import br.uff.ic.labgc.versioning.Versioning;
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,6 +29,7 @@ public class Server extends AbstractServer {
     
     
     Versioning versioning = new Versioning();
+    Storage storage = new Storage();
    
     
     public Server(String hostName) {
@@ -35,6 +37,8 @@ public class Server extends AbstractServer {
     }
 
     public String commit(VersionedItem file, String message, String token) throws ApplicationException {
+        if(!file.isDir())
+            throw new ApplicationException("O versionedItem não diretório");
         return versioning.addRevision((VersionedDir)file, token);
     }
 
@@ -46,164 +50,43 @@ public class Server extends AbstractServer {
         return versioning.getRevision(revision, token);
     }
 
-    public  List<VersionedItem> log(String token) throws ApplicationException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public  VersionedItem log(String token) throws ApplicationException {
+        return versioning.getLastLogs(token);
     }
-
+    
+    @Override
+    public VersionedItem log(int revision, String token) throws ApplicationException {
+        return versioning.getLastLogs(revision,token);
+    }
+    
     public String login(String user, String pwd, String repository) throws ApplicationException {
         System.out.printf("%s %s %s\n",repository,user,pwd);
         return versioning.login(repository, user, pwd);
     }
     
     public byte[] getItemContent(String hash) throws ApplicationException {
-        return versioning.getVersionedFileContent(hash,"nvfdovhfdoivbiofdvf");
+        return versioning.getVersionedFileContent(hash,"nvfdovhfdoivbiofdvf");//TODO:consertar esse método
     }
     
-
-//    public byte[] getItemContent(String hash) throws ApplicationException {
-//        
-//        File file = new File("..//..//" + serverTempFile);
-//        
-//        try {
-//            
-//            return getBytesFromFile(file);
-//        } catch (IOException ex) {
-//            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-//            throw new ServerException("Não foi possivel ler arquivo");
-//        }
-//        
-//    }
-
-    /*
-     * 
-     * metodos temporarios que serao excluidos
+    /**
+     * ADMINISTRAÇÃO 
      */
-    //items para a exclusao
-    String serverTempToken = "zyx";
-    String serverTempFile = "pom.xml";
-    private String tempSHA1() throws IOException, NoSuchAlgorithmException {
-
-        MessageDigest md;
-
-        md = MessageDigest.getInstance("SHA1");
-
-        FileInputStream fis = new FileInputStream("..//..//" + serverTempFile);
-        byte[] dataBytes = new byte[1024];
-
-        int nread = 0;
-
-        while ((nread = fis.read(dataBytes)) != -1) {
-            md.update(dataBytes, 0, nread);
-        };
-
-        byte[] mdbytes = md.digest();
-
-        //convert the byte to hex format
-        StringBuffer sb = new StringBuffer("");
-        for (int i = 0; i < mdbytes.length; i++) {
-            sb.append(Integer.toString((mdbytes[i] & 0xff) + 0x100, 16).substring(1));
-        }
-
-        return sb.toString();
-
-    }
-
-    private String sha1() {
-        try {
-            return tempSHA1();
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-
-    private long tempGetSize() {
-
-        File file = new File(serverTempFile);
-        return file.length();
-    }
-
-    private VersionedItem createProjectDir() {
-
-        VersionedDir dir = new VersionedDir();
-        VersionedFile file = this.createFile();
-        VersionedFile file2 = this.createFile2();
-
-        dir.setName(getRepPath());
-        dir.setAuthor(file.getAuthor());
-        dir.setCommitMessage(file.getCommitMessage());
-        dir.setLastChangedRevision(file.getLastChangedRevision());
-        dir.setLastChangedTime(file.getLastChangedTime());
-        dir.addItem(file);
-        dir.addItem(file2);
-
-
-        return dir;
-
-    }
-
-    private VersionedFile createFile() {
-
-        VersionedFile file = new VersionedFile();
-
-        file.setAuthor("lagc");
-        file.setName(serverTempFile);
-        file.setLastChangedRevision("5");
-        file.setLastChangedTime(new Date(1349792243));
-        file.setCommitMessage("primeiro commit");
-        
-
-        return file;
-    }
-
-    private VersionedFile createFile2() {
-
-        VersionedFile file = new VersionedFile();
-
-        file.setAuthor("lagc");
-        file.setName("a" + serverTempFile);
-        file.setLastChangedRevision("5");
-        file.setLastChangedTime(new Date(1349792243));
-        file.setCommitMessage("primeiro commit");
-
-        return file;
-    }
-
-    public static byte[] getBytesFromFile(File file) throws IOException {
-        InputStream is = new FileInputStream(file);
     
-        // Get the size of the file
-        long length = file.length();
+    public void checkin(VersionedItem item, String user) throws ApplicationException{
+        if(!item.isDir())
+            throw new ApplicationException("O versionedItem não diretório");
+        versioning.addFirstRevision((VersionedDir)item, user);
+    }
     
-        if (length > Integer.MAX_VALUE) {
-            // File is too large
-        }
+    public void addProject(String project, String user) throws ApplicationException{
+        storage.addProject(project, user);
+    }
     
-        // Create the byte array to hold the data
-        byte[] bytes = new byte[(int)length];
+    public void addUser(String name, String username, String password) throws ApplicationException{
+        storage.addUser(name, username, password);
+    }
     
-        // Read in the bytes
-        int offset = 0;
-        int numRead = 0;
-        while (offset < bytes.length
-               && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
-            offset += numRead;
-        }
-    
-        // Ensure all the bytes have been read in
-        if (offset < bytes.length) {
-            throw new IOException("Could not completely read file "+file.getName());
-        }
-    
-        // Close the input stream and return bytes
-        is.close();
-        
-        String value = new String(bytes);
-        
-        System.out.println("\n\n\nConteudo do pom.xml:\n\n"+value);
-        
-        return bytes;
+    public void addUserToProject(String project, String user)throws ApplicationException{
+        storage.addUserToProject(project, user);
     }
 }

@@ -83,7 +83,7 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public  List<VersionedItem> log(String token) throws RemoteException {
+    public  VersionedItem log(String token) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: log");
         try {
             return server.log(token);
