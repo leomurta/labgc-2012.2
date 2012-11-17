@@ -101,6 +101,6 @@ public interface IClient extends IObservable{
      * @param username nome do usuário
      * @throws ApplicationException 
      */
-    public void admCheckin(String username)throws ApplicationException;
+    public void init(String username)throws ApplicationException;
 }
 

@@ -72,7 +72,7 @@ public class Server extends AbstractServer {
      * ADMINISTRAÇÃO 
      */
     
-    public void checkin(VersionedItem item, String user) throws ApplicationException{
+    public void init(VersionedItem item, String user) throws ApplicationException{
         if(!item.isDir())
             throw new ApplicationException("O versionedItem não diretório");
         versioning.addFirstRevision((VersionedDir)item, user);

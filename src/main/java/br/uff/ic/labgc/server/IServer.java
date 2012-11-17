@@ -88,7 +88,7 @@ public interface IServer {
      * @param user usuário
      * @throws ApplicationException 
      */
-    public void checkin(VersionedItem item, String user) throws ApplicationException;
+    public void init(VersionedItem item, String user) throws ApplicationException;
     
     /**
      * ADM Método para criar um novo usuário no repositório

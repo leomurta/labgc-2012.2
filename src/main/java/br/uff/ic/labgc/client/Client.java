@@ -274,7 +274,7 @@ public class Client implements IClient {
     public void admRemoveUserFromProject()throws ApplicationException{
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    public void admCheckin(String username)throws ApplicationException{
+    public void init(String username)throws ApplicationException{
         throw new UnsupportedOperationException("Not supported yet.");
 //        VersionedItem item = new VersionedDir();
 //        server.checkin(item, username);
