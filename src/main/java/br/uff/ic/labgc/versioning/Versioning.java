@@ -355,15 +355,25 @@ public class Versioning implements IVersioning{
         return getLastLogs(EVCSConstants.DEFAULT_LOG_MSG, token);
     }
     
+    public VersionedDir getLastLogs(int num, String token){
+        return getLastLogs(num,token,EVCSConstants.REVISION_HEAD);
+    }
+    
     /*
      * primeiro da lista é o + recente
      */
     @Override
-    public VersionedDir getLastLogs(int num, String token){
+    public VersionedDir getLastLogs(int num, String token, String revisionNumber){
         VersionedDir list = new VersionedDir();
         ProjectUser pu = projectUserDAO.getByToken(token);
-        String revNum = revisionDAO.getHeadRevisionNumber(pu.getProject());
-        Revision revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), revNum);
+        Revision revision;
+        if (revisionNumber.equals(EVCSConstants.REVISION_HEAD)){
+            String headNum = revisionDAO.getHeadRevisionNumber(pu.getProject());
+            revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), headNum);
+        }
+        else{
+            revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), revisionNumber);
+        }
         ConfigurationItem ci = revision.getConfigItem();
         for(int i=0; i < num; i++){
             VersionedDir vd = new VersionedDir();
