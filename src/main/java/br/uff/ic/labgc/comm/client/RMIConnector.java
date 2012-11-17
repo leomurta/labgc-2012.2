@@ -209,12 +209,59 @@ public class RMIConnector extends AbstractServer {
         try {
             VersionedFile file = new VersionedFile();
             file.setContent(server.getItemContent(hash));
-            //file.inflate();
             result = file.getContent();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
         return result;
+    }
+
+    @Override
+    public VersionedItem log(String revision, String token) throws ApplicationException {
+         VersionedItem result = null;
+        try {
+            result = server.log(revision, token);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+        return result;
+    }
+
+    @Override
+    public void addProject(String project, String user) throws ApplicationException {
+        try {
+            server.addProject(project, user);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+    }
+
+    @Override
+    public void init(VersionedItem item, String user) throws ApplicationException {
+        try {
+            item.deflate();
+            server.init(item, user);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+    }
+
+    @Override
+    public void addUser(String name, String username, String password) throws ApplicationException {
+        try {
+            server.addUser(name, username, password);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
+    }
+
+    @Override
+    public void addUserToProject(String project, String user) throws ApplicationException {
+        try {
+            server.addUserToProject(project, user);
+        } catch (RemoteException ex) {
+            handleRemoteException(ex);
+        }
     }
 
     public static void main(String args[]) {

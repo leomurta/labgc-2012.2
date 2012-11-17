@@ -55,7 +55,7 @@ public class Server extends AbstractServer {
     }
     
     @Override
-    public VersionedItem log(int revision, String token) throws ApplicationException {
+    public VersionedItem log(String revision, String token) throws ApplicationException {
         return versioning.getLastLogs(revision,token);
     }
     

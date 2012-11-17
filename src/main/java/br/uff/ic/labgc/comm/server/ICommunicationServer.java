@@ -49,7 +49,9 @@ public interface ICommunicationServer extends Remote {
      * @throws RemoteException 
      */
     public String login(String user, String pwd, String repository)throws RemoteException;
+
     public VersionedItem log(String token) throws RemoteException;
+
     /**
      * Retorna o conteúdo do item versionado representado pelo hash informado.
      * @param hash Identifica o item versionado para o qual se deseja retornar o conteúdo
@@ -59,4 +61,39 @@ public interface ICommunicationServer extends Remote {
     public byte[] getItemContent(String hash) throws RemoteException;
     
     public String hello(String name) throws RemoteException;
+
+    public VersionedItem log(String revision, String token) throws RemoteException;
+
+    /**
+     * ADM Método  para adicionar projeto ao repostório
+     * @param project nome do projeto
+     * @param user usuário do sistema
+     * @throws ApplicationException 
+     */
+    public void addProject(String project, String user) throws RemoteException;
+    
+    /**
+     * ADM Método para enviar arquivos para o repositório. Cria uma nova HEAD
+     * @param item arquivos, VersionedItem
+     * @param user usuário
+     * @throws ApplicationException 
+     */
+    public void init(VersionedItem item, String user) throws RemoteException;
+    
+    /**
+     * ADM Método para criar um novo usuário no repositório
+     * @param name display name do usuário
+     * @param username login do usuário
+     * @param password senha do usuário
+     * @throws ApplicationException 
+     */
+    public void addUser(String name, String username, String password) throws RemoteException;
+    
+    /**
+     * ADM Método para vincular um usuário a um projeto
+     * @param project nome de um projeto existente no repositório
+     * @param user nome de um usuário existe no repositório
+     * @throws ApplicationException 
+     */
+    public void addUserToProject(String project, String user)throws RemoteException;
 }

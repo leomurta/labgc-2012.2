@@ -6,6 +6,9 @@ package br.uff.ic.labgc.workspace;
 
 import br.uff.ic.labgc.core.IObserver;
 import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.ApplicationException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -256,7 +259,12 @@ public class WorkspaceTest {
         System.out.println("commit");
         Workspace instance = null;
         VersionedItem expResult = null;
-        VersionedItem result = instance.commit();
+        VersionedItem result = null;
+        try {
+            result = instance.commit();
+        } catch (ApplicationException ex) {
+            Logger.getLogger(WorkspaceTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

@@ -132,4 +132,53 @@ public class CommunicationServer implements ICommunicationServer {
             throw new RemoteException("Erro ao executar getItemContent.", ex);
         }
     }
+
+    @Override
+    public VersionedItem log(String revision, String token) throws RemoteException {
+         VersionedItem result = null;
+        try {
+            result = server.log(revision, token);
+        } catch (ApplicationException ex) {
+            throw new RemoteException("Erro ao executar o comando log.", ex);
+        }
+        return result;
+    }
+
+    @Override
+    public void addProject(String project, String user) throws RemoteException {
+        try {
+            server.addProject(project, user);
+        } catch (ApplicationException ex) {
+            throw new RemoteException("Erro ao executar o comando addProject.", ex);
+        }
+    }
+
+    @Override
+    public void init(VersionedItem item, String user) throws RemoteException {
+        try {
+            item.inflate();
+            server.init(item, user);
+        } catch (ApplicationException ex) {
+            throw new RemoteException("Erro ao executar o comando init.", ex);
+        }
+    }
+
+    @Override
+    public void addUser(String name, String username, String password) throws RemoteException {
+        try {
+            server.addUser(name, username, password);
+        } catch (ApplicationException ex) {
+            throw new RemoteException("Erro ao executar o comando addUser.", ex);
+        }
+    }
+
+    @Override
+    public void addUserToProject(String project, String user) throws RemoteException {
+        try {
+            server.addUserToProject(project, user);
+        } catch (ApplicationException ex) {
+            throw new RemoteException("Erro ao executar o comando addUserToProject.", ex);
+        }
+    }
+
 }

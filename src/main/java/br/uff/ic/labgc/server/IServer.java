@@ -58,7 +58,7 @@ public interface IServer {
 
     public VersionedItem log(String token) throws ApplicationException;
 
-    public VersionedItem log(int revision, String token) throws ApplicationException;
+    public VersionedItem log(String revision, String token) throws ApplicationException;
 
     public String getRepPath();
 
