@@ -1,6 +1,5 @@
 package br.uff.ic.labgc.comm.client;
 
-import br.uff.ic.labgc.comm.server.CommunicationServer;
 import br.uff.ic.labgc.comm.server.ICommunicationServer;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
@@ -14,8 +13,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -217,10 +214,10 @@ public class RMIConnector extends AbstractServer {
     }
 
     @Override
-    public VersionedItem log(String revision, String token) throws ApplicationException {
+    public VersionedItem log(int qtdeRevisions, String token) throws ApplicationException {
          VersionedItem result = null;
         try {
-            result = server.log(revision, token);
+            result = server.log(qtdeRevisions, token);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }

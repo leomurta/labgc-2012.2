@@ -6,19 +6,8 @@ package br.uff.ic.labgc.server;
 
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ApplicationException;
-import br.uff.ic.labgc.exception.ServerException;
 import br.uff.ic.labgc.storage.Storage;
 import br.uff.ic.labgc.versioning.Versioning;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
@@ -55,8 +44,8 @@ public class Server extends AbstractServer {
     }
     
     @Override
-    public VersionedItem log(String revision, String token) throws ApplicationException {
-        return versioning.getLastLogs(revision,token);
+    public VersionedItem log(int qtdeRevisions, String token) throws ApplicationException {
+        return versioning.getLastLogs(qtdeRevisions,token);
     }
     
     public String login(String user, String pwd, String repository) throws ApplicationException {

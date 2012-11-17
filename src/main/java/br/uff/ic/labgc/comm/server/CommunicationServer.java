@@ -10,12 +10,10 @@ import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.properties.ApplicationProperties;
 import br.uff.ic.labgc.properties.IPropertiesConstants;
 import br.uff.ic.labgc.server.Server;
-import br.uff.ic.labgc.util.CompressUtils;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -134,10 +132,10 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public VersionedItem log(String revision, String token) throws RemoteException {
+    public VersionedItem log(int qtdeRevisions, String token) throws RemoteException {
          VersionedItem result = null;
         try {
-            result = server.log(revision, token);
+            result = server.log(qtdeRevisions, token);
         } catch (ApplicationException ex) {
             throw new RemoteException("Erro ao executar o comando log.", ex);
         }

@@ -5,9 +5,9 @@
 package br.uff.ic.labgc.comm.server;
 
 import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.ApplicationException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
 
 /**
  *
@@ -62,7 +62,7 @@ public interface ICommunicationServer extends Remote {
     
     public String hello(String name) throws RemoteException;
 
-    public VersionedItem log(String revision, String token) throws RemoteException;
+    public VersionedItem log(int qtdeRevisions, String token) throws RemoteException;
 
     /**
      * ADM Método  para adicionar projeto ao repostório
