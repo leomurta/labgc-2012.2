@@ -30,7 +30,7 @@ import java.util.logging.Logger;
  */
 public class Storage {
 
-    private static String dirPath = "../../repositorio/";
+    private static String dirPath = System.getProperty("br.uff.ic.labgc.repository");
     private static UserDAO userDAO = new UserDAO();
     private static ProjectDAO projectDAO = new ProjectDAO();
     private static ProjectUserDAO projectUserDAO = new ProjectUserDAO();

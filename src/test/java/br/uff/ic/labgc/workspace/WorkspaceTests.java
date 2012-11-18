@@ -20,9 +20,9 @@ import static org.junit.Assert.*;
  *
  * @author Cristiano
  */
-public class WorkspaceTest {
+public class WorkspaceTests {
     
-    public WorkspaceTest() {
+    public WorkspaceTests() {
     }
     
     @BeforeClass
