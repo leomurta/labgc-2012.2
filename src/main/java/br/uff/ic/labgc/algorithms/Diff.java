@@ -44,9 +44,12 @@ public class Diff {
             if (!isFile(file1) && !isFile(file2)) {
                 return null; //diff_directories((VersionedDir) file1, (VersionedDir) file2);
             } else {
-                throw new IncompatibleItensException();
+                if ( !isFile(file1) && isFile(file2) ){
+                    return diff_directories(null, null);
+                }
             }
         }
+        return diff_directories(null, null);
     }
 
     public static byte[] patch(VersionedItem file1, byte[] delta) {
@@ -185,9 +188,8 @@ public class Diff {
         return !file1.isDir();
     }
 
-    private static byte[] lcs_dir(List<VersionedItem> seq1, List<VersionedItem> seq2) {
-        return null;
-
+    private static List<VersionedItem> lcs_dir(List<VersionedItem> seq1, List<VersionedItem> seq2) {
+        return Set.difference(seq1, seq2);
     }
     
     // Finalizado
