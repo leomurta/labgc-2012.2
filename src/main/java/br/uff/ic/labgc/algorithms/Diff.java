@@ -143,23 +143,39 @@ public class Diff {
     }
 
     private static byte[] diff_directories(List<VersionedItem> dir1, List<VersionedItem> dir2) throws ApplicationException {
-        // PRIMEIRO CASO
-        // DELETA TODOS OS ARQUIVOS E DIRETÓRIOS DE DIR1
-        // ADICIONA TODOS OS ARQUIVOS E DIRETÓRIOS DE DIR2
+        
+        // TODO: Transformar o contador de Diff em uma variável global.
+
         byte[] ret = new byte[0];
         
         int count_diff = 0;
         byte[] arq_diff = new byte[0];
         
-        for(int i = 0; i < dir1.size(); i++){
-            if(dir1.get(i).isDir())
-                System.out.println("R " + dir1.get(i).getName() + " -D");
-            else
-                System.out.println("R " + dir1.get(i).getName() + " -F");
-        }
-        add_directory_recursively(ret, arq_diff, count_diff, dir2);
+        int i = 0;
+        int j = 0;
         
-        return null;
+        List<VersionedItem> lcs = lcs_dir(dir1, dir2);
+        
+        while( dir1.size() > 0 && dir2.size() > 0 ){
+            if( !Set.belongs_to(dir1.get(0), lcs) ){
+                if( dir1.get(0).isDir() ){
+                    System.out.println("R " + dir1.get(0).getName() + " -D");
+                } else {
+                    System.out.println("R " + dir1.get(0).getName() + " -F");
+                }
+            }
+            if( !Set.belongs_to(dir2.get(0), lcs) ){
+                if( dir2.get(0).isDir() ){
+                    add_directory_recursively(ret, arq_diff, count_diff, dir2);
+                } else {
+                    add_file(ret, arq_diff, count_diff, ((VersionedFile)dir2.get(0)).getName(), ((VersionedFile)dir2.get(0)).getContent());
+                }
+            }
+            dir1.remove(dir1.get(0));
+            dir2.remove(dir2.get(0));
+        }
+        
+        return ret;
     }
     
     private static void add_directory_recursively(byte[] main, byte[] diff, int count_diff, List<VersionedItem> dir) throws ApplicationException{
@@ -188,7 +204,7 @@ public class Diff {
         return !file1.isDir();
     }
 
-    private static List<VersionedItem> lcs_dir(List<VersionedItem> seq1, List<VersionedItem> seq2) {
+    private static List<VersionedItem> lcs_dir(List<VersionedItem> seq1, List<VersionedItem> seq2) throws ApplicationException {
         return Set.difference(seq1, seq2);
     }
     
@@ -225,7 +241,7 @@ public class Diff {
     }
 
     // Finalizado
-    private static boolean hasDiff(byte[] fline_seq1, byte[] fline_seq2) {
+    protected static boolean hasDiff(byte[] fline_seq1, byte[] fline_seq2) {
         if ( fline_seq1.length == fline_seq2.length) {
             for (int i = 0; i < fline_seq1.length; i++) {
                 if (Byte.compare(fline_seq1[i], fline_seq2[i]) != 0)
@@ -235,6 +251,26 @@ public class Diff {
             return true;
         }
         return false;
+    }
+    
+    protected static boolean hasDiff(List<VersionedItem> set1, List<VersionedItem> set2) throws ApplicationException {
+        if ( set1.size() == set2.size() ) {
+            boolean retorno = false;
+            for (int i = 0; i < set1.size() && !retorno; i++) {
+                for( int j = 0; j < set2.size() && !retorno; j++ ){
+                    if( set1.get(i).isDir() && set2.get(j).isDir() ){
+                        retorno = hasDiff( ((VersionedDir)set1).getContainedItens(), ((VersionedDir)set2).getContainedItens() );
+                    } else {
+                        if( !set1.get(i).isDir() && !set2.get(j).isDir() ){
+                            retorno = hasDiff( ((VersionedFile)set1).getContent(), ((VersionedFile)set2).getContent() );
+                        }
+                    }
+                }
+            }
+            return retorno;
+        } else {
+            return true;
+        }
     }
 
     private static byte[] del_first_sequence(int first_seq_size, byte[] seq) {
