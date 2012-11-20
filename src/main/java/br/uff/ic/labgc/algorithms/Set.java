@@ -19,12 +19,12 @@ public class Set {
             for( int i = 0; i < set1.size(); i++ ){
                 for( int j = 0; j < set2.size(); j++ ){
                     if( set1.get(i).isDir() && set2.get(j).isDir() ){
-                        if( !Diff.hasDiff( ((VersionedDir)set1).getContainedItens(), ((VersionedDir)set2).getContainedItens() ) ){
+                        if( !Diff.has_diff( ((VersionedDir)set1).getContainedItens(), ((VersionedDir)set2).getContainedItens() ) ){
                             retorno.add(set1.get(i));
                         }
                     } else {
                         if( !set1.get(i).isDir() && !set2.get(j).isDir() ){
-                            if( !Diff.hasDiff( ((VersionedFile)set1).getContent(), ((VersionedFile)set2).getContent() ) ){
+                            if( !Diff.has_diff( ((VersionedFile)set1).getContent(), ((VersionedFile)set2).getContent() ) ){
                                 retorno.add(set1.get(i));
                             }
                         }
@@ -50,10 +50,10 @@ public class Set {
     public static boolean belongs_to( VersionedItem item, List<VersionedItem> set1 ) throws ApplicationException{
         for( int i = 0; i < set1.size(); i++ ){
             if( item.isDir() && set1.get(i).isDir() ){
-                return Diff.hasDiff( ((VersionedDir)item).getContainedItens(), ((VersionedDir)set1.get(i)).getContainedItens() );
+                return Diff.has_diff( ((VersionedDir)item).getContainedItens(), ((VersionedDir)set1.get(i)).getContainedItens() );
             } else {
                 if( !item.isDir() && !set1.get(i).isDir() ){
-                    return Diff.hasDiff( ((VersionedFile)item).getContent(), ((VersionedFile)set1.get(i)).getContent() );
+                    return Diff.has_diff( ((VersionedFile)item).getContent(), ((VersionedFile)set1.get(i)).getContent() );
                 }
             }
         }

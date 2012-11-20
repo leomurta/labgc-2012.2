@@ -20,6 +20,9 @@ public class Diff {
     //
     private final static byte EOL = (new String("\n")).getBytes()[0];
     private final static byte EOF = (new String("\n")).getBytes()[0];
+    
+    private final static byte ID_DIR  = (new String("/§D")).getBytes()[0];
+    private final static byte ID_FILE = (new String("/§F")).getBytes()[0];
 
     public static void main(String args[]) throws ApplicationException {
         byte[] testeA;
@@ -33,26 +36,26 @@ public class Diff {
         //teste = getFline(teste);
 
         //System.out.println("-->\n" + new String(lcs(testeA, testeB)));
-        System.out.println(new String(diff_archives(testeA, testeB)));
+        System.out.println(new String(diff(testeA, testeB)));
     }
 
     public static byte[] run(VersionedItem file1, VersionedItem file2) throws ApplicationException, IncompatibleItensException {
 
-        if (isFile(file1) && isFile(file2)) {
-            return diff_archives( ((VersionedFile)file1).getContent(), ((VersionedFile)file2).getContent() );
+        if ( !file1.isDir() && !file2.isDir() ) {
+            return diff( ((VersionedFile)file1).getContent(), ((VersionedFile)file2).getContent() );
         } else {
-            if (!isFile(file1) && !isFile(file2)) {
+            if ( file1.isDir() && file2.isDir() ) {
                 return null; //diff_directories((VersionedDir) file1, (VersionedDir) file2);
             } else {
-                if ( !isFile(file1) && isFile(file2) ){
-                    return diff_directories(null, null);
+                if ( file1.isDir() && !file2.isDir() ){
+                    return null;
                 }
             }
         }
-        return diff_directories(null, null);
+        return null;
     }
 
-    public static byte[] patch(VersionedItem file1, byte[] delta) {
+    public static byte[] apply(VersionedItem file1, byte[] delta) {
 
         byte[] delta_aux = delta;
 
@@ -66,16 +69,9 @@ public class Diff {
 
     }
 
-    private static byte[] diff_archives(byte[] file1, byte[] file2) throws ApplicationException {
-        // Verifica se os Hashes de arquivo são diferentes
-        // Chama LCS
-        // 
-        
+    private static byte[] diff(byte[] file1, byte[] file2) throws ApplicationException {
+        // DIFFERENCE BETWEEN FILES
         String ret = "";
-        
-        // PRIMEIRO CASO
-        // REMOVE TODOS OS ARQUIVOS DE FILE1
-        // ADICIONA TODOS OS ARQUIVOS DE FILE2
 
         byte[] seq1 = file1.clone();
         byte[] seq2 = file2.clone();
@@ -94,18 +90,18 @@ public class Diff {
         
         while( !isNull(lcs1) ){
             int i_aux = i;
-            if( hasDiff( del_line_wraps( get_first_line(seq1) ), del_line_wraps( get_first_line(lcs1) ) ) ){
-                while( hasDiff( del_line_wraps( get_first_line(seq1) ), del_line_wraps( get_first_line(lcs1) ) ) ){
-                    seq1 = del_first_sequence( get_first_line(seq1).length, seq1 );
+            if( has_diff( del_line_wraps( get_first_sequence(seq1) ), del_line_wraps( get_first_sequence(lcs1) ) ) ){
+                while( has_diff( del_line_wraps( get_first_sequence(seq1) ), del_line_wraps( get_first_sequence(lcs1) ) ) ){
+                    seq1 = del_first_sequence( get_first_sequence(seq1).length, seq1 );
                     i++;
                 }
                 ret += ("R " + h + " " + i_aux + " " + (i-1) ) + '\n';
             }
-            if( hasDiff( del_line_wraps( get_first_line(seq2) ), del_line_wraps( get_first_line(lcs1) ) ) ){
+            if( has_diff( del_line_wraps( get_first_sequence(seq2) ), del_line_wraps( get_first_sequence(lcs1) ) ) ){
                 lines_added.removeAll(lines_added);
-                while( hasDiff( del_line_wraps( get_first_line(seq2) ), del_line_wraps( get_first_line(lcs1) ) ) ){
-                    lines_added.add( new String( del_line_wraps( get_first_line(seq2) ) ) );
-                    seq2 = del_first_sequence( get_first_line(seq2).length, seq2 );
+                while( has_diff( del_line_wraps( get_first_sequence(seq2) ), del_line_wraps( get_first_sequence(lcs1) ) ) ){
+                    lines_added.add( new String( del_line_wraps( get_first_sequence(seq2) ) ) );
+                    seq2 = del_first_sequence( get_first_sequence(seq2).length, seq2 );
                     j++;
                 }
                 ret += ("A " + h + " " + lines_added.size() ) + '\n';
@@ -114,9 +110,9 @@ public class Diff {
                 }
             }
 
-            seq1 = del_first_sequence( get_first_line(seq1).length, seq1 );
-            seq2 = del_first_sequence( get_first_line(seq2).length, seq2 );
-            lcs1 = del_first_sequence( get_first_line(lcs1).length, lcs1 );
+            seq1 = del_first_sequence( get_first_sequence(seq1).length, seq1 );
+            seq2 = del_first_sequence( get_first_sequence(seq2).length, seq2 );
+            lcs1 = del_first_sequence( get_first_sequence(lcs1).length, lcs1 );
             i++;
             j++;
             h++;
@@ -130,8 +126,8 @@ public class Diff {
         if( j <= tam_seq2 ){
             lines_added.removeAll(lines_added);
             while( !isNull(seq2) ){
-                lines_added.add( new String( del_line_wraps( get_first_line(seq2) ) ) );
-                seq2 = del_first_sequence( get_first_line(seq2).length, seq2 );
+                lines_added.add( new String( del_line_wraps( get_first_sequence(seq2) ) ) );
+                seq2 = del_first_sequence( get_first_sequence(seq2).length, seq2 );
             }
             ret += ("A " + h + " " + lines_added.size() ) + '\n';
             for( int r = 0; r < lines_added.size(); r++ ){
@@ -142,8 +138,8 @@ public class Diff {
         return ret.getBytes();
     }
 
-    private static byte[] diff_directories(List<VersionedItem> dir1, List<VersionedItem> dir2) throws ApplicationException {
-        
+    private static byte[] diff(List<VersionedItem> dir1, List<VersionedItem> dir2) throws ApplicationException {
+        // DIFFERENCE BETWEEN DIRECTORIES
         // TODO: Transformar o contador de Diff em uma variável global.
 
         byte[] ret = new byte[0];
@@ -154,57 +150,96 @@ public class Diff {
         int i = 0;
         int j = 0;
         
-        List<VersionedItem> lcs = lcs_dir(dir1, dir2);
+        List<VersionedItem> lcs = lcs(dir1, dir2);
+        
+        add_head( ret );
         
         while( dir1.size() > 0 && dir2.size() > 0 ){
             if( !Set.belongs_to(dir1.get(0), lcs) ){
                 if( dir1.get(0).isDir() ){
-                    System.out.println("R " + dir1.get(0).getName() + " -D");
+                    System.out.println("R -D" + dir1.get(0).getName());
                 } else {
-                    System.out.println("R " + dir1.get(0).getName() + " -F");
+                    System.out.println("R -F" + dir1.get(0).getName());
+                }
+            } else {
+                if( Set.belongs_to(dir1.get(0), dir2) ){
+                    // MODIFICAÇÃO
+                    if( dir1.get(0).isDir() ){
+                        // FALTA IDENTIFICADOR DO DIRETÓRIO RAIZ
+                        mod_recursively(ret, dir1);
+                    } else {
+                        mod(ret, (VersionedFile)dir1.get(0));
+                    }
+                    dir2.remove(dir1.get(0));
                 }
             }
             if( !Set.belongs_to(dir2.get(0), lcs) ){
                 if( dir2.get(0).isDir() ){
-                    add_directory_recursively(ret, arq_diff, count_diff, dir2);
+                    // FALTA IDENTIFICADOR DO DIRETÓRIO RAIZ
+                    add_recursively(ret, dir2);
                 } else {
-                    add_file(ret, arq_diff, count_diff, ((VersionedFile)dir2.get(0)).getName(), ((VersionedFile)dir2.get(0)).getContent());
+                    add(ret, (VersionedFile)dir2.get(0));
+                }
+            } else {
+                if( Set.belongs_to(dir2.get(0), dir1) ){
+                    // MODIFICAÇÃO
+                    if( dir1.get(0).isDir() ){
+                        // FALTA IDENTIFICADOR DO DIRETÓRIO RAIZ
+                        mod_recursively(ret, dir1);
+                    } else {
+                        mod(ret, (VersionedFile)dir1.get(0));
+                    }
+                    dir1.remove(dir2.get(0));
                 }
             }
             dir1.remove(dir1.get(0));
             dir2.remove(dir2.get(0));
         }
         
+        add_tail( ret );
+        
         return ret;
     }
     
-    private static void add_directory_recursively(byte[] main, byte[] diff, int count_diff, List<VersionedItem> dir) throws ApplicationException{
-        
+    private static void add_recursively(byte[] main, List<VersionedItem> dir) throws ApplicationException{
         for(int i = 0; i < dir.size(); i++){
             if(dir.get(i).isDir()){
-                System.out.println("A " + dir.get(i).getName() + " -D");
-                add_directory_recursively(main, diff, count_diff, dir);
-                System.out.println("ENDD");
+                System.out.println("A -D " + dir.get(i).getName());
+                add_recursively(main, dir);
+                System.out.println("END");
             }
             else{
-                add_file(main, diff, count_diff, ((VersionedFile)dir).getName(), ((VersionedFile)dir).getContent());
-                count_diff++;
+                add(main, (VersionedFile)dir);
             }
         }
     }
     
-    private static void add_file(byte[] main, byte[] diff, int count_diff, String file_name, byte[] file_content) throws ApplicationException{
-        System.out.println("A " + file_name + " -F " + count_diff);
-        diff = addFline(diff_archives(new byte[0], file_content), diff);
-        diff = addFline(("\n§§" + count_diff).getBytes(), diff);
+    private static void mod_recursively(byte[] main, List<VersionedItem> dir) throws ApplicationException{
+        for(int i = 0; i < dir.size(); i++){
+            if(dir.get(i).isDir()){
+                System.out.println("M -D " + dir.get(i).getName());
+                mod_recursively(main, dir);
+                System.out.println("END");
+            }
+            else{
+                mod(main, (VersionedFile)dir);
+            }
+        }
+    }
+    
+    private static void add(byte[] main, VersionedFile file) throws ApplicationException{
+        System.out.println("A -F " + file.getName() );
+        System.out.println(new String(diff(new byte[0], file.getContent())));
+        System.out.println("END");
+    }
+    
+    private static void mod(byte[] main, VersionedFile file) throws ApplicationException{
+        System.out.println("M -F " + file.getName() );
+        System.out.println(new String(diff(new byte[0], file.getContent())));
+        System.out.println("END");
     }
 
-    // Finalizado
-    private static boolean isFile(VersionedItem file1) {
-        return !file1.isDir();
-    }
-
-    private static List<VersionedItem> lcs_dir(List<VersionedItem> seq1, List<VersionedItem> seq2) throws ApplicationException {
+    private static List<VersionedItem> lcs(List<VersionedItem> seq1, List<VersionedItem> seq2) throws ApplicationException {
         return Set.difference(seq1, seq2);
     }
     
@@ -212,13 +247,13 @@ public class Diff {
     protected static byte[] lcs(byte[] seq1, byte[] seq2) {
 
         if (!isNull(seq1) && !isNull(seq2)) {
-            byte[] fline_seq1 = get_first_line(seq1); // Identifica primeira linha seq1
-            byte[] fline_seq2 = get_first_line(seq2); // Identifica segunda  linha seq2
+            byte[] fline_seq1 = get_first_sequence(seq1); // Identifica primeira linha seq1
+            byte[] fline_seq2 = get_first_sequence(seq2); // Identifica segunda  linha seq2
 
             byte[] new_seq1 = del_first_sequence( fline_seq1.length, seq1); // Remove primeiras linhas das sequências
             byte[] new_seq2 = del_first_sequence( fline_seq2.length, seq2);
 
-            if (hasDiff( del_line_wraps( fline_seq1 ), del_line_wraps( fline_seq2 ) )) {
+            if (has_diff( del_line_wraps( fline_seq1 ), del_line_wraps( fline_seq2 ) )) {
                 // Chamar duas frentes de LCS
                 byte[] lcs1 = lcs(new_seq1, seq2);
                 byte[] lcs2 = lcs(seq1, new_seq2);
@@ -231,7 +266,7 @@ public class Diff {
                     return lcs2;
                 }
             } else {
-                return addFline(fline_seq1, lcs(new_seq1, new_seq2));
+                return appends_at_the_beginning(fline_seq1, lcs(new_seq1, new_seq2));
             }
 
         } else {
@@ -241,7 +276,7 @@ public class Diff {
     }
 
     // Finalizado
-    protected static boolean hasDiff(byte[] fline_seq1, byte[] fline_seq2) {
+    protected static boolean has_diff(byte[] fline_seq1, byte[] fline_seq2) {
         if ( fline_seq1.length == fline_seq2.length) {
             for (int i = 0; i < fline_seq1.length; i++) {
                 if (Byte.compare(fline_seq1[i], fline_seq2[i]) != 0)
@@ -253,16 +288,16 @@ public class Diff {
         return false;
     }
     
-    protected static boolean hasDiff(List<VersionedItem> set1, List<VersionedItem> set2) throws ApplicationException {
+    protected static boolean has_diff(List<VersionedItem> set1, List<VersionedItem> set2) throws ApplicationException {
         if ( set1.size() == set2.size() ) {
             boolean retorno = false;
             for (int i = 0; i < set1.size() && !retorno; i++) {
                 for( int j = 0; j < set2.size() && !retorno; j++ ){
                     if( set1.get(i).isDir() && set2.get(j).isDir() ){
-                        retorno = hasDiff( ((VersionedDir)set1).getContainedItens(), ((VersionedDir)set2).getContainedItens() );
+                        retorno = has_diff( ((VersionedDir)set1).getContainedItens(), ((VersionedDir)set2).getContainedItens() );
                     } else {
                         if( !set1.get(i).isDir() && !set2.get(j).isDir() ){
-                            retorno = hasDiff( ((VersionedFile)set1).getContent(), ((VersionedFile)set2).getContent() );
+                            retorno = has_diff( ((VersionedFile)set1).getContent(), ((VersionedFile)set2).getContent() );
                         }
                     }
                 }
@@ -284,7 +319,7 @@ public class Diff {
 
     }
 
-    private static byte[] get_first_line(byte[] seq) {
+    private static byte[] get_first_sequence(byte[] seq) {
 
         if (seq.length != 0) {
             int i = 0;
@@ -302,7 +337,7 @@ public class Diff {
 
     }
 
-    private static byte[] addFline(byte[] fline_seq1, byte[] seq) {
+    private static byte[] appends_at_the_beginning(byte[] fline_seq1, byte[] seq) {
         byte[] retorno = new byte[fline_seq1.length + seq.length];
 
         for (int i = 0; i < fline_seq1.length; i++) {
@@ -310,6 +345,19 @@ public class Diff {
         }
         for (int i = 0; i < seq.length; i++) {
             retorno[i + fline_seq1.length] = seq[i];
+        }
+
+        return retorno;
+    }
+    
+    private static byte[] appends_at_the_end(byte[] final_seq, byte[] main_seq){
+        byte[] retorno = new byte[main_seq.length + final_seq.length];
+
+        for (int i = 0; i < main_seq.length; i++) {
+            retorno[i] = main_seq[i];
+        }
+        for (int i = 0; i < final_seq.length; i++) {
+            retorno[i + main_seq.length] = final_seq[i];
         }
 
         return retorno;
@@ -343,4 +391,13 @@ public class Diff {
         }
         return aux;
     }
+
+    private static void add_head(byte[] ret) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    private static void add_tail(byte[] ret) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
 }
