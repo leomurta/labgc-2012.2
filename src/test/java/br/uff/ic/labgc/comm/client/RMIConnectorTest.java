@@ -133,7 +133,7 @@ public class RMIConnectorTest {
             RMIConnector instance = null;
             String token = "";
             String expResult = "";
-            List<VersionedItem> result = instance.log( token);
+            VersionedItem result = instance.log( token);
             assertEquals(expResult, result);
             // TODO review the generated test code and remove the default call to fail.
             fail("The test case is a prototype.");

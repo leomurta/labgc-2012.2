@@ -63,7 +63,7 @@ public class CommunicationFactoryTest {
     public void testGetServerRemoto() throws ApplicationException {
         CommunicationFactory instance = CommunicationFactory.getFactory();
         String expResult = bundle.getString(IPropertiesConstants.COMM_REMOTE_CONNECTOR);
-        String result = instance.getServer("127.0.0.1").getClass().getName();
+        String result = instance.getServer("cmcdell").getClass().getName();
         assertEquals(expResult, result);
     }
 }
