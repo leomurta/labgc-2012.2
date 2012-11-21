@@ -299,8 +299,22 @@ public class Workspace implements IWorkspace {
         
     }
 
-    public void update(VersionedItem files) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    public void update(VersionedItem files) 
+            throws ApplicationException {
+        File local = new File(workspaceDir);
+        File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
+        
+        VersionedDir root = new VersionedDir(); 
+        VersionedDir working = new VersionedDir();
+        VersionedDir pristine = new VersionedDir();
+                
+        String exclusions[] = {WS_FOLDER};
+        working.addItem(VersionedItemUtils.read(local, exclusions, false));//false nao le o conteudo
+        pristine.addItem(VersionedItemUtils.read(mirror, false));//false nao le o conteudo
+        
+        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
+        
+        
     }
     
     public VersionedItem commit() 
@@ -626,5 +640,64 @@ public class Workspace implements IWorkspace {
         return result;
     }
 
+    
+       private VersionedDir compareVersionedDir2(VersionedDir pristine, VersionedDir working) throws ApplicationException {
+        VersionedDir root = new VersionedDir();
 
+        if (!pristine.getLastChangedTime().equals(working.getLastChangedTime())
+                || pristine.getSize() != working.getSize()) {
+            root.addItem(this.compareVersionedItems(pristine.getContainedItens(), working.getContainedItens()));
+            root.setStatus(EVCSConstants.MODIFIED);
+        }
+        return root;
+    }
+       
+    private VersionedFile compareVersionedFile2(VersionedFile pristine, VersionedFile working) throws ApplicationException {
+
+        VersionedFile file = working;
+          
+        if (! pristine.getHash().equals(working.getHash())){
+            if(pristine.hasContent() && working.hasContent()) {
+                file = this.applyDiff(pristine, working);
+            }
+            file.setStatus(EVCSConstants.MODIFIED);
+        }
+
+        return file;
+
+    }
+    
+    private List<VersionedItem> checkModified2(List<VersionedItem> pristine, List<VersionedItem> working) throws ApplicationException {
+        List<VersionedItem> pris = this.<VersionedItem>intersection(pristine, working);
+        List<VersionedItem> work = this.<VersionedItem>intersection(working, pristine);
+
+        Collections.sort(pris);
+        Collections.sort(work);
+
+        VersionedDir root = new VersionedDir();
+        for (VersionedItem itemp : pris) {
+            for (VersionedItem itemw : work) {
+                if (itemp.equals(itemw)) {
+                    if (itemp.isDir()) {
+                        root.addItem(this.compareVersionedDir2((VersionedDir) itemp, (VersionedDir) itemw));
+                    } else {
+                        root.addItem(this.compareVersionedFile2((VersionedFile) itemp, (VersionedFile) itemw));
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return root.getContainedItens();
+    }
+
+    private List<VersionedItem> compareModifiedVersionedItems(List<VersionedItem> newProject, List<VersionedItem> workingDiff) throws ApplicationException {
+        VersionedDir root = new VersionedDir();
+        List<VersionedItem> modified = this.checkModified2(newProject, workingDiff);
+        root.addItem(modified);
+
+        return root.getContainedItens();
+    }
+    
 } //End
