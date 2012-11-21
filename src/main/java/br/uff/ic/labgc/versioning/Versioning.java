@@ -359,11 +359,11 @@ public class Versioning implements IVersioning{
         return getRevision(revTo, token);
     }
     
-    public VersionedDir getLastLogs(String token) throws ApplicationException{
+    public List<VersionedItem> getLastLogs(String token) throws ApplicationException{
         return getLastLogs(EVCSConstants.DEFAULT_LOG_MSG, token);
     }
     
-    public VersionedDir getLastLogs(int num, String token) throws ApplicationException{
+    public List<VersionedItem> getLastLogs(int num, String token) throws ApplicationException{
         return getLastLogs(num,token,EVCSConstants.REVISION_HEAD);
     }
     
@@ -371,8 +371,8 @@ public class Versioning implements IVersioning{
      * primeiro da lista é o + recente
      */
     @Override
-    public VersionedDir getLastLogs(int num, String token, String revisionNumber) throws ApplicationException{
-        VersionedDir list = new VersionedDir();
+    public List<VersionedItem> getLastLogs(int num, String token, String revisionNumber) throws ApplicationException{
+        List<VersionedItem> list = new ArrayList();
         ProjectUser pu = projectUserDAO.getByToken(token);
         Revision revision;
         if (revisionNumber.equals(EVCSConstants.REVISION_HEAD)){
@@ -391,7 +391,7 @@ public class Versioning implements IVersioning{
             vd.setLastChangedTime(ci.getRevision().getDate());
             vd.setName(ci.getName());
             vd.setStatus(toTheirsStatus(ci.getType()));
-            list.addItem(vd);
+            list.add(vd);
             ci = ci.getPrevious();
             if (ci == null){
                 break;

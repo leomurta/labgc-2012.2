@@ -7,6 +7,8 @@ package br.uff.ic.labgc.versioning;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
+import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
@@ -97,7 +99,7 @@ public class VersioningTest {
      * Test of getRevision method, of class Versioning.
      */
     @Test
-    public void testGetRevision() throws VersioningException {
+    public void testGetRevision() throws ApplicationException {
         System.out.println("getRevision");
         String token = "nvfdovhfdoivbiofdvf";
         VersionedDir vd = versioning.getRevision("1.0", token);
@@ -265,7 +267,7 @@ public class VersioningTest {
      * Test of updateRevision method, of class Versioning.
      */
     //@Test
-    public void testUpdateRevision() throws VersioningException {
+    public void testUpdateRevision() throws ApplicationException {
         System.out.println("updateRevision");
         String revNum = "";
         String revTo = "";
@@ -311,8 +313,8 @@ public class VersioningTest {
         vd2.setLastChangedRevision("1.2");
         versioning.addRevision(vd2, token);
         
-        VersionedDir result = versioning.getLastLogs(token);
-        assertEquals(4, result.getContainedItens().size());
+        List<VersionedItem> result = versioning.getLastLogs(token);
+        assertEquals(4, result.size());
         
  //*       
         //deleting

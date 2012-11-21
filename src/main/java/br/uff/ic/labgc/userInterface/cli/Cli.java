@@ -484,7 +484,9 @@ public class Cli {
         VersionedItem listItem = null; 
         try 
         {
-           listItem = m_IClient.log();
+            if (m_IClient.isLogged()){
+                listItem = m_IClient.log();
+            }
            //Collections.sort(listItem, compare);
         } 
         catch (ApplicationException ex) 

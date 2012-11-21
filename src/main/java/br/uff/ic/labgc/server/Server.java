@@ -39,13 +39,17 @@ public class Server extends AbstractServer {
         return versioning.getRevision(revision, token);
     }
 
-    public  VersionedItem log(String token) throws ApplicationException {
-        return versioning.getLastLogs(token);
+    public  VersionedItem log(String token) throws ApplicationException { 
+        VersionedDir vd = new VersionedDir();
+        vd.setContainedItens(versioning.getLastLogs(token));
+        return vd;
     }
     
     @Override
     public VersionedItem log(int qtdeRevisions, String token) throws ApplicationException {
-        return versioning.getLastLogs(qtdeRevisions,token);
+        VersionedDir vd = new VersionedDir();
+        vd.setContainedItens(versioning.getLastLogs(token));
+        return vd;
     }
     
     public String login(String user, String pwd, String repository) throws ApplicationException {
