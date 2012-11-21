@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.storage;
 
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
@@ -102,7 +103,7 @@ public class ProjectUserDAO {
         return pu;
     }
     
-     public ProjectUser getByToken(String token) {
+     public ProjectUser getByToken(String token) throws ApplicationException{
         try {
             Session sessao = HibernateUtil.getSession();
             

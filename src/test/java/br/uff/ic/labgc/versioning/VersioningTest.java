@@ -158,14 +158,14 @@ public class VersioningTest {
         vf1.setStatus(EVCSConstants.ADDED);
         vd.addItem(vf1);
         
-        VersionedFile vf2 = new VersionedFile("vnfdovh9e0h0", 10);
+        VersionedFile vf2 = new VersionedFile("vnfdovh9e0h0", 10, vd.getName());
         vf2.setAuthor(vd.getAuthor());
         vf2.setCommitMessage(vd.getCommitMessage());
         vf2.setName("arquivo1.txt");
         vf2.setStatus(EVCSConstants.UNMODIFIED);
         vd.addItem(vf2);
         
-        VersionedFile vf3 = new VersionedFile("vcdfsniovfbiov", 5);
+        VersionedFile vf3 = new VersionedFile("vcdfsniovfbiov", 5, vd.getName());
         vf3.setAuthor(vd.getAuthor());
         vf3.setCommitMessage(vd.getCommitMessage());
         vf3.setName("arquivo2.txt");

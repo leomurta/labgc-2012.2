@@ -28,9 +28,7 @@ public class ProjectUser {
     }
     
     public void generateToken() {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
-        System.out.println(dateFormat.format(date));
         int h = 0;
         String aux = date.toString()+project.getName()+user.getPassword()+user.getName();
         int len = aux.length();

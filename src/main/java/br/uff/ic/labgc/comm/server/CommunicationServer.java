@@ -119,11 +119,11 @@ public class CommunicationServer implements ICommunicationServer {
     
 
     @Override
-    public byte[] getItemContent(String hash) throws RemoteException {
+    public byte[] getItemContent(String hash, String projectName) throws RemoteException {
         Logger.getLogger(CommunicationServer.class.getName()).log(Level.INFO, "communication server command received: getItemContent");
         try {
             VersionedFile file = new VersionedFile();
-            file.setContent(server.getItemContent(hash));
+            file.setContent(server.getItemContent(hash, projectName));
             file.deflate();
             return file.getContent();
         } catch (ApplicationException ex) {

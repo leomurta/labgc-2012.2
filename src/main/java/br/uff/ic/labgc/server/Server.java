@@ -53,8 +53,8 @@ public class Server extends AbstractServer {
         return versioning.login(repository, user, pwd);
     }
     
-    public byte[] getItemContent(String hash) throws ApplicationException {
-        return versioning.getVersionedFileContent(hash,"nvfdovhfdoivbiofdvf");//TODO:consertar esse método
+    public byte[] getItemContent(String hash, String projectName) throws ApplicationException {
+        return versioning.getVersionedFileContent(hash,projectName);//TODO:consertar esse método
     }
     
     /**

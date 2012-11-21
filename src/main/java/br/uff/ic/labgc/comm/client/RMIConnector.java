@@ -201,11 +201,11 @@ public class RMIConnector extends AbstractServer {
      * efetuar o getItemContent
      */
     @Override
-    public byte[] getItemContent(String hash) throws ApplicationException {
+    public byte[] getItemContent(String hash, String projectName) throws ApplicationException {
         byte[] result = null;
         try {
             VersionedFile file = new VersionedFile();
-            file.setContent(server.getItemContent(hash));
+            file.setContent(server.getItemContent(hash, projectName));
             result = file.getContent();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
