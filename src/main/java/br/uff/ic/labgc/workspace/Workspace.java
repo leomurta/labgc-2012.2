@@ -318,6 +318,8 @@ public class Workspace implements IWorkspace {
         
         root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
         root.setLastChangedRevision(this.getRevision());
+        root.setName(WS_FOLDER);
+        root.setStatus(EVCSConstants.MODIFIED);
         
         return root;
         
