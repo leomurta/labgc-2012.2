@@ -67,6 +67,8 @@ public interface IClient extends IObservable{
      */
     public boolean hasWorkspace();
     
+    public void setHost(String host) throws ApplicationException;
+    
     /**
      * ADM métodos
      */

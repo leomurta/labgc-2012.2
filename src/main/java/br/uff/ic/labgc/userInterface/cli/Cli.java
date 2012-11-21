@@ -557,7 +557,14 @@ public class Cli {
                     }
                 }
                 
-                m_IClient = new Client(strHost);
+                m_IClient = new Client();
+              try {
+                  m_IClient.setHost(strHost);
+                  //TODO pedir login para ter username
+                  m_IClient.admCreateProject(strProjectName, "username1");
+              } catch (ApplicationException ex) {
+                  Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+              }
                 
                 //TODO Chamanr Método para Criacao de Método
            }

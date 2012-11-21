@@ -6,6 +6,7 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncompatibleItensException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +19,11 @@ public class Diff {
     // OUTPUT DELTA
     // <- Não definido ainda ! ->
     //
-    private final static byte EOL = (new String("\n")).getBytes()[0];
-    private final static byte EOF = (new String("\n")).getBytes()[0];
+    private final static byte[] EOL = (new String("\n")).getBytes();
+    private final static byte[] EOF = (new String("\n")).getBytes();
     
-    private final static byte ID_DIR  = (new String("/§D")).getBytes()[0];
-    private final static byte ID_FILE = (new String("/§F")).getBytes()[0];
+    private final static byte[] ID_DIR  = (new String("/§D")).getBytes();
+    private final static byte[] ID_FILE = (new String("/§F")).getBytes();
 
     public static void main(String args[]) throws ApplicationException {
         byte[] testeA;
@@ -32,17 +33,23 @@ public class Diff {
 
         testeA = teste2.getBytes();
         testeB = teste3.getBytes();
+        
+        VersionedFile testeC = new VersionedFile();
+        VersionedFile testeD = new VersionedFile();
+        
+        testeC.setContent(testeA);
+        testeD.setContent(testeB);
 
         //teste = getFline(teste);
 
         //System.out.println("-->\n" + new String(lcs(testeA, testeB)));
-        System.out.println(new String(diff(testeA, testeB)));
+        System.out.println(new String(diff(testeC, testeD)));
     }
 
     public static byte[] run(VersionedItem file1, VersionedItem file2) throws ApplicationException, IncompatibleItensException {
 
         if ( !file1.isDir() && !file2.isDir() ) {
-            return diff( ((VersionedFile)file1).getContent(), ((VersionedFile)file2).getContent() );
+            return diff( ((VersionedFile)file1), ((VersionedFile)file2) );
         } else {
             if ( file1.isDir() && file2.isDir() ) {
                 return null; //diff_directories((VersionedDir) file1, (VersionedDir) file2);
@@ -54,8 +61,12 @@ public class Diff {
         }
         return null;
     }
+    
+    public static byte[] run_and_send_by_email(VersionedItem file1, VersionedItem file2, String target_email){
+        return null;
+    }
 
-    public static byte[] apply(VersionedItem file1, byte[] delta) {
+    public static byte[] apply(VersionedFile file1, byte[] delta) {
 
         byte[] delta_aux = delta;
 
@@ -68,13 +79,25 @@ public class Diff {
         return null;
 
     }
+    
+    public static List<VersionedItem> apply(VersionedDir dir, byte[] delta){
+        return null;
+    }
+    
+    public static byte[] apply_email(VersionedFile file1, File email){
+        return null;
+    }
+    
+    public static List<VersionedItem> apply_email(VersionedDir dir, File email){
+        return null;
+    }
 
-    private static byte[] diff(byte[] file1, byte[] file2) throws ApplicationException {
+    private static byte[] diff(VersionedFile file1, VersionedFile file2) throws ApplicationException {
         // DIFFERENCE BETWEEN FILES
         String ret = "";
 
-        byte[] seq1 = file1.clone();
-        byte[] seq2 = file2.clone();
+        byte[] seq1 = file1.getContent().clone();
+        byte[] seq2 = file2.getContent().clone();
         byte[] lcs1 = lcs(seq1, seq2);
         
         int i = 0;
@@ -86,7 +109,8 @@ public class Diff {
         ArrayList<String> lines_added = new ArrayList<>();
         
         // REGISTRA HASH SEGURO
-        ret += ("HASH_TESTE\n\n");
+        ret += file1.getHash();
+        ret += '\n';
         
         while( !isNull(lcs1) ){
             int i_aux = i;
@@ -138,7 +162,7 @@ public class Diff {
         return ret.getBytes();
     }
 
-    private static byte[] diff(List<VersionedItem> dir1, List<VersionedItem> dir2) throws ApplicationException {
+    private static byte[] diff(VersionedDir d1, VersionedDir d2) throws ApplicationException {
         // DIFFERENCE BETWEEN DIRECTORIES
         // TODO: Transformar o contador de Diff em uma variável global.
 
@@ -147,12 +171,15 @@ public class Diff {
         int count_diff = 0;
         byte[] arq_diff = new byte[0];
         
+        List<VersionedItem> dir1 = d1.getContainedItens();
+        List<VersionedItem> dir2 = d2.getContainedItens();
+        
         int i = 0;
         int j = 0;
         
         List<VersionedItem> lcs = lcs(dir1, dir2);
         
-        add_head( ret );
+        add_head( ret, d1 );
         
         while( dir1.size() > 0 && dir2.size() > 0 ){
             if( !Set.belongs_to(dir1.get(0), lcs) ){
@@ -196,7 +223,7 @@ public class Diff {
             dir2.remove(dir2.get(0));
         }
         
-        add_tail( ret );
+        add_tail( ret, d1 );
         
         return ret;
     }
@@ -229,13 +256,13 @@ public class Diff {
     
     private static void add(byte[] main, VersionedFile file) throws ApplicationException{
         System.out.println("A -F " + file.getName() );
-        System.out.println(new String(diff(new byte[0], file.getContent())));
+        System.out.println(new String(diff(new VersionedFile(), file)));
         System.out.println("END");
     }
     
     private static void mod(byte[] main, VersionedFile file) throws ApplicationException{
         System.out.println("M -F " + file.getName() );
-        System.out.println(new String(diff(new byte[0], file.getContent())));
+        System.out.println(new String(diff(new VersionedFile(), file)));
         System.out.println("END");
     }
 
@@ -323,7 +350,7 @@ public class Diff {
 
         if (seq.length != 0) {
             int i = 0;
-            while (Byte.compare(seq[i++], EOL) != 0 && i+1 <= seq.length);
+            while (Byte.compare(seq[i++], EOL[0]) != 0 && i+1 <= seq.length);
             byte[] retorno = new byte[i];
 
             for (int j = 0; j < retorno.length; j++) {
@@ -366,7 +393,7 @@ public class Diff {
     private static int countLines(byte[] lcs_file) {
         int tam = 0;
         for (int i = 0; i < lcs_file.length; i++) {
-            if (Byte.compare(lcs_file[i], EOL) == 0) {
+            if (Byte.compare(lcs_file[i], EOL[0]) == 0) {
                 tam++;
             }
         }
@@ -380,10 +407,12 @@ public class Diff {
     private static byte[] del_line_wraps(byte[] seq){
         int tam;
         
-        if(Byte.compare(seq[seq.length-1], EOL) == 0)
+        if(Byte.compare(seq[seq.length-1], EOL[0]) == 0) {
             tam = seq.length-1;
-        else
+        }
+        else {
             tam = seq.length;
+        }
         
         byte[] aux = new byte[tam];
         for(int i = 0; i < aux.length; i++){
@@ -392,12 +421,44 @@ public class Diff {
         return aux;
     }
 
-    private static void add_head(byte[] ret) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    private static void add_head(byte[] ret, VersionedItem dir) {
+        
+        byte[] eol = "\n".getBytes();
+        
+        // INITIALIZE
+        // // /§D
+        // // /§F
+        if( dir.isDir() ){
+            appends_at_the_beginning(ID_DIR, ret);
+        } else {
+            appends_at_the_beginning(ID_FILE, ret);
+            appends_at_the_beginning(eol, ret);
+            appends_at_the_beginning(((VersionedFile)dir).getHash().getBytes(), ret);
+        }
+        
+        appends_at_the_beginning(eol, ret);
+        
+        // REC HEADER
+        // // NAME
+        // // AUTHOR
+        appends_at_the_beginning(dir.getName().getBytes(), ret);
+        appends_at_the_beginning(eol, ret);
+        appends_at_the_beginning(dir.getAuthor().getBytes(), ret);
+        appends_at_the_beginning(eol, ret);
     }
 
-    private static void add_tail(byte[] ret) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    private static void add_tail(byte[] ret, VersionedItem dir) {
+        byte[] eol = "\n".getBytes();
+        
+        // FINALIZE
+        // // /§D
+        // // /§F
+        appends_at_the_end(eol, ret);
+        if( dir.isDir() ){
+            appends_at_the_end(ID_DIR, ret);
+        } else {
+            appends_at_the_end(ID_FILE, ret);
+        }
     }
     
 }

@@ -13,6 +13,7 @@ import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.StorageCanNotCreateDirException;
 import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
 import br.uff.ic.labgc.exception.StorageUserNotFoundException;
+import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import br.uff.ic.labgc.versioning.Versioning;
 import java.io.File;
@@ -79,6 +80,7 @@ public class Storage {
             throw new StorageObjectAlreadyExistException("Projeto "+projName+" já existe");
         }
 
+        HibernateUtil.beginTransaction();
         Project project = new Project(projName);
         try {
             User user = userDAO.getByUserName(userName);
@@ -99,6 +101,7 @@ public class Storage {
             revisionDAO.add(revision);
             ci = new ConfigurationItem(1, projName, "", 'A', 1, 0, null, null, revision);
             revision.setConfigItem(ci);
+            HibernateUtil.commitTransaction();
 
         } catch (ObjectNotFoundException e) {
             Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, null, e);

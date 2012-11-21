@@ -263,7 +263,7 @@ public class WorkspaceTests {
         try {
             result = instance.commit();
         } catch (ApplicationException ex) {
-            Logger.getLogger(WorkspaceTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(WorkspaceTests.class.getName()).log(Level.SEVERE, null, ex);
         }
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.

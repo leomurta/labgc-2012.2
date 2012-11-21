@@ -28,6 +28,7 @@ import br.uff.ic.labgc.storage.RevisionDAO;
 import br.uff.ic.labgc.storage.Storage;
 import br.uff.ic.labgc.storage.User;
 import br.uff.ic.labgc.storage.UserDAO;
+import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.io.BufferedReader;
 import java.io.File;
@@ -146,9 +147,12 @@ public class Versioning implements IVersioning{
         }
         Project project = projectDAO.getByName(projectName);
         ProjectUser pu = projectUserDAO.get(project.getId(), user.getId());
-        if (pu.getToken().isEmpty()){
+ 
+       HibernateUtil.beginTransaction();
+       if (pu.getToken()==null || pu.getToken().isEmpty()){
             pu.generateToken();
         }
+       HibernateUtil.commitTransaction();
         return pu.getToken();
     }
 
@@ -250,9 +254,12 @@ public class Versioning implements IVersioning{
             String headRevision = revisionDAO.getHeadRevisionNumber(pu.getProject());
             
             if (!headRevision.equals(number)){
-                throw new VersioningNeedToUpdateException();
+                VersioningNeedToUpdateException ex = new VersioningNeedToUpdateException();
+                Logger.getLogger(Versioning.class.getName()).log(Level.WARNING, null, ex);
+                throw ex;
             }
             
+            HibernateUtil.beginTransaction();
             Revision currRevision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(),headRevision);
             String newHeadRevision = incrementRevision(headRevision);
             
@@ -266,13 +273,16 @@ public class Versioning implements IVersioning{
             versionedDirToConfigItem(vd,ci,false);
             previous.setNext(ci);
             configItemDAO.add(ci);
-            
+
             storage.storeFiles(vd, projectName);
 
             revision.setConfigItem(ci);
+            HibernateUtil.commitTransaction();
             return revision.getNumber();
             
         }catch (ObjectNotFoundException e) {
+            System.out.println("excecao");
+             Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, null, e);
              throw new VersioningException("Objeto não encontrado", e);   
         }
     }

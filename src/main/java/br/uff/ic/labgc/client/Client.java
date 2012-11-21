@@ -65,8 +65,8 @@ public class Client implements IClient {
     }
 
     // Construtor para Comandos sem Workspace
-    public Client(String hostname) {
-        this.hostname = hostname;
+    public Client() {
+        
     }
 
     /**
@@ -74,21 +74,22 @@ public class Client implements IClient {
      *
      * @param systemDirectory diretorio raiz da area de trabalho
      */
-//    public Client(String systemDirectory) 
-//    {
-//
-//        workspace = new Workspace(systemDirectory);
-//        try {
-//            this.hostname = workspace.getHost();
-//            this.repository = workspace.getProject();
-//        } catch (WorkspaceException ex) {
-//            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//
-//    }
+    public Client(String systemDirectory) 
+    {
+
+        workspace = new Workspace(systemDirectory);
+        try {
+            this.hostname = workspace.getHost();
+            this.repository = workspace.getProject();
+        } catch (WorkspaceException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
     //comandos para o servidor
     public VersionedItem commit(String message) throws ApplicationException {
         VersionedItem files = workspace.commit();
+        this.isLogged();
         String revision = server.commit(files, message, loginToken);
         workspace.setRevision(revision);
         return files;
@@ -278,5 +279,11 @@ public class Client implements IClient {
         throw new UnsupportedOperationException("Not supported yet.");
 //        VersionedItem item = new VersionedDir();
 //        server.checkin(item, username);
+    }
+
+    @Override
+    public void setHost(String host) throws ApplicationException {
+        this.hostname = host;
+        getServer();
     }
 }
