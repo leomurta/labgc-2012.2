@@ -317,6 +317,7 @@ public class Workspace implements IWorkspace {
         pristine.addItem(VersionedItemUtils.read(mirror));
         
         root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
+        root.setLastChangedRevision(this.getRevision());
         
         return root;
         
