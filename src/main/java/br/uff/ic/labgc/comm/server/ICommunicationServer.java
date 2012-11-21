@@ -58,7 +58,7 @@ public interface ICommunicationServer extends Remote {
      * @return Conteúdo do item versionado solicitado
      * @throws RemoteException 
      */
-    public byte[] getItemContent(String hash) throws RemoteException;
+    public byte[] getItemContent(String hash, String projectName) throws RemoteException;
     
     public String hello(String name) throws RemoteException;
 

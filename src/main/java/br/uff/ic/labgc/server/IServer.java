@@ -71,7 +71,7 @@ public interface IServer {
      * @return Conteúdo do item versionado solicitado
      * @throws ServerException
      */
-    public byte[] getItemContent(String hash) throws ApplicationException;    
+    public byte[] getItemContent(String hash, String projectName) throws ApplicationException;    
     
     /**
      * ADM Método  para adicionar projeto ao repostório

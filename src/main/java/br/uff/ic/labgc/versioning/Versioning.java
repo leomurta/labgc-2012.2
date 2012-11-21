@@ -94,12 +94,13 @@ public class Versioning implements IVersioning{
         {	
             ConfigurationItem configItem = (ConfigurationItem)it.next();
             Revision ciRev = configItem.getRevision();
+            String projectName = ciRev.getProject().getName();
             VersionedItem vi;
             if (configItem.getDir() == 1){
                 vi = configItemToVersionedDir(configItem);
             }
             else{
-                vi = new VersionedFile(configItem.getHash(),configItem.getSize());
+                vi = new VersionedFile(configItem.getHash(),configItem.getSize(),projectName);
             }
             
             vi.setAuthor(ciRev.getUser().getName());
@@ -128,7 +129,7 @@ public class Versioning implements IVersioning{
 
 
     @Override
-    public VersionedDir getRevision(String revNum, String token) throws VersioningException{
+    public VersionedDir getRevision(String revNum, String token) throws ApplicationException{
         ProjectUser pu = projectUserDAO.getByToken(token);
         if (revNum.equals(EVCSConstants.REVISION_HEAD)) {
             revNum = revisionDAO.getHeadRevisionNumber(pu.getProject());
@@ -157,10 +158,8 @@ public class Versioning implements IVersioning{
     }
 
     @Override
-    public byte[] getVersionedFileContent (String hash, String token) throws VersioningException{
-        ProjectUser pu = projectUserDAO.getByToken(token);
-        String projName = pu.getProject().getName();
-        File path = new File(Storage.getDirPath()+projName+"/"+storage.hashToPath(hash));
+    public byte[] getVersionedFileContent (String hash, String projectName) throws ApplicationException{
+        File path = new File(Storage.getDirPath()+projectName+"/"+storage.hashToPath(hash));
         try {
             return getBytesFromFile(path);
         } catch (IOException ex) {
@@ -281,7 +280,6 @@ public class Versioning implements IVersioning{
             return revision.getNumber();
             
         }catch (ObjectNotFoundException e) {
-            System.out.println("excecao");
              Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, null, e);
              throw new VersioningException("Objeto não encontrado", e);   
         }
@@ -357,15 +355,15 @@ public class Versioning implements IVersioning{
      * Dada uma revisão, madar o diff para que esta seja atualizada para outra
      */
     @Override
-    public VersionedDir updateRevision(String revNum, String revTo, String token) throws VersioningException {
+    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ApplicationException {
         return getRevision(revTo, token);
     }
     
-    public VersionedDir getLastLogs(String token){
+    public List<VersionedItem> getLastLogs(String token) throws ApplicationException{
         return getLastLogs(EVCSConstants.DEFAULT_LOG_MSG, token);
     }
     
-    public VersionedDir getLastLogs(int num, String token){
+    public List<VersionedItem> getLastLogs(int num, String token) throws ApplicationException{
         return getLastLogs(num,token,EVCSConstants.REVISION_HEAD);
     }
     
@@ -373,8 +371,8 @@ public class Versioning implements IVersioning{
      * primeiro da lista é o + recente
      */
     @Override
-    public VersionedDir getLastLogs(int num, String token, String revisionNumber){
-        VersionedDir list = new VersionedDir();
+    public List<VersionedItem> getLastLogs(int num, String token, String revisionNumber) throws ApplicationException{
+        List<VersionedItem> list = new ArrayList();
         ProjectUser pu = projectUserDAO.getByToken(token);
         Revision revision;
         if (revisionNumber.equals(EVCSConstants.REVISION_HEAD)){
@@ -393,7 +391,7 @@ public class Versioning implements IVersioning{
             vd.setLastChangedTime(ci.getRevision().getDate());
             vd.setName(ci.getName());
             vd.setStatus(toTheirsStatus(ci.getType()));
-            list.addItem(vd);
+            list.add(vd);
             ci = ci.getPrevious();
             if (ci == null){
                 break;

@@ -47,15 +47,15 @@ public interface IVersioning {
      * @param token
      * @return 
      */
-    public VersionedDir getRevision(String revNum, String token) throws VersioningException;
+    public VersionedDir getRevision(String revNum, String token) throws ApplicationException;
     
-    public VersionedDir updateRevision(String revNum, String revTo, String token) throws VersioningException;
+    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ApplicationException;
     
     public String login(String projectName, String userName, String pass) throws VersioningException;
     
-    public byte[] getVersionedFileContent(String hash, String token) throws VersioningException;
+    public byte[] getVersionedFileContent(String hash, String projectName) throws ApplicationException;
     
-    public VersionedDir getLastLogs(int num, String token, String revisionNumber);
+    public List<VersionedItem> getLastLogs(int num, String token, String revisionNumber) throws ApplicationException;
     
     public String addRevision(VersionedDir vd, String token) throws ApplicationException;
     

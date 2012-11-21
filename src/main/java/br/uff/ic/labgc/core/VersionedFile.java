@@ -48,6 +48,12 @@ public class VersionedFile extends VersionedItem implements Serializable {
      */
     private String hash;
     
+    /**
+     * Nome do projeto ao qual este VersionedFile pertence.
+     * Esta varáivel é setada somente pelo servidor
+     */
+    private String projectName;
+    
     
     /**
      * Indicaca se o item possui conflito  a ser resolvido
@@ -70,10 +76,11 @@ public class VersionedFile extends VersionedItem implements Serializable {
      *
      * @param hash
      */
-    public VersionedFile(String hash, long size) {
+    public VersionedFile(String hash, long size, String projectName) {
         this();
         this.hash = hash;
         this.size = size;
+        this.projectName = projectName;
     }
 
     public VersionedFile(String lastChangedRevision, Date lastChangedTime, String name, String author, String commitMessage) {
@@ -99,11 +106,15 @@ public class VersionedFile extends VersionedItem implements Serializable {
             if (this.getHash() == null || this.getHash().equals("")) {
                 throw new ApplicationException("Não é possível recuperar o conteúdo de um item sem informar seu hash.");
             }
-            setContent(CommunicationFactory.getFactory().getServer(originHost).getItemContent(this.getHash()));
+            setContent(CommunicationFactory.getFactory().getServer(originHost).getItemContent(this.getHash(),this.getProjectName()));
         } else if (isCompressed()) {
             inflate();
         }
         return content;
+    }
+
+    public String getProjectName() {
+        return projectName;
     }
 
     public void setContent(byte[] content) {
