@@ -416,7 +416,8 @@ public class Cli {
             registerObserver();
             try 
             {
-                m_IClient.commit(strMessage);
+                if(m_IClient.isLogged())
+                    m_IClient.commit(strMessage);
             } 
             catch (ApplicationException ex)
             {

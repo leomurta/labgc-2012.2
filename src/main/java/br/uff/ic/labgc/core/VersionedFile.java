@@ -107,8 +107,6 @@ public class VersionedFile extends VersionedItem implements Serializable {
                 throw new ApplicationException("Não é possível recuperar o conteúdo de um item sem informar seu hash.");
             }
             setContent(CommunicationFactory.getFactory().getServer(originHost).getItemContent(this.getHash(),this.getProjectName()));
-        } else if (isCompressed()) {
-            inflate();
         }
         return content;
     }
