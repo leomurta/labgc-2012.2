@@ -13,11 +13,10 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Esta classe é responsável executar comandos em um servidor remoto, utilizando
+ * Esta classe é responsável por executar comandos em um servidor remoto, utilizando
  * o protocolo RMI. Em sua inicialização, é pre
  *
  * @author Cristiano
@@ -38,27 +37,34 @@ public class RMIConnector extends AbstractServer {
      */
     public RMIConnector(String hostName) throws CommunicationException {
         super(hostName);
+        LoggerFactory.getLogger(RMIConnector.class).debug("Inicializando RMIConnector com o servidor {}", hostName);
         this.repPort = Integer.parseInt(ApplicationProperties.getPropertyValue(IPropertiesConstants.COMM_REMOTE_PORT));
+        LoggerFactory.getLogger(RMIConnector.class).debug("Porta de comunicação utilizada: {}", repPort);
 
         if (System.getSecurityManager() == null) {
+            LoggerFactory.getLogger(RMIConnector.class).debug("Inicializando um novo SecurityManager.");
             System.setSecurityManager(new SecurityManager());
+            LoggerFactory.getLogger(RMIConnector.class).debug("Novo SecurityManager inicializado.");
         }
         try {
             String repositoryServerObject = ApplicationProperties.getPropertyValue(IPropertiesConstants.RMI_REPOSITORY_OBJECT);
             Registry registry = LocateRegistry.getRegistry(getRepHost(), repPort);
+            LoggerFactory.getLogger(RMIConnector.class).debug("Buscando pelo objeto {} remotamente no servidor {}.", repositoryServerObject, getRepHost());
             server = (ICommunicationServer) registry.lookup(repositoryServerObject);
+            LoggerFactory.getLogger(RMIConnector.class).debug("{} localizado remotamente no servidor {}.", repositoryServerObject, getRepHost());
         } catch (NotBoundException ex) {
-            Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(RMIConnector.class).error("Não foi possível localizar o servidor no host: {}", getRepHost(), ex);
             throw new CommunicationException("Não foi possível localizar o servidor no host: " + getRepHost(), ex);
         } catch (AccessException ex) {
-            Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(RMIConnector.class).error("A comunicação com o host {} falhou.", getRepHost(), ex);
             throw new CommunicationException("Problemas de autorização ao tentar acessar o servidor no host: "
                     + getRepHost(), ex);
         } catch (RemoteException ex) {
-            Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(RMIConnector.class).error("Não foi possível localizar o servidor no host: {}", getRepHost(), ex);
             throw new CommunicationException("A comunicação com o host " + getRepHost() + " falhou.",
                     ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).debug("Inicialização de RMIConnector finalizada com sucesso.");
     }
 
     /**
@@ -72,13 +78,17 @@ public class RMIConnector extends AbstractServer {
      */
     @Override
     public String commit(VersionedItem item, String message, String token) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("commit -> Entry");
         String result = null;
         try {
+            LoggerFactory.getLogger(RMIConnector.class).debug("Compactando o conteúdo a ser enviado para o servidor.");
             item.deflate();
+            LoggerFactory.getLogger(RMIConnector.class).debug("Conteúdo compactado com sucesso.");
             result = server.commit(item, message, token);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("commit -> Exit");
         return result;
     }
 
@@ -92,27 +102,20 @@ public class RMIConnector extends AbstractServer {
      * efetuar o update
      */
     @Override
-    public VersionedItem update(String clientRevision,  String revision, String token) throws ApplicationException {
+    public VersionedItem update(String clientRevision, String revision, String token) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("update -> Entry");
         VersionedItem result = null;
         try {
             result = server.update(clientRevision, revision, token);
+            LoggerFactory.getLogger(RMIConnector.class).debug("Descompactando conteúdo recebido do servidor.");
             result.inflate();
+            LoggerFactory.getLogger(RMIConnector.class).debug("Conteúdo descompactado com sucesso.");
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("update -> Exit");
         return result;
     }
-
-    /**
-     * Executa remotamente o comando diff
-     *
-     * @param item
-     * @param version
-     * @return
-     * @throws ApplicationException Exceção ocorrida no servidor ao tentar
-     * efetuar o diff
-     */
-    
 
     /**
      * Executa remotamente o comando log
@@ -123,12 +126,14 @@ public class RMIConnector extends AbstractServer {
      */
     @Override
     public VersionedItem log(String token) throws ApplicationException {
-         VersionedItem result = null;
+        LoggerFactory.getLogger(RMIConnector.class).trace("log -> Entry");
+        VersionedItem result = null;
         try {
             result = server.log(token);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("log -> Exit");
         return result;
     }
 
@@ -140,12 +145,14 @@ public class RMIConnector extends AbstractServer {
      * @throws ApplicationException
      */
     public String hello(String name) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("hello -> Entry");
         String result = null;
         try {
             result = server.hello(name);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("hello -> Exit");
         return result;
     }
 
@@ -160,13 +167,17 @@ public class RMIConnector extends AbstractServer {
      */
     @Override
     public VersionedItem checkout(String revision, String token) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("checkout -> Entry");
         VersionedItem result = null;
         try {
             result = server.checkout(revision, token);
+            LoggerFactory.getLogger(RMIConnector.class).debug("Descompactando conteúdo recebido do servidor.");
             result.inflate();
+            LoggerFactory.getLogger(RMIConnector.class).debug("Conteúdo descompactado com sucesso.");
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("checkout -> Exit");
         return result;
     }
 
@@ -182,6 +193,7 @@ public class RMIConnector extends AbstractServer {
      */
     @Override
     public String login(String user, String pwd, String repository) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("login -> Entry");
         setRepPath(repository);
         String result = null;
         try {
@@ -189,6 +201,7 @@ public class RMIConnector extends AbstractServer {
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("login -> Exit");
         return result;
     }
 
@@ -202,66 +215,84 @@ public class RMIConnector extends AbstractServer {
      */
     @Override
     public byte[] getItemContent(String hash, String projectName) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("getItemContent -> Entry");
         byte[] result = null;
         try {
             VersionedFile file = new VersionedFile();
             file.setContent(server.getItemContent(hash, projectName));
+            LoggerFactory.getLogger(RMIConnector.class).debug("Descompactando conteúdo recebido do servidor.");
+            file.inflate();
+            LoggerFactory.getLogger(RMIConnector.class).debug("Conteúdo descompactado com sucesso.");
             result = file.getContent();
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("getItemContent -> Exit");
         return result;
     }
 
     @Override
     public VersionedItem log(int qtdeRevisions, String token) throws ApplicationException {
-         VersionedItem result = null;
+        LoggerFactory.getLogger(RMIConnector.class).trace("log -> Entry");
+        VersionedItem result = null;
         try {
             result = server.log(qtdeRevisions, token);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("log -> Exit");
         return result;
     }
 
     @Override
     public void addProject(String project, String user) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("addProject -> Entry");
         try {
             server.addProject(project, user);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("addProject -> Exit");
     }
 
     @Override
     public void init(VersionedItem item, String user) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("init -> Entry");
         try {
+            LoggerFactory.getLogger(RMIConnector.class).debug("Compactando o conteúdo a ser enviado para o servidor.");
             item.deflate();
+            LoggerFactory.getLogger(RMIConnector.class).debug("Conteúdo compactado com sucesso.");
             server.init(item, user);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("init -> Exit");
     }
 
     @Override
     public void addUser(String name, String username, String password) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("addUser -> Entry");
         try {
             server.addUser(name, username, password);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("addUser -> Exit");
     }
 
     @Override
     public void addUserToProject(String project, String user) throws ApplicationException {
+        LoggerFactory.getLogger(RMIConnector.class).trace("addUserToProject -> Entry");
         try {
             server.addUserToProject(project, user);
         } catch (RemoteException ex) {
             handleRemoteException(ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("addUserToProject -> Exit");
     }
 
     public static void main(String args[]) {
+        LoggerFactory.getLogger(RMIConnector.class).trace("main -> Entry");
         try {
             RMIConnector rmi = new RMIConnector("localhost");
             String command = args[0];
@@ -269,10 +300,11 @@ public class RMIConnector extends AbstractServer {
                 System.out.println(rmi.hello("Cristiano"));
             }
         } catch (CommunicationException ex) {
-            Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(RMIConnector.class).error(null, ex);
         } catch (ApplicationException ex) {
-            Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(RMIConnector.class).error(null, ex);
         }
+        LoggerFactory.getLogger(RMIConnector.class).trace("main -> Exit");
     }
 
     /**
@@ -289,7 +321,7 @@ public class RMIConnector extends AbstractServer {
         if (cause instanceof ApplicationException) {
             throw (ApplicationException) cause;
         } else {
-            Logger.getLogger(RMIConnector.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(RMIConnector.class).error(null, ex);
             throw new ApplicationException("Ocorreu um erro ao tentar executar a operação, verifique a exceção aninhada para mais detalhes.",
                     ex.getCause());
         }
