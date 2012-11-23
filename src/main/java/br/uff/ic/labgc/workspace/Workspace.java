@@ -334,16 +334,22 @@ public class Workspace implements IWorkspace {
         root.setLastChangedRevision(this.getRevision());
         root.setName(WS_FOLDER);
         root.setStatus(EVCSConstants.MODIFIED);
-        
+        if (!VersionedItemUtils.isModified(root.getContainedItens())){
+            throw new WorkspaceException("Conteúdo não foi modificado");
+        }
         return root;
         
     }
     public void endCommit(String revision, VersionedItem item) throws ApplicationException{
         this.setRevision(revision);
-        File mirror = new File(workspaceDir, WS_FOLDER + File.separator + ESPELHO);
+        File local = new File(workspaceDir);
+        File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
+        VersionedDir working = new VersionedDir();
+        String exclusions[] = {WS_FOLDER};
         deleteDir(mirror); // mudar a função para não deletar o espelho só o conteúdo
         mirror.mkdir(); 
-        VersionedItemUtils.write(mirror,((VersionedDir) item).getContainedItens());
+        working.addItem(VersionedItemUtils.read(local, exclusions));
+        VersionedItemUtils.write(mirror,working.getContainedItens());
     }
     //implementar para o cliente
 
