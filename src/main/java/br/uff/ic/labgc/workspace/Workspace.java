@@ -330,7 +330,7 @@ public class Workspace implements IWorkspace {
         working.addItem(VersionedItemUtils.read(local, exclusions));//false nao le o conteudo
         pristine.addItem(VersionedItemUtils.read(mirror));
         
-        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
+        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens())); // testar depois se veio unmodified e throws erro
         root.setLastChangedRevision(this.getRevision());
         root.setName(WS_FOLDER);
         root.setStatus(EVCSConstants.MODIFIED);
