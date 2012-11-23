@@ -48,16 +48,17 @@ public class Set {
     }
     
     public static boolean belongs_to( VersionedItem item, List<VersionedItem> set1 ) throws ApplicationException{
-        for( int i = 0; i < set1.size(); i++ ){
+        boolean ret = false;
+        for( int i = 0; i < set1.size() && ret; i++ ){
             if( item.isDir() && set1.get(i).isDir() ){
-                return Diff.has_diff( ((VersionedDir)item).getContainedItens(), ((VersionedDir)set1.get(i)).getContainedItens() );
+                ret = !Diff.has_diff( ((VersionedDir)item).getContainedItens(), ((VersionedDir)set1.get(i)).getContainedItens() );
             } else {
                 if( !item.isDir() && !set1.get(i).isDir() ){
-                    return Diff.has_diff( ((VersionedFile)item).getContent(), ((VersionedFile)set1.get(i)).getContent() );
+                    ret = !Diff.has_diff( ((VersionedFile)item).getContent(), ((VersionedFile)set1.get(i)).getContent() );
                 }
             }
         }
-        return false;
+        return ret;
     }
     
 }
