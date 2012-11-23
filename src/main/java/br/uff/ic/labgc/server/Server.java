@@ -53,7 +53,6 @@ public class Server extends AbstractServer {
     }
     
     public String login(String user, String pwd, String repository) throws ApplicationException {
-        System.out.printf("%s %s %s\n",repository,user,pwd);
         return versioning.login(repository, user, pwd);
     }
     

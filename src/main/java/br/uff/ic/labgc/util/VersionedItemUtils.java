@@ -189,6 +189,16 @@ public class VersionedItemUtils {
         VersionedItemUtils vi = new VersionedItemUtils();
         return vi.compareVersionedItems(pristine, working);
     }
+    
+    public static boolean isModified(List<VersionedItem> items){
+        for(VersionedItem item:items) {
+            if(item.getStatus() != EVCSConstants.UNMODIFIED ) {
+                return true;
+            }
+        }
+            
+        return false;
+    }
 
     // <editor-fold defaultstate="collapsed" desc="Ferramentas de verificacao"> 
     /**
