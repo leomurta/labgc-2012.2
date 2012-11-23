@@ -17,29 +17,7 @@ public class Set {
         ArrayList<VersionedItem> retorno = new ArrayList<>();
         if( set1.size() > 0 || set2.size() > 0 ){
             for( int i = 0; i < set1.size(); i++ ){
-                for( int j = 0; j < set2.size(); j++ ){
-                    if( set1.get(i).isDir() && set2.get(j).isDir() ){
-                        if( !Diff.has_diff( ((VersionedDir)set1).getContainedItens(), ((VersionedDir)set2).getContainedItens() ) ){
-                            retorno.add(set1.get(i));
-                        }
-                    } else {
-                        if( !set1.get(i).isDir() && !set2.get(j).isDir() ){
-                            if( !Diff.has_diff( ((VersionedFile)set1).getContent(), ((VersionedFile)set2).getContent() ) ){
-                                retorno.add(set1.get(i));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return retorno.subList(0, retorno.size());
-    }
-    
-    public static List<VersionedItem> difference( List<VersionedItem> set1, List<VersionedItem> set2 ) throws ApplicationException{
-        ArrayList<VersionedItem> retorno = new ArrayList<>();
-        if( set1.size() > 0 || set2.size() > 0 ){
-            for( int i = 0; i < set1.size(); i++ ){
-                if( !belongs_to(set1.get(i), set2)){
+                if( belongs_to(set1.get(i), set2)){
                     retorno.add(set1.get(i));
                 }
             }
@@ -51,10 +29,10 @@ public class Set {
         boolean ret = false;
         for( int i = 0; i < set1.size() && ret; i++ ){
             if( item.isDir() && set1.get(i).isDir() ){
-                ret = !Diff.has_diff( ((VersionedDir)item).getContainedItens(), ((VersionedDir)set1.get(i)).getContainedItens() );
+                ret = ((VersionedDir)item).getName().equals(((VersionedDir)set1.get(i)).getName());//!Diff.has_diff( ((VersionedDir)item).getContainedItens(), ((VersionedDir)set1.get(i)).getContainedItens() );
             } else {
                 if( !item.isDir() && !set1.get(i).isDir() ){
-                    ret = !Diff.has_diff( ((VersionedFile)item).getContent(), ((VersionedFile)set1.get(i)).getContent() );
+                    ret = ((VersionedFile)item).getName().equals(((VersionedFile)set1.get(i)).getName());//!Diff.has_diff( ((VersionedFile)item).getContent(), ((VersionedFile)set1.get(i)).getContent() );
                 }
             }
         }

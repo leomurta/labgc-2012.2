@@ -128,14 +128,40 @@ public class Diff {
     }
     
     public static List<VersionedItem> apply(VersionedDir dir, byte[] delta){
-        return null;
-    }
-    
-    public static byte[] apply_email(VersionedFile file1, File email){
-        return null;
-    }
-    
-    public static List<VersionedItem> apply_email(VersionedDir dir, File email){
+        byte[] delta1 = delta.clone();
+        byte[] aux;
+        
+        ArrayList<VersionedItem> ret = new ArrayList<>();
+        
+        while(countLines(delta1) > 0){
+            aux = get_first_sequence(delta1);
+            delta1 = del_first_sequence(aux.length, delta1);
+            
+            if( !has_diff(aux, ID_DIR) ){
+                // Começa Apply em Diretório
+                // Retorna um DIRETÓRIO para um LIST
+                VersionedDir dir_final = new VersionedDir();
+                // Lê delta até completar HEADER do dir_final
+                
+                while( has_diff(aux, ID_DIR) ){
+                    // COMANDOS
+                    // A -F
+                    // // ret.add( apply() )
+                    // A -D
+                    // // ret.add( apply() )
+                    // R -F
+                    // R -D
+                    // M -F
+                    // M -D
+                }
+            } else {
+                if( !has_diff(aux, ID_FILE) ){
+                    // Começa Apply em Arquivo
+                    // Retorna um ARQUIVO para um LIST
+                }
+            }
+        }
+        
         return null;
     }
 
@@ -155,7 +181,6 @@ public class Diff {
         
         ArrayList<String> lines_added = new ArrayList<>();
         
-        System.out.println(file1.getName());
         ret += new String( add_head(new byte[0], file1) );
         
         while( !isNull(lcs1) ){
@@ -226,9 +251,12 @@ public class Diff {
         int j = 0;
         
         List<VersionedItem> lcs = lcs(dir1, dir2);
+        
+        System.out.println("LCS------");
         for(int z = 0; z < lcs.size(); z++ ){
             System.out.println(lcs.get(z).getName());
         }
+        System.out.println("LCS------");
         
         ret = appends_at_the_beginning(ret, add_head( ret, d1 ));
         
@@ -257,12 +285,16 @@ public class Diff {
             if( dir2.size() > 0 ){
             if( !Set.belongs_to(dir2.get(0), lcs) ){
                 if( dir2.get(0).isDir() ){
-                    // FALTA IDENTIFICADOR DO DIRETÓRIO RAIZ
                     ret = add_recursively(ret, dir2);
                 } else {
                     ret = add(ret, (VersionedFile)dir2.get(0));
                 }
             } else {
+                if( dir2.get(0).isDir() ){
+                    //ret = mod_recursively(ret, dir1, ((VersionedDir)dir2.get(0)));
+                } else {
+                    
+                }
 //                if( Set.belongs_to(dir2.get(0), dir1) ){
 //                    // MODIFICAÇÃO
 //                    if( dir1.get(0).isDir() ){
@@ -283,12 +315,11 @@ public class Diff {
         return ret;
     }
     
-    private static byte[] add_recursively(byte[] main, List<VersionedItem> dir) throws ApplicationException{
+    private static byte[] add_recursively(byte[] main, List<VersionedItem> dir ) throws ApplicationException{
         for(int i = 0; i < dir.size(); i++){
             if(dir.get(i).isDir()){
                 main = appends_at_the_beginning(main, ("A -D " + dir.get(i).getName() + '\n').getBytes());
                 main = add_recursively(main, dir);
-                main = appends_at_the_beginning(main, ("END" + '\n').getBytes());
             }
             else{
                 main = add(main, (VersionedFile)dir);
@@ -297,15 +328,14 @@ public class Diff {
         return main;
     }
     
-    private static byte[] mod_recursively(byte[] main, List<VersionedItem> dir) throws ApplicationException{
-        for(int i = 0; i < dir.size(); i++){
-            if(dir.get(i).isDir()){
-                System.out.println("M -D " + dir.get(i).getName());
-                main = mod_recursively(main, dir);
-                System.out.println("END");
+    private static byte[] mod_recursively(byte[] main, List<VersionedItem> dir1, List<VersionedItem> dir2) throws ApplicationException{
+        for(int i = 0; i < dir1.size(); i++){
+            if(dir1.get(i).isDir()){
+                System.out.println("M -D " + dir2.get(i).getName());
+                //main = mod_recursively(main, dir);
             }
             else{
-                main = mod(main, (VersionedFile)dir);
+                main = mod(main, (VersionedFile)dir1, (VersionedFile)dir2);
             }
         }
         return main;
@@ -316,21 +346,19 @@ public class Diff {
         aux.setContent(new byte[0]);
         main = appends_at_the_beginning(main, ("A -F " + file.getName()  + '\n').getBytes());
         main = appends_at_the_beginning(main, diff(aux, file));
-        main = appends_at_the_beginning(main, ("END" + '\n').getBytes());
         return main;
     }
     
-    private static byte[] mod(byte[] main, VersionedFile file) throws ApplicationException{
+    private static byte[] mod(byte[] main, VersionedFile file1, VersionedFile file2) throws ApplicationException{
         VersionedFile aux = new VersionedFile();
         aux.setContent(new byte[0]);
-        System.out.println("M -F " + file.getName() );
-        System.out.println(new String(diff(aux, file)));
-        System.out.println("END");
+        System.out.println("M -F " + file2.getName() );
+        System.out.println(new String(diff(file1, file2)));
         return main;
     }
 
     private static List<VersionedItem> lcs(List<VersionedItem> seq1, List<VersionedItem> seq2) throws ApplicationException {
-        return Set.difference(seq1, seq2);
+        return Set.intersection(seq1, seq2);
     }
     
     // Finalizado
