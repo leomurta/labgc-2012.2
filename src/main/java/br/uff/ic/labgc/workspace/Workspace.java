@@ -341,7 +341,8 @@ public class Workspace implements IWorkspace {
     public void endCommit(String revision, VersionedItem item) throws ApplicationException{
         this.setRevision(revision);
         File mirror = new File(workspaceDir, WS_FOLDER + File.separator + ESPELHO);
-        deleteDir(mirror);
+        deleteDir(mirror); // mudar a função para não deletar o espelho só o conteúdo
+        mirror.mkdir(); 
         VersionedItemUtils.write(mirror,((VersionedDir) item).getContainedItens());
     }
     //implementar para o cliente
