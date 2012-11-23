@@ -88,10 +88,10 @@ public class Client implements IClient {
     }
     //comandos para o servidor
     public VersionedItem commit(String message) throws ApplicationException {
-        VersionedItem files = workspace.commit();
+        VersionedItem files = workspace.beginCommit();
         files.setCommitMessage(message);        
         String revision = server.commit(files, message, loginToken);
-        workspace.setRevision(revision);
+        workspace.endCommit(revision, files);
         return files;
     }
 

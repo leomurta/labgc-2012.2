@@ -86,8 +86,9 @@ public interface IWorkspace extends IObservable{
 
     public void update(VersionedItem files) throws ApplicationException;
 
-    public VersionedItem commit()throws ApplicationException;
+    public VersionedItem beginCommit()throws ApplicationException;
     
+    public void endCommit(String revision, VersionedItem item) throws ApplicationException;
     //Não implementado
     public VersionedItem diff(String file, String version);
 

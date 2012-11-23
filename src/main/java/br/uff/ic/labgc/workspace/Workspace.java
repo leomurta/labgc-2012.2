@@ -317,7 +317,7 @@ public class Workspace implements IWorkspace {
         
     }
     
-    public VersionedItem commit() 
+    public VersionedItem beginCommit() 
         throws ApplicationException {
         File local = new File(workspaceDir);
         File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
@@ -338,7 +338,12 @@ public class Workspace implements IWorkspace {
         return root;
         
     }
-    
+    public void endCommit(String revision, VersionedItem item) throws ApplicationException{
+        this.setRevision(revision);
+        File mirror = new File(workspaceDir, WS_FOLDER + File.separator + ESPELHO);
+        deleteDir(mirror);
+        VersionedItemUtils.write(mirror,((VersionedDir) item).getContainedItens());
+    }
     //implementar para o cliente
 
     public VersionedItem diff(String file, String version) {
