@@ -304,17 +304,59 @@ public class Workspace implements IWorkspace {
         File local = new File(workspaceDir);
         File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
         
-        VersionedDir root = new VersionedDir(); 
+        //VersionedDir difflocal = new VersionedDir(); 
+       // VersionedDir diffremote = new VersionedDir();
         VersionedDir working = new VersionedDir();
         VersionedDir pristine = new VersionedDir();
                 
         String exclusions[] = {WS_FOLDER};
         working.addItem(VersionedItemUtils.read(local, exclusions, false));//false nao le o conteudo
         pristine.addItem(VersionedItemUtils.read(mirror, false));//false nao le o conteudo
-        
-        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
-        
-        
+        // 
+        List<VersionedItem> difflocal = VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens());
+        List<VersionedItem> diffremote = VersionedItemUtils.diff(pristine.getContainedItens(), ((VersionedDir) (files)).getContainedItens());
+        List<VersionedItem> listPristine = pristine.getContainedItens();
+        VersionedDir root = new VersionedDir();
+        Collections.sort(difflocal);
+        Collections.sort(diffremote);
+        VersionedFile file;
+        for (VersionedItem itemp : difflocal) {
+            for (VersionedItem itemw : diffremote) {
+                if (itemp.equals(itemw)){ 
+                    if (! itemp.isDir()) {
+                        if ((itemp.getStatus()== EVCSConstants.MODIFIED) && (itemw.getStatus()== EVCSConstants.MODIFIED)){ // ws modificado e novo modificado
+                            file=(VersionedFile)itemw;
+                            file.setName(itemw.getName()+".deles");
+                            root.addItem(file);
+                            file=(VersionedFile)itemp;
+                            file.setName(itemw.getName()+".meu");
+                            root.addItem(file);
+                            // espelho
+                            for (VersionedItem item : listPristine){
+                                if (itemp.equals(item)){
+                                    file=(VersionedFile)itemp;
+                                    file.setContent(((VersionedFile) (item)).getContent()); // conteúdo de espelho
+                                    file.setLastChangedTime(((VersionedFile) (item)).getLastChangedTime());
+                                    file.setName(itemw.getName()+".base");
+                                    root.addItem(file);
+                                }
+                            }// for espelho
+                            continue;
+                        }
+                        if ((itemp.getStatus()== EVCSConstants.UNMODIFIED) && (itemw.getStatus()== EVCSConstants.MODIFIED)){ //só o novo modificado
+                            root.addItem(itemw);
+                            continue;
+                        }
+                   }
+                } //if equal 
+            }// for 2
+        } //for 1
+        for (VersionedItem itemw : diffremote) {
+            if ((itemw.getStatus()== EVCSConstants.ADDED)){ //só tem no novo
+                root.addItem(itemw);
+            }
+        }
+        VersionedItemUtils.write(local,root.getContainedItens());
     }
     
     public VersionedItem beginCommit() 
@@ -655,5 +697,4 @@ public class Workspace implements IWorkspace {
         return result;
     }
 
-    
 } //End
