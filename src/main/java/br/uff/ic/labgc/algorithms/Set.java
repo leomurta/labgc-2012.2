@@ -17,7 +17,8 @@ public class Set {
         ArrayList<VersionedItem> retorno = new ArrayList<>();
         if( set1.size() > 0 || set2.size() > 0 ){
             for( int i = 0; i < set1.size(); i++ ){
-                if( belongs_to(set1.get(i), set2)){
+                System.out.println(set1.get(i).getName());
+                if( belongs_to(set1.get(i), set2) != -1 ){
                     retorno.add(set1.get(i));
                 }
             }
@@ -25,14 +26,18 @@ public class Set {
         return retorno.subList(0, retorno.size());
     }
     
-    public static boolean belongs_to( VersionedItem item, List<VersionedItem> set1 ) throws ApplicationException{
-        boolean ret = false;
-        for( int i = 0; i < set1.size() && ret; i++ ){
+    public static int belongs_to( VersionedItem item, List<VersionedItem> set1 ) throws ApplicationException{
+        int ret = -1;
+        for( int i = 0; i < set1.size() && ret == -1; i++ ){
             if( item.isDir() && set1.get(i).isDir() ){
-                ret = ((VersionedDir)item).getName().equals(((VersionedDir)set1.get(i)).getName());//!Diff.has_diff( ((VersionedDir)item).getContainedItens(), ((VersionedDir)set1.get(i)).getContainedItens() );
+                if((item).getName().equals((set1.get(i)).getName())){
+                    ret = i;
+                }
             } else {
                 if( !item.isDir() && !set1.get(i).isDir() ){
-                    ret = ((VersionedFile)item).getName().equals(((VersionedFile)set1.get(i)).getName());//!Diff.has_diff( ((VersionedFile)item).getContent(), ((VersionedFile)set1.get(i)).getContent() );
+                    if((item).getName().equals((set1.get(i)).getName())){
+                        ret = i;
+                    }
                 }
             }
         }

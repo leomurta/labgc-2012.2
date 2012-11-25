@@ -24,7 +24,9 @@ public class Diff {
     private final static byte[] EOF = (new String("\n")).getBytes();
     
     private final static byte[] ID_DIR  = (new String("/§D")).getBytes();
+    private final static byte[] ID_END_DIR  = (new String("/§§D")).getBytes();
     private final static byte[] ID_FILE = (new String("/§F")).getBytes();
+    private final static byte[] ID_END_FILE = (new String("/§§F")).getBytes();
 
     public static void main(String args[]) throws ApplicationException {
         byte[] testeA;
@@ -66,6 +68,18 @@ public class Diff {
         file3.setAuthor("Raphael");
         file3.setContent(testeA);
         
+        // // // SUB-DIRETÓRIO 1
+        VersionedDir dir3 = new VersionedDir();
+        dir3.setName("MyDirectory3");
+        
+        // // // ARQUIVO 5
+        VersionedFile file5 = new VersionedFile();
+        file5.setName("FILE5");
+        file5.setAuthor("Raphael");
+        file5.setContent(testeB);
+        
+        dir3.addItem(file5);
+        
         // // DIRETÓRIO 2
         VersionedDir dir2 = new VersionedDir();
         dir2.setName("MyDirectory2");
@@ -79,12 +93,13 @@ public class Diff {
         
         // // // ARQUIVO 4
         VersionedFile file4 = new VersionedFile();
-        file4.setName("FILE4");
+        file4.setName("FILE3");
         file4.setAuthor("Raphael");
         file4.setContent(testeB);
         
         dir1.addItem(file1);
         dir1.addItem(file3);
+        dir2.addItem(dir3);
         
         dir2.addItem(file2);
         dir2.addItem(file4);
@@ -106,10 +121,6 @@ public class Diff {
                 }
             }
         }
-        return null;
-    }
-    
-    public static byte[] run_and_send_by_email(VersionedItem file1, VersionedItem file2, String target_email){
         return null;
     }
 
@@ -143,7 +154,7 @@ public class Diff {
                 VersionedDir dir_final = new VersionedDir();
                 // Lê delta até completar HEADER do dir_final
                 
-                while( has_diff(aux, ID_DIR) ){
+                while( has_diff(aux, ID_END_DIR) ){
                     // COMANDOS
                     // A -F
                     // // ret.add( apply() )
@@ -164,6 +175,8 @@ public class Diff {
         
         return null;
     }
+    
+    private static VersionedDir()
 
     private static byte[] diff(VersionedFile file1, VersionedFile file2) throws ApplicationException {
         // DIFFERENCE BETWEEN FILES
@@ -199,7 +212,7 @@ public class Diff {
                     seq2 = del_first_sequence( get_first_sequence(seq2).length, seq2 );
                     j++;
                 }
-                ret += ("A " + h + " " + lines_added.size() ) + '\n';
+                ret += ("A " + h + " " + i_aux + " " + lines_added.size() ) + '\n';
                 for( int r = 0; r < lines_added.size(); r++ ){
                     ret += ( lines_added.get(r) ) + '\n';
                 }
@@ -224,7 +237,7 @@ public class Diff {
                 lines_added.add( new String( del_line_wraps( get_first_sequence(seq2) ) ) );
                 seq2 = del_first_sequence( get_first_sequence(seq2).length, seq2 );
             }
-            ret += ("A " + h + " " + lines_added.size() ) + '\n';
+            ret += ("A " + h + " " + i + " " + lines_added.size() ) + '\n';
             for( int r = 0; r < lines_added.size(); r++ ){
                 ret += ( lines_added.get(r) ) + '\n';
             }
@@ -262,51 +275,44 @@ public class Diff {
         
         while( dir1.size() > 0 || dir2.size() > 0 ){
             if( dir1.size() > 0 ){
-            if( !Set.belongs_to(dir1.get(0), lcs) ){
-                if( dir1.get(0).isDir() ){
-                    ret = appends_at_the_beginning(ret, ("R -D " + dir1.get(0).getName() + '\n').getBytes());
+                if( Set.belongs_to(dir1.get(0), lcs) == -1 ){
+                    if( dir1.get(0).isDir() ){
+                        ret = appends_at_the_beginning(ret, ("R -D " + dir1.get(0).getName() + '\n').getBytes());
+                    } else {
+                        ret = appends_at_the_beginning(ret, ("R -F " + dir1.get(0).getName() + '\n').getBytes());
+                    }
                 } else {
-                    ret = appends_at_the_beginning(ret, ("R -F " + dir1.get(0).getName() + '\n').getBytes());
+                    if( dir1.get(0).isDir() ){
+                        ret = mod_recursively(ret, ((VersionedDir)dir1.get(0)).getContainedItens(), ((VersionedDir)dir2.get(Set.belongs_to(dir1.get(0), dir2))).getContainedItens());
+                    } else {
+                        ret = mod(ret, (VersionedFile)dir1.get(0), (VersionedFile)dir2.get(Set.belongs_to(dir1.get(0), dir2)));
+                    }
+                    dir2.remove(Set.belongs_to(dir1.get(0), dir2));
                 }
-            } else {
-//                if( Set.belongs_to(dir1.get(0), dir2) ){
-//                    // MODIFICAÇÃO
-//                    if( dir1.get(0).isDir() ){
-//                        // FALTA IDENTIFICADOR DO DIRETÓRIO RAIZ
-//                        mod_recursively(ret, dir1);
-//                    } else {
-//                        mod(ret, (VersionedFile)dir1.get(0));
-//                    }
-//                    dir2.remove(dir1.get(0));
-//                }
-            }
-            dir1.remove(dir1.get(0));
+                dir1.remove(dir1.get(0));
             }
             if( dir2.size() > 0 ){
-            if( !Set.belongs_to(dir2.get(0), lcs) ){
-                if( dir2.get(0).isDir() ){
-                    ret = add_recursively(ret, dir2);
+                if( Set.belongs_to(dir2.get(0), lcs) == -1 ){
+                    if( dir2.get(0).isDir() ){
+                        ret = appends_at_the_beginning(ret, ("A -D " + ((VersionedDir)dir2.get(0)).getName() + '\n').getBytes());
+                        ret = appends_at_the_beginning(ret, add_head( ret, (VersionedDir)dir2.get(0) ));
+                        ret = add_recursively(ret, ((VersionedDir)dir2.get(0)).getContainedItens());
+                        ret = appends_at_the_beginning(ret, add_tail( ret, ((VersionedDir)dir2.get(0)) ));
+                    } else {
+                        ret = add(ret, (VersionedFile)dir2.get(0));
+                    }
                 } else {
-                    ret = add(ret, (VersionedFile)dir2.get(0));
+                    if( dir2.get(0).isDir() ){
+                        ret = appends_at_the_beginning(ret, ("M -D " + d2.getName() + '\n').getBytes());
+                        ret = appends_at_the_beginning(ret, add_head( ret, d2 ));
+                        ret = mod_recursively(ret, ((VersionedDir)dir1.get(Set.belongs_to(dir2.get(0), dir1))).getContainedItens(), ((VersionedDir)dir2.get(0)).getContainedItens());
+                        ret = appends_at_the_beginning(ret, add_tail( ret, d2 ));
+                    } else {
+                        ret = add(ret, (VersionedFile)dir2.get(0));
+                    }
+                    dir1.remove(Set.belongs_to(dir2.get(0), dir1));
                 }
-            } else {
-                if( dir2.get(0).isDir() ){
-                    //ret = mod_recursively(ret, dir1, ((VersionedDir)dir2.get(0)));
-                } else {
-                    
-                }
-//                if( Set.belongs_to(dir2.get(0), dir1) ){
-//                    // MODIFICAÇÃO
-//                    if( dir1.get(0).isDir() ){
-//                        // FALTA IDENTIFICADOR DO DIRETÓRIO RAIZ
-//                        mod_recursively(ret, dir1);
-//                    } else {
-//                        mod(ret, (VersionedFile)dir1.get(0));
-//                    }
-//                    dir1.remove(dir2.get(0));
-//                }
-            }
-            dir2.remove(dir2.get(0));
+                dir2.remove(dir2.get(0));
             }
         }
         
@@ -319,23 +325,47 @@ public class Diff {
         for(int i = 0; i < dir.size(); i++){
             if(dir.get(i).isDir()){
                 main = appends_at_the_beginning(main, ("A -D " + dir.get(i).getName() + '\n').getBytes());
+                main = appends_at_the_beginning(main, add_head( main, dir.get(i) ));
                 main = add_recursively(main, dir);
+                main = appends_at_the_beginning(main, add_tail( main, dir.get(i) ));
             }
             else{
-                main = add(main, (VersionedFile)dir);
+                main = add(main, (VersionedFile)dir.get(i));
             }
         }
         return main;
     }
     
-    private static byte[] mod_recursively(byte[] main, List<VersionedItem> dir1, List<VersionedItem> dir2) throws ApplicationException{
-        for(int i = 0; i < dir1.size(); i++){
-            if(dir1.get(i).isDir()){
-                System.out.println("M -D " + dir2.get(i).getName());
-                //main = mod_recursively(main, dir);
+    private static byte[] mod_recursively(byte[] main, List<VersionedItem> dir, List<VersionedItem> dir_final ) throws ApplicationException{
+        for(int i = 0; i < dir.size(); i++){
+            if(dir.get(i).isDir()){
+                if( Set.belongs_to(dir.get(i), dir_final) != -1 ){
+                    main = appends_at_the_beginning(main, ("M -D " + dir.get(i).getName() + '\n').getBytes());
+                    main = appends_at_the_beginning(main, add_head( main, dir.get(i) ));
+                    main = mod_recursively(main, dir, ((VersionedDir)dir_final.get(Set.belongs_to(dir.get(i), dir_final))).getContainedItens());
+                    main = appends_at_the_beginning(main, add_tail( main, dir.get(i) ));
+                    dir_final.remove(Set.belongs_to(dir.get(i), dir_final));
+                } else {
+                    main = appends_at_the_beginning(main, ("R -D " + dir.get(i).getName() + '\n').getBytes());
+                }
             }
             else{
-                main = mod(main, (VersionedFile)dir1, (VersionedFile)dir2);
+                if( Set.belongs_to(dir.get(i), dir_final) != -1 ){
+                    main = mod(main, (VersionedFile)dir.get(i), (VersionedFile)dir_final.get(Set.belongs_to(dir.get(i), dir_final)));
+                    dir_final.remove(Set.belongs_to(dir.get(i), dir_final));
+                } else {
+                    main = appends_at_the_beginning(main, ("R -M " + dir.get(i).getName() + '\n').getBytes());
+                }
+            }
+        }
+        for( int i = 0; i < dir_final.size(); i++ ){
+            if( dir_final.get(i).isDir() ){
+            main = appends_at_the_beginning(main, ("A -D " + dir_final.get(i).getName() + '\n').getBytes());
+            main = appends_at_the_beginning(main, add_head( main, dir_final.get(i) ));
+            add_recursively(main, ((VersionedDir)dir_final.get(i)).getContainedItens());
+            main = appends_at_the_beginning(main, add_tail( main, dir.get(i) ));
+            } else {
+                add(main, (VersionedFile)dir_final.get(i));
             }
         }
         return main;
@@ -349,11 +379,9 @@ public class Diff {
         return main;
     }
     
-    private static byte[] mod(byte[] main, VersionedFile file1, VersionedFile file2) throws ApplicationException{
-        VersionedFile aux = new VersionedFile();
-        aux.setContent(new byte[0]);
-        System.out.println("M -F " + file2.getName() );
-        System.out.println(new String(diff(file1, file2)));
+    private static byte[] mod(byte[] main, VersionedFile file, VersionedFile file_final) throws ApplicationException{
+        main = appends_at_the_beginning(main, ("M -F " + file.getName()  + '\n').getBytes());
+        main = appends_at_the_beginning(main, diff(file, file_final));
         return main;
     }
 
@@ -524,8 +552,8 @@ public class Diff {
             ret_aux = appends_at_the_end(ID_DIR, ret_aux);
         } else {
             ret_aux = appends_at_the_end(ID_FILE, ret_aux);
-            ret_aux = appends_at_the_end(eol, ret_aux);
-            ret_aux = appends_at_the_end(((VersionedFile)dir).getHash().getBytes(), ret_aux);
+//            ret_aux = appends_at_the_end(eol, ret_aux);
+//            ret_aux = appends_at_the_end(((VersionedFile)dir).getHash().getBytes(), ret_aux);
         }
         
         ret_aux = appends_at_the_end(eol, ret_aux);
@@ -533,11 +561,11 @@ public class Diff {
         // REC HEADER
         // // NAME
         // // AUTHOR
-        System.out.println(dir.getName());
+//        System.out.println(dir.getName());
         ret_aux = appends_at_the_end(dir.getName().getBytes(), ret_aux);
         ret_aux = appends_at_the_end(eol, ret_aux);
-        ret_aux = appends_at_the_end(dir.getAuthor().getBytes(), ret_aux);
-        ret_aux = appends_at_the_end(eol, ret_aux);
+//        ret_aux = appends_at_the_end(dir.getAuthor().getBytes(), ret_aux);
+//        ret_aux = appends_at_the_end(eol, ret_aux);
         
         return ret_aux;
     }
@@ -550,9 +578,9 @@ public class Diff {
         // // /§F
         // ret = appends_at_the_end(eol, ret);
         if( dir.isDir() ){
-            ret = appends_at_the_end(ID_DIR, new byte[0]);
+            ret = appends_at_the_end(ID_END_DIR, new byte[0]);
         } else {
-            ret = appends_at_the_end(ID_FILE, new byte[0]);
+            ret = appends_at_the_end(ID_END_FILE, new byte[0]);
         }
         ret = appends_at_the_end(eol, ret);
         
