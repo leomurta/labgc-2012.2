@@ -27,11 +27,20 @@ public class Diff {
     private final static byte[] ID_END_DIR  = (new String("/§§D")).getBytes();
     private final static byte[] ID_FILE = (new String("/§F")).getBytes();
     private final static byte[] ID_END_FILE = (new String("/§§F")).getBytes();
+    
+    private final static byte[] ADD = (new String("A")).getBytes();
+    private final static byte[] DEL = (new String("R")).getBytes();
+    private final static byte[] MOD = (new String("M")).getBytes();
+    
+    private final static byte[] FILE_PARAM = (new String("-F")).getBytes();
+    private final static byte[] DIR_PARAM  = (new String("-D")).getBytes();
+    
+    private static byte[] delta1;
 
     public static void main(String args[]) throws ApplicationException {
         byte[] testeA;
         byte[] testeB;
-        String teste2 = "D" + '\n' + "Caramba !" + '\n' + "G" + '\n' + "M";
+        String teste2 = "Caramba!" + '\n' + "tt" + '\n' + "G" + '\n' + "M";
         String teste3 = "Todos os papeis são amarelos" + '\n' + "Caramba !" + '\n' + "HTT" + '\n' + "I" + '\n' + "G" + '\n' + "TGG";
 //
         testeA = teste2.getBytes();
@@ -103,8 +112,11 @@ public class Diff {
         
         dir2.addItem(file2);
         dir2.addItem(file4);
-        
-        System.out.println(new String(diff(dir1, dir2)));
+        System.out.println(new String(file1.getContent()));
+        System.out.println("-------------------------------------");
+        System.out.println(new String(file4.getContent()));
+        System.out.println("-------------------------------------");
+        System.out.println(new String(apply(file1, diff(file1, file4))));
         
     }
 
@@ -124,59 +136,85 @@ public class Diff {
         return null;
     }
 
-    public static byte[] apply(VersionedFile file1, byte[] delta) {
-
-        byte[] delta_aux = delta;
-
-        //while (getFline(delta_aux)[0] != EOF) {
-            // Comparação de Bytes
-            // Se R, Remove
-            // Se A, Adiciona
-        //}
-
-        return null;
-
-    }
-    
-    public static List<VersionedItem> apply(VersionedDir dir, byte[] delta){
-        byte[] delta1 = delta.clone();
-        byte[] aux;
+    public static byte[] apply(VersionedFile file1, byte[] delta) throws ApplicationException {
         
-        ArrayList<VersionedItem> ret = new ArrayList<>();
+        // ARQUIVO DE RETORNO
+        byte[] ret  = new byte[0];
+        byte[] file = file1.getContent().clone();
         
-        while(countLines(delta1) > 0){
-            aux = get_first_sequence(delta1);
-            delta1 = del_first_sequence(aux.length, delta1);
+        delta1 = delta.clone();
+        byte[] first_line = get_first_sequence(delta1);
+        delta1 = del_first_sequence(first_line.length, delta1);
+
+        
+        int block = 0;
+        int current_line = 0;
+
+        if( !has_diff( del_line_wraps(first_line), ID_FILE ) ){
             
-            if( !has_diff(aux, ID_DIR) ){
-                // Começa Apply em Diretório
-                // Retorna um DIRETÓRIO para um LIST
-                VersionedDir dir_final = new VersionedDir();
-                // Lê delta até completar HEADER do dir_final
+            // CARREGAR HEADER
+            first_line = get_first_sequence(delta1);
+            delta1 = del_first_sequence(first_line.length, delta1);
+        
+            // ITERAR ATÉ ACHAR O ID_END_FILE
+            first_line = get_first_sequence(delta1);
+            delta1 = del_first_sequence(first_line.length, delta1);
+            
+            while( has_diff( del_line_wraps(first_line), ID_END_FILE ) ){
                 
-                while( has_diff(aux, ID_END_DIR) ){
-                    // COMANDOS
-                    // A -F
-                    // // ret.add( apply() )
-                    // A -D
-                    // // ret.add( apply() )
-                    // R -F
-                    // R -D
-                    // M -F
-                    // M -D
+                while( current_line < Integer.valueOf( new String( get_param( del_line_wraps(first_line), 3 ) ) ) ){
+                    ret = appends_at_the_end(get_first_sequence(file), ret);
+                    file = del_first_sequence(get_first_sequence(file).length, file);
+                    current_line++;
                 }
-            } else {
-                if( !has_diff(aux, ID_FILE) ){
-                    // Começa Apply em Arquivo
-                    // Retorna um ARQUIVO para um LIST
+                // IDENTIFICA QUAL COMANDO
+                // A ou R
+                if( !has_diff( get_param( del_line_wraps(first_line), 1 ), DEL ) ){
+                    // DEL_LINE
+                    // SE O BLOCO FOR O MESMO
+                    // ITERAR NO ARQUIVO PRINCIPAL ATÉ A LINHA CORRESPONDENTE
+                    if( block == Integer.valueOf( new String( get_param( del_line_wraps(first_line), 2 ) ) ) ){
+                        int it = Integer.valueOf( new String( get_param( del_line_wraps(first_line), 4 ) ) );
+                        for( int i = Integer.valueOf( new String( get_param( del_line_wraps(first_line), 3 ) ) ); i < it+1; i++ ){
+                            first_line = get_first_sequence(file);
+                            file = del_first_sequence(first_line.length, file);
+                            current_line++;
+                        }
+                    }
+                first_line = get_first_sequence(delta1);
+                delta1 = del_first_sequence(first_line.length, delta1);
                 }
+
+                
+                if( !has_diff( get_param( first_line, 1 ), ADD ) ){
+                    // ADD_LINE
+                    // SE O BLOCO FOR O MESMO
+                    // ADD LINHAS NOVAS NO ARQUIVO DE RETORNO
+                    if( block == Integer.valueOf( new String( get_param( del_line_wraps(first_line), 2 ) ) ) ){
+                        int it = Integer.valueOf( new String( get_param( del_line_wraps(first_line), 4 ) ) );
+                        for( int i = 0; i < it; i++ ){
+                            first_line = get_first_sequence(delta1);
+                            delta1 = del_first_sequence(first_line.length, delta1);
+                            ret = appends_at_the_end(first_line, ret);
+                        }
+                    }
+                first_line = get_first_sequence(delta1);
+                delta1 = del_first_sequence(first_line.length, delta1);
+                }
+                
+                block++;
             }
+            
+        } else {
+            // TÁ ERRADO
         }
         
-        return null;
+        return ret;
     }
     
-    private static VersionedDir()
+    public static VersionedItem apply(VersionedItem dir, byte[] delta){
+        return null;
+    }
 
     private static byte[] diff(VersionedFile file1, VersionedFile file2) throws ApplicationException {
         // DIFFERENCE BETWEEN FILES
@@ -585,6 +623,11 @@ public class Diff {
         ret = appends_at_the_end(eol, ret);
         
         return ret;
+    }
+    
+    private static byte[] get_param( byte[] args, int param ){
+        String[] retorno = (new String(args)).split(" ");
+        return retorno[param-1].getBytes();
     }
     
 }
