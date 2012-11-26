@@ -538,6 +538,7 @@ public class VersionedItemUtils {
                 file = this.applyDiff(pristine, working);
             }
             file.setStatus(EVCSConstants.MODIFIED);
+            file.setAuthor(System.getProperty("user.name"));
         }
 
         return file;

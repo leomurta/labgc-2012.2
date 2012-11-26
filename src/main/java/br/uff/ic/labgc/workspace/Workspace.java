@@ -375,10 +375,11 @@ public class Workspace implements IWorkspace {
         root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens())); // testar depois se veio unmodified e throws erro
         root.setLastChangedRevision(this.getRevision());
         root.setName(WS_FOLDER);
-        root.setStatus(EVCSConstants.MODIFIED);
+
         if (!VersionedItemUtils.isModified(root.getContainedItens())){
             throw new WorkspaceException("Conteúdo não foi modificado");
         }
+        root.setStatus(EVCSConstants.MODIFIED);
         return root;
         
     }
