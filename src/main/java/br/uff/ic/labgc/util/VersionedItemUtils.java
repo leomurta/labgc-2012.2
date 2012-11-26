@@ -454,6 +454,7 @@ public class VersionedItemUtils {
                 VersionedDir dir = (VersionedDir) item;
                 root.addItem(this.setAdded(dir.getContainedItens()));
             } else {
+                item.setAuthor (System.getProperty("user.name"));  // Author
                 root.addItem(item);
             }
 
@@ -538,7 +539,7 @@ public class VersionedItemUtils {
                 file = this.applyDiff(pristine, working);
             }
             file.setStatus(EVCSConstants.MODIFIED);
-            file.setAuthor(System.getProperty("user.name"));
+            file.setAuthor(System.getProperty("user.name")); // Author
         }
 
         return file;
