@@ -17,7 +17,6 @@ public class Set {
         ArrayList<VersionedItem> retorno = new ArrayList<>();
         if( set1.size() > 0 || set2.size() > 0 ){
             for( int i = 0; i < set1.size(); i++ ){
-                System.out.println(set1.get(i).getName());
                 if( belongs_to(set1.get(i), set2) != -1 ){
                     retorno.add(set1.get(i));
                 }
@@ -36,6 +35,8 @@ public class Set {
             } else {
                 if( !item.isDir() && !set1.get(i).isDir() ){
                     if((item).getName().equals((set1.get(i)).getName())){
+                    System.out.println(item.getName());
+                    System.out.println(set1.get(i).getName());
                         ret = i;
                     }
                 }

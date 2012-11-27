@@ -40,8 +40,8 @@ public class Diff {
     public static void main(String args[]) throws ApplicationException {
         byte[] testeA;
         byte[] testeB;
-        String teste2 = "Caramba!" + '\n' + "tt" + '\n' + "G" + '\n' + "M";
-        String teste3 = "Todos os papeis são amarelos" + '\n' + "Caramba !" + '\n' + "HTT" + '\n' + "I" + '\n' + "G" + '\n' + "TGG";
+        String teste2 = "Caramba !" + '\n' + "tt" + '\n' + "GH" + '\n' + "G" + '\n' + "R";
+        String teste3 = "Todos os papeis são amarelos" + '\n' + "Caramba !" + '\n' + "HTT" + '\n' + "I" + '\n' + "TG" + '\n' + "G" + '\n' + "R";
 //
         testeA = teste2.getBytes();
         testeB = teste3.getBytes();
@@ -112,12 +112,25 @@ public class Diff {
         
         dir2.addItem(file2);
         dir2.addItem(file4);
-        System.out.println(new String(file1.getContent()));
-        System.out.println("-------------------------------------");
-        System.out.println(new String(file4.getContent()));
-        System.out.println("-------------------------------------");
-        System.out.println(new String(apply(file1, diff(file1, file4))));
+
+        //System.out.println(new String(diff(dir1, dir2)));
+        VersionedDir teste_final = apply( dir1, diff(dir1, dir2) );
+        System.out.println("-------------------------");
+        //show( teste_final.getContainedItens(), 0 );
         
+    }
+    
+    public static void show( List<VersionedItem> lista, int ident ){
+        String vazio = "";
+        for( int i = 0; i < ident; i++ ){
+            vazio += " ";
+        }
+        for( int i = 0; i < lista.size(); i++ ){
+            System.out.println( vazio + lista.get(i).getName() );
+            if( lista.get(i).isDir() ){
+                show( ((VersionedDir)lista.get(i)).getContainedItens(), ident+1 );
+            }
+        }
     }
 
     public static byte[] run(VersionedItem file1, VersionedItem file2) throws ApplicationException, IncompatibleItensException {
@@ -151,10 +164,6 @@ public class Diff {
         int current_line = 0;
 
         if( !has_diff( del_line_wraps(first_line), ID_FILE ) ){
-            
-            // CARREGAR HEADER
-            first_line = get_first_sequence(delta1);
-            delta1 = del_first_sequence(first_line.length, delta1);
         
             // ITERAR ATÉ ACHAR O ID_END_FILE
             first_line = get_first_sequence(delta1);
@@ -212,7 +221,140 @@ public class Diff {
         return ret;
     }
     
-    public static VersionedItem apply(VersionedItem dir, byte[] delta){
+    public static VersionedDir apply(VersionedDir dir, byte[] delta) throws ApplicationException{
+        
+        
+        // DIRETÓRIO DE RETORNO
+        VersionedDir ret = new VersionedDir();
+        ret.setName(dir.getName());
+        ret.addItem(dir.getContainedItens());
+        
+        delta1 = delta.clone();        
+        byte[] first_line = get_first_sequence(delta1);
+        delta1 = del_first_sequence(first_line.length, delta1);
+
+        System.out.println( new String(del_line_wraps(first_line)));
+        
+        if( !has_diff( del_line_wraps(first_line), ID_DIR ) ){
+            
+            first_line = get_first_sequence(delta1);
+            delta1 = del_first_sequence(first_line.length, delta1);
+            
+            System.out.println( new String(del_line_wraps(first_line)));
+            
+            while( has_diff( del_line_wraps(first_line), ID_END_FILE ) ){
+                
+                System.out.println("ENTREI !!");
+                
+                if( !has_diff( get_param(first_line, 1), ADD ) ){
+                    
+                    if( !has_diff( get_param(first_line, 2), FILE_PARAM ) ){
+                        
+                        // CRIA NOVO ARQUIVO
+                        VersionedFile file_aux = new VersionedFile();
+                        file_aux.setName( new String( get_param(first_line, 3) ) );
+                        file_aux.setContent( new byte[0] );
+                        
+                        file_aux.setContent( apply( file_aux, delta ) );
+                        
+                        ret.addItem( file_aux );
+                        
+                    } else {
+                        
+                        if( !has_diff( get_param(first_line, 2), DIR_PARAM ) ){
+                            
+                            // CRIA NOVO DIRETÓRIO
+                            VersionedDir dir_aux = new VersionedDir();
+                            dir_aux.setName( new String( get_param(first_line, 3) ) );
+                            dir_aux = apply( dir_aux, delta );
+
+                            ret.addItem( dir_aux );
+                            
+                        }
+                        
+                    }
+                    
+                } else {
+                    if( !has_diff( get_param(first_line, 1), DEL ) ){
+
+                        if( !has_diff( get_param(first_line, 2), FILE_PARAM ) ){
+
+                            // REMOVE ARQUIVO
+                            List<VersionedItem> list_aux = ret.getContainedItens();
+                            VersionedFile aux = new VersionedFile();
+                            aux.setName( new String( del_line_wraps(get_param(first_line, 3))) );
+                            list_aux.remove( Set.belongs_to(aux, list_aux) );
+                            
+                            ret.setContainedItens( list_aux );
+
+                        } else {
+
+                            if( !has_diff( get_param(first_line, 2), DIR_PARAM ) ){
+
+                                // REMOVE DIRETÓRIO
+                                List<VersionedItem> list_aux = ret.getContainedItens();
+                                VersionedDir aux = new VersionedDir();
+                                aux.setName( new String( get_param(first_line, 3) ) );
+                                list_aux.remove( Set.belongs_to(aux, list_aux) );
+
+                                ret.setContainedItens( list_aux );
+
+                            }
+
+                        }
+
+                    } else {
+                        
+                        if( !has_diff( get_param(first_line, 1), MOD ) ){
+
+                            if( !has_diff( get_param(first_line, 2), FILE_PARAM ) ){
+
+                                // MODIFICA ARQUIVO
+                                List<VersionedItem> list_aux = ret.getContainedItens();
+                                VersionedFile older = new VersionedFile();
+                                VersionedFile newer = new VersionedFile();
+                                
+                                older.setName( new String( get_param(first_line, 3) ) );
+                                older = (VersionedFile)list_aux.get( Set.belongs_to(older, list_aux) );
+                                
+                                newer.setName( new String( get_param(first_line, 3) ) );
+                                
+                                newer.setContent( apply( older, delta1 ) );
+                                
+                                list_aux.set( Set.belongs_to(older, list_aux), newer );
+
+                                ret.setContainedItens( list_aux );
+
+                            } else {
+
+                                if( !has_diff( get_param(first_line, 2), DIR_PARAM ) ){
+
+                                    // MODIFICA DIRETÓRIO
+                                    List<VersionedItem> list_aux = ret.getContainedItens();
+                                    
+                                    VersionedDir older = new VersionedDir();
+                                    older.setName( new String( get_param(first_line, 3) ) );
+                                    older = (VersionedDir)list_aux.get( Set.belongs_to(older, list_aux) );
+                                    
+                                    VersionedDir newer = apply( older, delta1 );
+                                    newer.setName( new String( get_param(first_line, 3) ) );
+
+                                    list_aux.set( Set.belongs_to(older, list_aux), newer );
+
+                                    ret.setContainedItens( list_aux );
+
+                                }
+
+                            }
+
+                        }
+                        
+                    }
+                }
+                
+            }
+        }
+        
         return null;
     }
 
@@ -265,11 +407,11 @@ public class Diff {
         }
         
         // REMOVE TODAS AS LINHAS APÓS LCS DA SEQ1
-        if( i <= tam_seq1 )
+        if( i < tam_seq1 )
             ret += ("R " + h + " " + i + " " + (tam_seq1-1) ) + '\n';
         
         // ADICIONA TODAS AS LINHAS APÓS LCS DA SEQ2
-        if( j <= tam_seq2 ){
+        if( j < tam_seq2 ){
             lines_added.removeAll(lines_added);
             while( !isNull(seq2) ){
                 lines_added.add( new String( del_line_wraps( get_first_sequence(seq2) ) ) );
@@ -302,12 +444,6 @@ public class Diff {
         int j = 0;
         
         List<VersionedItem> lcs = lcs(dir1, dir2);
-        
-        System.out.println("LCS------");
-        for(int z = 0; z < lcs.size(); z++ ){
-            System.out.println(lcs.get(z).getName());
-        }
-        System.out.println("LCS------");
         
         ret = appends_at_the_beginning(ret, add_head( ret, d1 ));
         
@@ -600,8 +736,8 @@ public class Diff {
         // // NAME
         // // AUTHOR
 //        System.out.println(dir.getName());
-        ret_aux = appends_at_the_end(dir.getName().getBytes(), ret_aux);
-        ret_aux = appends_at_the_end(eol, ret_aux);
+//        ret_aux = appends_at_the_end(dir.getName().getBytes(), ret_aux);
+//        ret_aux = appends_at_the_end(eol, ret_aux);
 //        ret_aux = appends_at_the_end(dir.getAuthor().getBytes(), ret_aux);
 //        ret_aux = appends_at_the_end(eol, ret_aux);
         
