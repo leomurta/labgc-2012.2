@@ -281,23 +281,35 @@ public class Workspace implements IWorkspace {
     }
     
     public VersionedItem status()
-            throws ApplicationException {
+            throws WorkspaceException {
         File local = new File(workspaceDir);
         File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
         
-        VersionedDir root = new VersionedDir(); 
-        VersionedDir working = new VersionedDir();
-        VersionedDir pristine = new VersionedDir();
-                
-        String exclusions[] = {WS_FOLDER};
-        working.addItem(VersionedItemUtils.read(local, exclusions, false));//false nao le o conteudo
-        pristine.addItem(VersionedItemUtils.read(mirror, false));
-        
-        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
-        
-        return root;
-        
+        String dir01 = workspaceDir + File.separator + WS_FOLDER + File.separator + ESPELHO;
+        String dir02 = workspaceDir;
+        VersionedItem lItem;
+        lItem = compareDir(dir01, dir02);
+        return lItem;
     }
+    
+//    public VersionedItem status()
+//            throws ApplicationException {
+//        File local = new File(workspaceDir);
+//        File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
+//        
+//        VersionedDir root = new VersionedDir(); 
+//        VersionedDir working = new VersionedDir();
+//        VersionedDir pristine = new VersionedDir();
+//                
+//        String exclusions[] = {WS_FOLDER};
+//        working.addItem(VersionedItemUtils.read(local, exclusions, false));//false nao le o conteudo
+//        pristine.addItem(VersionedItemUtils.read(mirror, false));
+//        
+//        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
+//        
+//        return root;
+//        
+//    }
 
     public void update(VersionedItem files) 
             throws ApplicationException {
@@ -477,6 +489,7 @@ public class Workspace implements IWorkspace {
 
                 item.setName(file2.getName());
                 item.setStatus(EVCSConstants.MODIFIED);
+		item.setAuthor(System.getProperty("user.name")); // Author
                 listVersionedItems.add(item);
             }
             if (!file2.exists()) { //se foi deletado
@@ -489,9 +502,11 @@ public class Workspace implements IWorkspace {
 
                 item.setName(file2.getName());
                 item.setStatus(EVCSConstants.DELETED);
+		item.setAuthor(System.getProperty("user.name")); // Author
                 listVersionedItems.add(item);
             }
         }
+        
         baseDir = Paths.get(workspaceDir);
         countdir = baseDir.getNameCount();
         File dir02 = new File(workspaceDir);
@@ -511,6 +526,8 @@ public class Workspace implements IWorkspace {
                 }
                 //se foi adicionado
                 item.setName(f.getName());
+				item.setStatus(EVCSConstants.ADDED);
+				item.setAuthor(System.getProperty("user.name")); // Author
                 listVersionedItems.add(item);
             }
         }
