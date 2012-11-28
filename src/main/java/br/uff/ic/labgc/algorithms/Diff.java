@@ -41,7 +41,7 @@ public class Diff {
         byte[] testeA;
         byte[] testeB;
         String teste2 = "Caramba !" + '\n' + "tt" + '\n' + "GH" + '\n' + "G" + '\n' + "R" + '\n' + "Z";
-        String teste3 = "Todos os papeis são amarelos" + '\n' + "Caramba !" + '\n' + "HTT" + '\n' + "I" + '\n' + "TG" + '\n' + "G" + '\n' + "R";
+        String teste3 = "Todos os papeis são amarelos" + '\n' + "Caramba !" + '\n' + "HTT" + '\n' + "I" + '\n' + "TG" + '\n' + "G" + '\n' + "R" + '\n' + "S";
 //
         testeA = teste2.getBytes();
         testeB = teste3.getBytes();
@@ -94,6 +94,18 @@ public class Diff {
         dir2.setName("MyDirectory2");
         dir2.setAuthor("Raphael");
         
+        // // // SUB-DIRETÓRIO 1
+        VersionedDir dir4 = new VersionedDir();
+        dir4.setName("MyDirectory4");
+        
+        // // // ARQUIVO 6
+        VersionedFile file6 = new VersionedFile();
+        file6.setName("FILE5");
+        file6.setAuthor("Raphael");
+        file6.setContent(testeB);
+        
+        dir4.addItem(file6);
+        
         // // // ARQUIVO 2
         VersionedFile file2 = new VersionedFile();
         file2.setName("FILE2");
@@ -108,8 +120,9 @@ public class Diff {
         
         dir1.addItem(file1);
         dir1.addItem(file3);
-        dir2.addItem(dir3);
+        dir1.addItem(dir4);
         
+        dir2.addItem(dir3);
         dir2.addItem(file2);
         dir2.addItem(file4);
 
@@ -127,6 +140,7 @@ public class Diff {
         System.out.println(teste_final.getName());
         show(teste_final.getContainedItens(), 1);
         System.out.println("-------------------------");
+        System.out.println(new String(diff(file1, file2)));
         //show( teste_final.getContainedItens(), 0 );
         
     }
@@ -202,9 +216,9 @@ public class Diff {
                             file = del_first_sequence(first_line.length, file);
                             current_line++;
                         }
+                        first_line = get_first_sequence(delta1);
+                        delta1 = del_first_sequence(first_line.length, delta1);
                     }
-                first_line = get_first_sequence(delta1);
-                delta1 = del_first_sequence(first_line.length, delta1);
                 }
 
                 
@@ -219,9 +233,9 @@ public class Diff {
                             delta1 = del_first_sequence(first_line.length, delta1);
                             ret = appends_at_the_end(first_line, ret);
                         }
+                        first_line = get_first_sequence(delta1);
+                        delta1 = del_first_sequence(first_line.length, delta1);
                     }
-                first_line = get_first_sequence(delta1);
-                delta1 = del_first_sequence(first_line.length, delta1);
                 }
                 
                 block++;
@@ -306,8 +320,7 @@ public class Diff {
                                 // REMOVE DIRETÓRIO
                                 List<VersionedItem> list_aux = ret.getContainedItens();
                                 VersionedDir aux = new VersionedDir();
-                                aux.setName( new String( get_param(first_line, 3) ) );
-                                list_aux.remove( Set.belongs_to(aux, list_aux) );
+                                list_aux.remove( Set.belongs_to(new String(del_line_wraps(get_param(first_line, 3))), list_aux) );
 
                                 ret.setContainedItens( list_aux );
 
@@ -419,21 +432,31 @@ public class Diff {
         }
         
         // REMOVE TODAS AS LINHAS APÓS LCS DA SEQ1
-        if( i < tam_seq1 )
-            ret += ("R " + h + " " + i + " " + (tam_seq1-1) ) + '\n';
+        int i_aux = i;
+        boolean teste = false;
+        while( !isNull(seq1) ){
+            i++;
+            seq1 = del_first_sequence( get_first_sequence(seq1).length, seq1 );
+            teste = true;
+        }
+        if(teste)
+            ret += ("R " + h + " " + i_aux + " " + (i-1) ) + '\n';
         
         // ADICIONA TODAS AS LINHAS APÓS LCS DA SEQ2
-        if( j < tam_seq2 ){
+
             lines_added.removeAll(lines_added);
+            teste = false;
             while( !isNull(seq2) ){
                 lines_added.add( new String( del_line_wraps( get_first_sequence(seq2) ) ) );
                 seq2 = del_first_sequence( get_first_sequence(seq2).length, seq2 );
+                teste = true;
             }
-            ret += ("A " + h + " " + i + " " + lines_added.size() ) + '\n';
-            for( int r = 0; r < lines_added.size(); r++ ){
-                ret += ( lines_added.get(r) ) + '\n';
+            if(teste){
+                ret += ("A " + h + " " + i_aux + " " + lines_added.size() ) + '\n';
+                for( int r = 0; r < lines_added.size(); r++ ){
+                    ret += ( lines_added.get(r) ) + '\n';
+                }
             }
-        }
         
         ret += new String( add_tail(new byte[0], file1) );
 
@@ -712,7 +735,7 @@ public class Diff {
     }
 
     private static boolean isNull(byte[] seq) {
-        return (seq.length == 0);
+        return (seq.length == 0 );
     }
     
     private static byte[] del_line_wraps(byte[] seq){
