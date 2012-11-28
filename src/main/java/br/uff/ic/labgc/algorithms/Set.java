@@ -35,11 +35,19 @@ public class Set {
             } else {
                 if( !item.isDir() && !set1.get(i).isDir() ){
                     if((item).getName().equals((set1.get(i)).getName())){
-                    System.out.println(item.getName());
-                    System.out.println(set1.get(i).getName());
                         ret = i;
                     }
                 }
+            }
+        }
+        return ret;
+    }
+    
+    public static int belongs_to( String item, List<VersionedItem> set1 ) throws ApplicationException{
+        int ret = -1;
+        for( int i = 0; i < set1.size() && ret == -1; i++ ){
+            if( item.equals( set1.get(i).getName() ) ){
+                ret = i;
             }
         }
         return ret;
