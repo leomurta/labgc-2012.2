@@ -229,10 +229,11 @@ public class WorkspaceTests {
     /**
      * Test of status method, of class Workspace.
      */
-    //@Test
+    @Test
     public void testStatus() throws Exception {
         System.out.println("status");
-        Workspace instance = new Workspace("F:/mybackups/Educacao/Mestrado-UFF/Git/labgc-2012.2/launchers/windows/projeto1");
+        String path = System.getProperty("user.dir").concat("\\launchers\\windows\\projeto1");
+        Workspace instance = new Workspace(path);
         VersionedItem expResult = null;
         VersionedItem result = instance.status();
         assertEquals(expResult, result);
@@ -242,7 +243,7 @@ public class WorkspaceTests {
      * Test of update method, of class Workspace.
      */
     //@Test
-    public void testUpdate() {
+    public void testUpdate() throws ApplicationException {
         System.out.println("update");
         VersionedItem files = null;
         Workspace instance = null;
@@ -261,7 +262,7 @@ public class WorkspaceTests {
         VersionedItem expResult = null;
         VersionedItem result = null;
         try {
-            result = instance.commit();
+            result = instance.beginCommit();
         } catch (ApplicationException ex) {
             Logger.getLogger(WorkspaceTests.class.getName()).log(Level.SEVERE, null, ex);
         }
