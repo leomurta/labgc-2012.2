@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.storage;
 
+import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.InfrastructureException;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
@@ -160,7 +161,7 @@ public class ProjectUserDAOTest implements IDAOTest{
      * Test of getByToken method, of class ProjectUserDAO.
      */
     @Test
-    public void testGetByToken() {
+    public void testGetByToken() throws ApplicationException {
         System.out.println("getByToken");
         String token = "nvfdovhfdoivbiofdvf";
         ProjectUser result = projectUserDAO.getByToken(token);
