@@ -4,12 +4,9 @@
  */
 package br.uff.ic.labgc.storage;
 
-import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
-import br.uff.ic.labgc.versioning.Versioning;
-import java.lang.reflect.Method;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

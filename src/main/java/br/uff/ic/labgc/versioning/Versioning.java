@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.versioning;
 
+import br.uff.ic.labgc.algorithms.Diff;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
@@ -140,6 +141,7 @@ public class Versioning implements IVersioning{
     }
     
     //nao encontrado, senha incorreta, sem permissao
+    @Override
     public String login(String projectName, String userName, String pass) throws VersioningException{
         User user = userDAO.getByUserName(userName);
         if (!user.getPassword().equals(pass)){
@@ -156,6 +158,13 @@ public class Versioning implements IVersioning{
         return pu.getToken();
     }
 
+    /**
+     *
+     * @param hash
+     * @param projectName
+     * @return
+     * @throws ApplicationException
+     */
     @Override
     public byte[] getVersionedFileContent (String hash, String projectName) throws ApplicationException{
         
@@ -168,7 +177,7 @@ public class Versioning implements IVersioning{
             throw new VersioningIOException("nao foi possivel ler o conteudo do arquivo",ex);
         }
     }
-    public static byte[] getBytesFromFile(File file) throws IOException {
+    private static byte[] getBytesFromFile(File file) throws IOException {
         InputStream is = new FileInputStream(file);
     
         // Get the size of the file
@@ -357,6 +366,9 @@ public class Versioning implements IVersioning{
      */
     @Override
     public VersionedDir updateRevision(String revNum, String revTo, String token) throws ApplicationException {
+        //VersionedDir vd = getRevision(revNum, token);
+        //VersionedDir vdTo = getRevision(revTo, token);
+        //return Diff.diff(vd,vdTo);
         return getRevision(revTo, token);
     }
     
