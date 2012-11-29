@@ -4,7 +4,6 @@
  */
 package br.uff.ic.labgc.versioning;
 
-import br.uff.ic.labgc.algorithms.Diff;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
@@ -28,28 +27,16 @@ import br.uff.ic.labgc.storage.User;
 import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javassist.bytecode.Descriptor;
 
 /**
  *
