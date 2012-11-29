@@ -10,13 +10,10 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
-import br.uff.ic.labgc.exception.StorageCanNotCreateDirException;
 import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
-import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
-import br.uff.ic.labgc.exception.StorageUserNotFoundException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
 import br.uff.ic.labgc.storage.ConfigurationItemDAO;
 import br.uff.ic.labgc.storage.Project;
@@ -70,11 +67,13 @@ public class Versioning implements IVersioning{
         protected void addProject(String projName, String userName, ConfigurationItem ci) throws StorageException{
             super.addProject(projName, userName, ci);
         }
+        @Override
         protected String hashToPath(String hash){
             return super.hashToPath(hash);
         }
-        protected void storeFiles(VersionedDir father, String projName) throws ApplicationException {
-            super.storeFiles(father, projName);
+        @Override
+        protected void persistFile(String dirPath, String filePath, byte[] content) throws ApplicationException {
+            super.persistFile(dirPath, filePath, content);
         }
     }
     
@@ -275,7 +274,7 @@ public class Versioning implements IVersioning{
             previous.setNext(ci);
             configItemDAO.add(ci);
 
-            storage.storeFiles(vd, projectName);
+            storeFiles(vd, projectName);
 
             revision.setConfigItem(ci);
             HibernateUtil.commitTransaction();
@@ -304,7 +303,7 @@ public class Versioning implements IVersioning{
         
         versionedDirToConfigItem(vd,ci,true);
         configItemDAO.add(ci);
-        storage.storeFiles(vd, projectName);
+        storeFiles(vd, projectName);
     }
     
     private void versionedDirToConfigItem(VersionedDir vd, ConfigurationItem father, boolean first){
@@ -401,5 +400,20 @@ public class Versioning implements IVersioning{
         }
         
         return list;
+    }
+    
+    protected void storeFiles(VersionedDir father, String projName) throws ApplicationException {
+        for (Iterator<VersionedItem> it = father.getContainedItens().iterator(); it.hasNext();) {
+            VersionedItem vi = it.next();
+            if (vi.getStatus() == EVCSConstants.DELETED || vi.getStatus() == EVCSConstants.UNMODIFIED){
+                continue;
+            }
+            if (vi.isDir()) {
+                storeFiles((VersionedDir) vi, projName);
+                continue;
+            }
+            VersionedFile vf = (VersionedFile) vi;
+            storage.persistFile(projName, vf.getHash(), vf.getContent());
+        }
     }
 }

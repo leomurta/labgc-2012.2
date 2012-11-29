@@ -123,12 +123,13 @@ public class StorageTest {
      * Test of storeFiles method, of class Storage.
      */
     //@Test
-    public void testStoreFiles() throws Exception {
+    public void testPersistFile() throws Exception {
         System.out.println("storeFiles");
-        VersionedDir father = null;
-        String projName = "";
+        String dirPath = "";
+        String filePath = "";
+        byte[] content = null;
         Storage instance = new Storage();
-        instance.storeFiles(father, projName);
+        instance.persistFile(dirPath, filePath, content);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
