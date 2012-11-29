@@ -134,9 +134,11 @@ public class Cli {
 
         //CommandLineParser parser = new PosixParser();
         
-        /*args = new String[2];
-        args[0]="-revert";
-        args[1]="asas";*/
+        /*args = new String[4];
+        args[0]="-create";
+        args[1]="localhost";
+        args[1]="--n";
+        args[1]="ProjetoLeo";*/
         
         CommandLineParser parser = new GnuParser();
         addOptions();
@@ -345,7 +347,8 @@ public class Cli {
         }
     }
 
-    private boolean checkLogin() {
+    private boolean checkLogin() 
+    {
 
         //Verificando Login
         try {
@@ -613,17 +616,27 @@ public class Cli {
                         System.out.println(ex.getMessage());
                     }
                 }
-                
+                //System.out.println("AAAAAAAA");
                 m_IClient = new Client();
-              try {
+                
+                Scanner leitor = new Scanner(System.in);
+                System.out.println("Type Login:");
+                String strLogin = leitor.nextLine();
+
+                //System.out.println("Type Password:");
+                //String strPass = leitor.nextLine();
+                
+              try 
+              {
                   m_IClient.setHost(strHost);
-                  //TODO pedir login para ter username
-                  m_IClient.admCreateProject(strProjectName, "username1");
-              } catch (ApplicationException ex) {
+                  m_IClient.admCreateProject(strProjectName, strLogin);
+              } 
+              catch (ApplicationException ex) 
+              {
                   Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+                  System.out.println(ex.getMessage());
               }
                 
-                //TODO Chamanr Método para Criacao de Método
            }
            else
            {
