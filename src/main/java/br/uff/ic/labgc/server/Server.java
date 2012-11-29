@@ -31,8 +31,8 @@ public class Server extends AbstractServer {
         return versioning.addRevision((VersionedDir)file, token);
     }
 
-    public VersionedItem update(String clientRevision, String revision,  String token) throws ApplicationException {
-        return versioning.updateRevision(clientRevision, revision, token);
+    public VersionedItem update(String revision,  String token) throws ApplicationException {
+        return versioning.updateRevision(revision, token);
     }
 
     public VersionedItem checkout(String revision, String token) throws ApplicationException {

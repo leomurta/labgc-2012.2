@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.versioning;
 
+import br.uff.ic.labgc.algorithms.Diff;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
@@ -350,13 +351,20 @@ public class Versioning implements IVersioning{
 
     /*
      * Dada uma revisão, madar o diff para que esta seja atualizada para outra
+     * será feito merge no cliente
      */
     @Override
-    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ApplicationException {
-        //VersionedDir vd = getRevision(revNum, token);
-        //VersionedDir vdTo = getRevision(revTo, token);
-        //return Diff.diff(vd,vdTo);
+    public VersionedDir updateRevision(String revTo, String token) throws ApplicationException {
         return getRevision(revTo, token);
+    }
+    
+    //para se fazer diff and apply
+    @Override
+    public byte[] updateRevision(String revNum, String revTo, String token) throws ApplicationException {
+        VersionedDir vd = getRevision(revNum, token);
+        VersionedDir vdTo = getRevision(revTo, token);
+        //return Diff.diff(vd,vdTo);
+        return null;
     }
     
     public List<VersionedItem> getLastLogs(String token) throws ApplicationException{

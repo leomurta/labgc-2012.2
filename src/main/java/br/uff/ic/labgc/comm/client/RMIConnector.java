@@ -102,11 +102,11 @@ public class RMIConnector extends AbstractServer {
      * efetuar o update
      */
     @Override
-    public VersionedItem update(String clientRevision, String revision, String token) throws ApplicationException {
+    public VersionedItem update(String revision, String token) throws ApplicationException {
         LoggerFactory.getLogger(RMIConnector.class).trace("update -> Entry");
         VersionedItem result = null;
         try {
-            result = server.update(clientRevision, revision, token);
+            result = server.update(revision, token);
             LoggerFactory.getLogger(RMIConnector.class).debug("Descompactando conteúdo recebido do servidor.");
             result.inflate();
             LoggerFactory.getLogger(RMIConnector.class).debug("Conteúdo descompactado com sucesso.");

@@ -67,11 +67,11 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public VersionedItem update(String clientRevision, String revision, String token) throws RemoteException {
+    public VersionedItem update(String revision, String token) throws RemoteException {
         LoggerFactory.getLogger(CommunicationServer.class).trace("update -> Entry");
         VersionedItem result = null;
         try {
-            result = server.update(clientRevision, revision, token);
+            result = server.update(revision, token);
             LoggerFactory.getLogger(CommunicationServer.class).debug("Compactando conteúdo a ser enviado para o cliente.");
             result.deflate();
             LoggerFactory.getLogger(CommunicationServer.class).debug("Conteúdo compactado com sucesso.");

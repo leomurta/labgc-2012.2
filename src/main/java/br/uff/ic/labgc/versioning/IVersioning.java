@@ -49,7 +49,9 @@ public interface IVersioning {
      */
     public VersionedDir getRevision(String revNum, String token) throws ApplicationException;
     
-    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ApplicationException;
+    public VersionedDir updateRevision(String revTo, String token) throws ApplicationException;
+    
+    public byte[] updateRevision(String revNum, String revTo, String token) throws ApplicationException;
     
     public String login(String projectName, String userName, String pass) throws VersioningException;
     

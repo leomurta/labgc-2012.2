@@ -31,7 +31,7 @@ public interface ICommunicationServer extends Remote {
      * @return Item versionado composto referente à revisão solicitada
      * @throws RemoteException
      */
-    public VersionedItem update(String clientRevision, String revision, String token) throws RemoteException;
+    public VersionedItem update(String revision, String token) throws RemoteException;
     /**
      * Efetua o checkout da revisão solicitada.
      * @param revision Revisão que se deseja efetuar o checkout
