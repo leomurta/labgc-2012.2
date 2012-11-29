@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.workspace;
 
+import br.uff.ic.labgc.algorithms.Merge;
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
@@ -284,68 +285,23 @@ public class Workspace implements IWorkspace {
             throws WorkspaceException, ApplicationException {
         String dir01 = workspaceDir + File.separator + WS_FOLDER + File.separator + ESPELHO;
         String dir02 = workspaceDir;
-        return compareDir(dir01, dir02,false);
+        return compareDir(dir01, dir02, false);
     }
     
 
     public void update(VersionedItem files) 
             throws ApplicationException {
-        File local = new File(workspaceDir);
-        File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
+        String dir01 = workspaceDir + File.separator + WS_FOLDER + File.separator + ESPELHO;
+        String dir02 = workspaceDir;
+        VersionedItem difflocal = new VersionedDir();;
+        VersionedItem diffremote = new VersionedDir();;
+        difflocal = compareDir(dir01, dir02,true);
         
-        //VersionedDir difflocal = new VersionedDir(); 
-       // VersionedDir diffremote = new VersionedDir();
-        VersionedDir working = new VersionedDir();
-        VersionedDir pristine = new VersionedDir();
-                
-        String exclusions[] = {WS_FOLDER};
-        working.addItem(VersionedItemUtils.read(local, exclusions, false));//false nao le o conteudo
-        pristine.addItem(VersionedItemUtils.read(mirror, false));//false nao le o conteudo
-        // 
-        List<VersionedItem> difflocal = VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens());
-        List<VersionedItem> diffremote = VersionedItemUtils.diff(pristine.getContainedItens(), ((VersionedDir) (files)).getContainedItens());
-        List<VersionedItem> listPristine = pristine.getContainedItens();
+        diffremote = compareDir(dir01,files,true);
         VersionedDir root = new VersionedDir();
-        Collections.sort(difflocal);
-        Collections.sort(diffremote);
-        VersionedFile file;
-        for (VersionedItem itemp : difflocal) {
-            for (VersionedItem itemw : diffremote) {
-                if (itemp.equals(itemw)){ 
-                    if (! itemp.isDir()) {
-                        if ((itemp.getStatus()== EVCSConstants.MODIFIED) && (itemw.getStatus()== EVCSConstants.MODIFIED)){ // ws modificado e novo modificado
-                            file=(VersionedFile)itemw;
-                            file.setName(itemw.getName()+".deles");
-                            root.addItem(file);
-                            file=(VersionedFile)itemp;
-                            file.setName(itemw.getName()+".meu");
-                            root.addItem(file);
-                            // espelho
-                            for (VersionedItem item : listPristine){
-                                if (itemp.equals(item)){
-                                    file=(VersionedFile)itemp;
-                                    file.setContent(((VersionedFile) (item)).getContent()); // conteúdo de espelho
-                                    file.setLastChangedTime(((VersionedFile) (item)).getLastChangedTime());
-                                    file.setName(itemw.getName()+".base");
-                                    root.addItem(file);
-                                }
-                            }// for espelho
-                            continue;
-                        }
-                        if ((itemp.getStatus()== EVCSConstants.UNMODIFIED) && (itemw.getStatus()== EVCSConstants.MODIFIED)){ //só o novo modificado
-                            root.addItem(itemw);
-                            continue;
-                        }
-                   }
-                } //if equal 
-            }// for 2
-        } //for 1
-        for (VersionedItem itemw : diffremote) {
-            if ((itemw.getStatus()== EVCSConstants.ADDED)){ //só tem no novo
-                root.addItem(itemw);
-            }
-        }
-        VersionedItemUtils.write(local,root.getContainedItens());
+        preencheRec2 (((VersionedDir)difflocal), ((VersionedDir)diffremote), root);
+        
+        if (root.getStatus()!=EVCSConstants.UNMODIFIED) VersionedItemUtils.write(new File (dir02),root.getContainedItens());
     }
     
     public VersionedItem beginCommit() 
@@ -353,11 +309,7 @@ public class Workspace implements IWorkspace {
         VersionedDir root = new VersionedDir();     
         String dir01 = workspaceDir + File.separator + WS_FOLDER + File.separator + ESPELHO;
         String dir02 = workspaceDir;
-        try {
-            root = compareDir(dir01, dir02,true);
-        } catch (IOException ex) {
-            Logger.getLogger(Workspace.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        root = compareDir(dir01, dir02,true);
         if (!VersionedItemUtils.isModified(root.getContainedItens())){
             throw new WorkspaceException("Conteúdo não foi modificado");
         }
@@ -439,7 +391,7 @@ public class Workspace implements IWorkspace {
         }
     }
     
-    private void preencheRec(VersionedDir working, VersionedDir pristine, VersionedDir father, Boolean getContent) throws IOException, ApplicationException{
+    private void preencheRec(VersionedDir working, VersionedDir pristine, VersionedDir father, Boolean getContent) throws ApplicationException{
         father.setName(pristine.getName());
         father.setAuthor(pristine.getAuthor());
         father.setLastChangedTime(pristine.getLastChangedTime());
@@ -505,8 +457,53 @@ public class Workspace implements IWorkspace {
             }
         }        
     }
+        private void preencheRec2(VersionedDir local, VersionedDir remote, VersionedDir father) throws ApplicationException{
+        father.setAuthor(remote.getAuthor());
+        father.setLastChangedTime(remote.getLastChangedTime());
+        father.setStatus(EVCSConstants.UNMODIFIED);
+        
+        //compara se teve modificação
+        for (VersionedItem vip : local.getContainedItens()) { //local
+            VersionedItem vi; // temporário
+            if (vip.isDir()){
+                vi = new VersionedDir();
+            }
+            else{
+                vi = new VersionedFile();
+            }
+            for (VersionedItem viw : remote.getContainedItens()) { //remoto
+                if (vip.getName().equals(viw.getName())){
+                    if (vi.isDir()){
+                        vi.setName(vip.getName());
+                        preencheRec2((VersionedDir)viw,(VersionedDir)vip,(VersionedDir)vi);
+                    }else{
+                        if ((vip.getStatus() == (EVCSConstants.MODIFIED)) && (viw.getStatus() == (EVCSConstants.MODIFIED))){
+                            vi.setName(vip.getName());
+                            vi= Merge.TwoWayMerge(((VersionedFile)vip), ((VersionedFile)viw));
+                        }
+                        if ((vip.getStatus() == (EVCSConstants.UNMODIFIED)) && (viw.getStatus() == (EVCSConstants.MODIFIED))){
+                            vi.setName(vip.getName());
+                            ((VersionedFile)vi).setContent(((VersionedFile)viw).getContent());
+                        }
+                    }
+                    break;
+                }                 
+            }
+            father.addItem(vi);
+        }
+        
+        //adicionados
+        for (VersionedItem viw : remote.getContainedItens()) {
+            if (viw.getStatus() == EVCSConstants.ADDED){ //adicionado
+                father.addItem(viw); // viw já tem o content
+                father.setStatus(EVCSConstants.MODIFIED);
+            }
+        }//for
+    }//preencheRec2
     
-    private VersionedDir compareDir(String espelhoDir, String workspaceDir, Boolean getContent) throws ApplicationException, IOException {
+
+    private VersionedDir compareDir(String espelhoDir, String workspaceDir, Boolean getContent) 
+            throws ApplicationException {
   
         File local = new File(workspaceDir);
         File mirror = new File(espelhoDir);
@@ -520,6 +517,21 @@ public class Workspace implements IWorkspace {
         
         VersionedDir root = new VersionedDir();
         preencheRec(working, pristine, root, getContent);
+        return root;
+    }
+    
+    private VersionedDir compareDir(String espelhoDir, VersionedItem remoteItens, Boolean getContent) 
+            throws ApplicationException {
+  
+        File mirror = new File(espelhoDir);
+        
+        VersionedDir pristine = new VersionedDir();
+                
+        String exclusions[] = {WS_FOLDER};
+        pristine.addItem(VersionedItemUtils.read(mirror, getContent));//false nao le o conteudo
+        
+        VersionedDir root = new VersionedDir();
+        preencheRec(((VersionedDir)remoteItens), pristine, root, getContent);
         return root;
     }
 
