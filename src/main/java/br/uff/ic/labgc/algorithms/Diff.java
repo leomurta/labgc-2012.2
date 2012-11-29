@@ -40,8 +40,8 @@ public class Diff {
     public static void main(String args[]) throws ApplicationException {
         byte[] testeA;
         byte[] testeB;
-        String teste2 = "Caramba !" + '\n' + "tt" + '\n' + "GH" + '\n' + "G" + '\n' + "R";
-        String teste3 = "Todos os papeis são amarelos" + '\n' + "Caramba !" + '\n' + "HTT" + '\n' + "I" + '\n' + "TG" + '\n' + "G" + '\n' + "R";
+        String teste2 = "Caramba !" + '\n' + "tt" + '\n' + "GH" + '\n' + "G" + '\n' + "R" + '\n' + "Z";
+        String teste3 = "Todos os papeis são amarelos" + '\n' + "Caramba !" + '\n' + "HTT" + '\n' + "I" + '\n' + "TG" + '\n' + "G" + '\n' + "R" + '\n' + "S";
 //
         testeA = teste2.getBytes();
         testeB = teste3.getBytes();
@@ -94,11 +94,23 @@ public class Diff {
         dir2.setName("MyDirectory2");
         dir2.setAuthor("Raphael");
         
+        // // // SUB-DIRETÓRIO 1
+        VersionedDir dir4 = new VersionedDir();
+        dir4.setName("MyDirectory4");
+        
+        // // // ARQUIVO 6
+        VersionedFile file6 = new VersionedFile();
+        file6.setName("FILE5");
+        file6.setAuthor("Raphael");
+        file6.setContent(testeB);
+        
+        dir4.addItem(file6);
+        
         // // // ARQUIVO 2
         VersionedFile file2 = new VersionedFile();
         file2.setName("FILE2");
         file2.setAuthor("Raphael");
-        file2.setContent(testeA);
+        file2.setContent(testeB);
         
         // // // ARQUIVO 4
         VersionedFile file4 = new VersionedFile();
@@ -108,27 +120,42 @@ public class Diff {
         
         dir1.addItem(file1);
         dir1.addItem(file3);
-        dir2.addItem(dir3);
+        dir1.addItem(dir4);
         
+        dir2.addItem(dir3);
         dir2.addItem(file2);
         dir2.addItem(file4);
 
+        System.out.println("-------------------------");
+        for( int i = 0; i < dir1.getContainedItens().size(); i++ ){
+            System.out.println( dir1.getContainedItens().get(i).getName() );
+        }
+        System.out.println("-------------------------");
+        for( int i = 0; i < dir2.getContainedItens().size(); i++ ){
+            System.out.println( dir2.getContainedItens().get(i).getName() );
+        }
+        System.out.println("-------------------------");
         //System.out.println(new String(diff(dir1, dir2)));
         VersionedDir teste_final = apply( dir1, diff(dir1, dir2) );
+        System.out.println(teste_final.getName());
+        show(teste_final.getContainedItens(), 1);
         System.out.println("-------------------------");
+        System.out.println(new String(diff(file1, file2)));
         //show( teste_final.getContainedItens(), 0 );
         
     }
     
-    public static void show( List<VersionedItem> lista, int ident ){
+    public static void show( List<VersionedItem> lista, int ident ) throws ApplicationException{
         String vazio = "";
         for( int i = 0; i < ident; i++ ){
             vazio += " ";
         }
         for( int i = 0; i < lista.size(); i++ ){
-            System.out.println( vazio + lista.get(i).getName() );
+            System.out.println( vazio + "\\ " + lista.get(i).getName() );
             if( lista.get(i).isDir() ){
                 show( ((VersionedDir)lista.get(i)).getContainedItens(), ident+1 );
+            } else {
+                System.out.println(new String(((VersionedFile)lista.get(i)).getContent()));
             }
         }
     }
@@ -189,9 +216,9 @@ public class Diff {
                             file = del_first_sequence(first_line.length, file);
                             current_line++;
                         }
+                        first_line = get_first_sequence(delta1);
+                        delta1 = del_first_sequence(first_line.length, delta1);
                     }
-                first_line = get_first_sequence(delta1);
-                delta1 = del_first_sequence(first_line.length, delta1);
                 }
 
                 
@@ -206,9 +233,9 @@ public class Diff {
                             delta1 = del_first_sequence(first_line.length, delta1);
                             ret = appends_at_the_end(first_line, ret);
                         }
+                        first_line = get_first_sequence(delta1);
+                        delta1 = del_first_sequence(first_line.length, delta1);
                     }
-                first_line = get_first_sequence(delta1);
-                delta1 = del_first_sequence(first_line.length, delta1);
                 }
                 
                 block++;
@@ -216,6 +243,11 @@ public class Diff {
             
         } else {
             // TÁ ERRADO
+        }
+        
+        while( !isNull(file) ){
+            ret = appends_at_the_end(get_first_sequence(file), ret);
+            file = del_first_sequence(get_first_sequence(file).length, file);
         }
         
         return ret;
@@ -232,19 +264,13 @@ public class Diff {
         delta1 = delta.clone();        
         byte[] first_line = get_first_sequence(delta1);
         delta1 = del_first_sequence(first_line.length, delta1);
-
-        System.out.println( new String(del_line_wraps(first_line)));
         
         if( !has_diff( del_line_wraps(first_line), ID_DIR ) ){
             
             first_line = get_first_sequence(delta1);
             delta1 = del_first_sequence(first_line.length, delta1);
             
-            System.out.println( new String(del_line_wraps(first_line)));
-            
-            while( has_diff( del_line_wraps(first_line), ID_END_FILE ) ){
-                
-                System.out.println("ENTREI !!");
+            while( has_diff( del_line_wraps(first_line), ID_END_DIR ) ){
                 
                 if( !has_diff( get_param(first_line, 1), ADD ) ){
                     
@@ -252,10 +278,10 @@ public class Diff {
                         
                         // CRIA NOVO ARQUIVO
                         VersionedFile file_aux = new VersionedFile();
-                        file_aux.setName( new String( get_param(first_line, 3) ) );
+                        file_aux.setName( new String( del_line_wraps(get_param(first_line, 3) )) );
                         file_aux.setContent( new byte[0] );
                         
-                        file_aux.setContent( apply( file_aux, delta ) );
+                        file_aux.setContent( apply( file_aux, delta1 ) );
                         
                         ret.addItem( file_aux );
                         
@@ -265,9 +291,9 @@ public class Diff {
                             
                             // CRIA NOVO DIRETÓRIO
                             VersionedDir dir_aux = new VersionedDir();
-                            dir_aux.setName( new String( get_param(first_line, 3) ) );
-                            dir_aux = apply( dir_aux, delta );
-
+                            dir_aux.setName( new String( del_line_wraps(get_param(first_line, 3) )) );
+                            dir_aux = apply( dir_aux, delta1 );
+                            
                             ret.addItem( dir_aux );
                             
                         }
@@ -283,7 +309,7 @@ public class Diff {
                             List<VersionedItem> list_aux = ret.getContainedItens();
                             VersionedFile aux = new VersionedFile();
                             aux.setName( new String( del_line_wraps(get_param(first_line, 3))) );
-                            list_aux.remove( Set.belongs_to(aux, list_aux) );
+                            list_aux.remove( Set.belongs_to( new String( del_line_wraps(get_param(first_line, 3))) , list_aux) );
                             
                             ret.setContainedItens( list_aux );
 
@@ -294,8 +320,7 @@ public class Diff {
                                 // REMOVE DIRETÓRIO
                                 List<VersionedItem> list_aux = ret.getContainedItens();
                                 VersionedDir aux = new VersionedDir();
-                                aux.setName( new String( get_param(first_line, 3) ) );
-                                list_aux.remove( Set.belongs_to(aux, list_aux) );
+                                list_aux.remove( Set.belongs_to(new String(del_line_wraps(get_param(first_line, 3))), list_aux) );
 
                                 ret.setContainedItens( list_aux );
 
@@ -314,14 +339,13 @@ public class Diff {
                                 VersionedFile older = new VersionedFile();
                                 VersionedFile newer = new VersionedFile();
                                 
-                                older.setName( new String( get_param(first_line, 3) ) );
-                                older = (VersionedFile)list_aux.get( Set.belongs_to(older, list_aux) );
+                                older = (VersionedFile)list_aux.get( Set.belongs_to(new String( del_line_wraps( get_param(first_line, 3) ) ), list_aux) );
                                 
-                                newer.setName( new String( get_param(first_line, 3) ) );
+                                newer.setName( new String( del_line_wraps( get_param(first_line, 3) ) ) );
                                 
                                 newer.setContent( apply( older, delta1 ) );
                                 
-                                list_aux.set( Set.belongs_to(older, list_aux), newer );
+                                list_aux.set( Set.belongs_to(new String( del_line_wraps( get_param(first_line, 3) ) ), list_aux), newer );
 
                                 ret.setContainedItens( list_aux );
 
@@ -333,13 +357,11 @@ public class Diff {
                                     List<VersionedItem> list_aux = ret.getContainedItens();
                                     
                                     VersionedDir older = new VersionedDir();
-                                    older.setName( new String( get_param(first_line, 3) ) );
-                                    older = (VersionedDir)list_aux.get( Set.belongs_to(older, list_aux) );
+                                    older = (VersionedDir)list_aux.get( Set.belongs_to(new String( del_line_wraps( get_param(first_line, 3) ) ), list_aux) );
                                     
                                     VersionedDir newer = apply( older, delta1 );
-                                    newer.setName( new String( get_param(first_line, 3) ) );
 
-                                    list_aux.set( Set.belongs_to(older, list_aux), newer );
+                                    list_aux.set( Set.belongs_to(new String( del_line_wraps( get_param(first_line, 3) ) ), list_aux), newer );
 
                                     ret.setContainedItens( list_aux );
 
@@ -352,10 +374,13 @@ public class Diff {
                     }
                 }
                 
+            first_line = get_first_sequence(delta1);
+            delta1 = del_first_sequence(first_line.length, delta1);
+                
             }
         }
         
-        return null;
+        return ret;
     }
 
     private static byte[] diff(VersionedFile file1, VersionedFile file2) throws ApplicationException {
@@ -407,21 +432,31 @@ public class Diff {
         }
         
         // REMOVE TODAS AS LINHAS APÓS LCS DA SEQ1
-        if( i < tam_seq1 )
-            ret += ("R " + h + " " + i + " " + (tam_seq1-1) ) + '\n';
+        int i_aux = i;
+        boolean teste = false;
+        while( !isNull(seq1) ){
+            i++;
+            seq1 = del_first_sequence( get_first_sequence(seq1).length, seq1 );
+            teste = true;
+        }
+        if(teste)
+            ret += ("R " + h + " " + i_aux + " " + (i-1) ) + '\n';
         
         // ADICIONA TODAS AS LINHAS APÓS LCS DA SEQ2
-        if( j < tam_seq2 ){
+
             lines_added.removeAll(lines_added);
+            teste = false;
             while( !isNull(seq2) ){
                 lines_added.add( new String( del_line_wraps( get_first_sequence(seq2) ) ) );
                 seq2 = del_first_sequence( get_first_sequence(seq2).length, seq2 );
+                teste = true;
             }
-            ret += ("A " + h + " " + i + " " + lines_added.size() ) + '\n';
-            for( int r = 0; r < lines_added.size(); r++ ){
-                ret += ( lines_added.get(r) ) + '\n';
+            if(teste){
+                ret += ("A " + h + " " + i_aux + " " + lines_added.size() ) + '\n';
+                for( int r = 0; r < lines_added.size(); r++ ){
+                    ret += ( lines_added.get(r) ) + '\n';
+                }
             }
-        }
         
         ret += new String( add_tail(new byte[0], file1) );
 
@@ -437,8 +472,14 @@ public class Diff {
         int count_diff = 0;
         byte[] arq_diff = new byte[0];
         
-        List<VersionedItem> dir1 = d1.getContainedItens();
-        List<VersionedItem> dir2 = d2.getContainedItens();
+        ArrayList<VersionedItem> d1_aux = new ArrayList<>();
+        ArrayList<VersionedItem> d2_aux = new ArrayList<>();
+        
+        d1_aux.addAll(d1.getContainedItens());
+        d2_aux.addAll(d2.getContainedItens());
+        
+        List<VersionedItem> dir1 = d1_aux.subList(0, d1_aux.size());
+        List<VersionedItem> dir2 = d2_aux.subList(0, d2_aux.size());
         
         int i = 0;
         int j = 0;
@@ -694,7 +735,7 @@ public class Diff {
     }
 
     private static boolean isNull(byte[] seq) {
-        return (seq.length == 0);
+        return (seq.length == 0 );
     }
     
     private static byte[] del_line_wraps(byte[] seq){

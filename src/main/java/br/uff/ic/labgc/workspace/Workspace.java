@@ -6,7 +6,6 @@ package br.uff.ic.labgc.workspace;
 
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ApplicationException;
-import br.uff.ic.labgc.exception.WorkspaceDirNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceEpelhoNaoExisteException;
 import br.uff.ic.labgc.exception.WorkspaceException;
 import br.uff.ic.labgc.exception.WorkspaceRepNaoExisteException;
@@ -281,23 +280,30 @@ public class Workspace implements IWorkspace {
     }
     
     public VersionedItem status()
-            throws ApplicationException {
-        File local = new File(workspaceDir);
-        File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
-        
-        VersionedDir root = new VersionedDir(); 
-        VersionedDir working = new VersionedDir();
-        VersionedDir pristine = new VersionedDir();
-                
-        String exclusions[] = {WS_FOLDER};
-        working.addItem(VersionedItemUtils.read(local, exclusions, false));//false nao le o conteudo
-        pristine.addItem(VersionedItemUtils.read(mirror, false));
-        
-        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
-        
-        return root;
-        
+            throws WorkspaceException, ApplicationException {
+        String dir01 = workspaceDir + File.separator + WS_FOLDER + File.separator + ESPELHO;
+        String dir02 = workspaceDir;
+        return compareDir1(dir01, dir02);
     }
+    
+//    public VersionedItem status()
+//            throws ApplicationException {
+//        File local = new File(workspaceDir);
+//        File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
+//        
+//        VersionedDir root = new VersionedDir(); 
+//        VersionedDir working = new VersionedDir();
+//        VersionedDir pristine = new VersionedDir();
+//                
+//        String exclusions[] = {WS_FOLDER};
+//        working.addItem(VersionedItemUtils.read(local, exclusions, false));//false nao le o conteudo
+//        pristine.addItem(VersionedItemUtils.read(mirror, false));
+//        
+//        root.addItem(VersionedItemUtils.diff(pristine.getContainedItens(), working.getContainedItens()));
+//        
+//        return root;
+//        
+//    }
 
     public void update(VersionedItem files) 
             throws ApplicationException {
@@ -477,6 +483,7 @@ public class Workspace implements IWorkspace {
 
                 item.setName(file2.getName());
                 item.setStatus(EVCSConstants.MODIFIED);
+		item.setAuthor(System.getProperty("user.name")); // Author
                 listVersionedItems.add(item);
             }
             if (!file2.exists()) { //se foi deletado
@@ -489,9 +496,11 @@ public class Workspace implements IWorkspace {
 
                 item.setName(file2.getName());
                 item.setStatus(EVCSConstants.DELETED);
+		item.setAuthor(System.getProperty("user.name")); // Author
                 listVersionedItems.add(item);
             }
         }
+        
         baseDir = Paths.get(workspaceDir);
         countdir = baseDir.getNameCount();
         File dir02 = new File(workspaceDir);
@@ -502,7 +511,7 @@ public class Workspace implements IWorkspace {
             max = baseDir.getNameCount();
             Path relativeDir = baseDir.subpath(countdir, max);
             File d = relativeDir.toFile();
-            File file2 = new File(workspaceDir + File.separator, d.toString());
+            File file2 = new File(espelhoDir + File.separator, d.toString());
             if (!file2.exists()) {
                 if (f.isDirectory()) {
                     item = new VersionedDir();
@@ -511,12 +520,94 @@ public class Workspace implements IWorkspace {
                 }
                 //se foi adicionado
                 item.setName(f.getName());
+				item.setStatus(EVCSConstants.ADDED);
+				item.setAuthor(System.getProperty("user.name")); // Author
                 listVersionedItems.add(item);
             }
         }
         VersionedDir result=new VersionedDir();
         result.addItem(listVersionedItems);
         return result;
+    }
+    
+    private void preencheRec(VersionedDir working, VersionedDir pristine, VersionedDir father){
+        father.setName(pristine.getName());
+        father.setAuthor(pristine.getAuthor());
+        father.setLastChangedTime(pristine.getLastChangedTime());
+        father.setStatus(EVCSConstants.UNMODIFIED);
+        
+        //compara se teve modificação e "deleção"
+        for (VersionedItem vip : pristine.getContainedItens()) {
+            boolean achou = false;
+            VersionedItem vi;
+            if (vip.isDir()){
+                vi = new VersionedDir();
+            }
+            else{
+                vi = new VersionedFile();
+            }
+            vi.setName(vip.getName());
+            for (VersionedItem viw : working.getContainedItens()) {
+                if (vip.getName().equals(viw.getName())){
+                    achou = true;
+                    if (vip.getLastChangedTime().equals(viw.getLastChangedTime())){
+                        vi.setStatus(EVCSConstants.UNMODIFIED);
+                        
+                        //Se diretório não é modificado só precisa fazer isso aqui
+                        if (vi.isDir()){
+                            preencheRec((VersionedDir)viw,(VersionedDir)vip,(VersionedDir)vi);
+                        }  
+                    }
+                    else{
+                        vi.setStatus(EVCSConstants.MODIFIED);
+                        father.setStatus(EVCSConstants.MODIFIED);
+                        vi.setAuthor(System.getProperty("user.name"));
+                    }
+                    break;
+                }                 
+            }
+            if (achou == false){ //deletado
+                vi.setStatus(EVCSConstants.DELETED);
+                father.setStatus(EVCSConstants.MODIFIED);
+                vi.setAuthor(System.getProperty("user.name"));
+            }
+            father.addItem(vi);
+        }
+        
+        //adicionados
+        for (VersionedItem viw : working.getContainedItens()) {
+            boolean naoachou = true;
+            for (VersionedItem vip : pristine.getContainedItens()) {
+                if (viw.getName().equals(vip.getName())){
+                    naoachou = false;
+                    break;
+                }                 
+            }
+            if (naoachou == true){ //adicionado
+                father.addItem(viw);
+                father.setStatus(EVCSConstants.ADDED);
+                father.setAuthor(System.getProperty("user.name"));
+            }
+        }        
+    }
+    
+    private VersionedDir compareDir1(String espelhoDir, String workspaceDir) throws ApplicationException {
+        Path baseDir = Paths.get(espelhoDir);
+        int countdir = baseDir.getNameCount();
+        int max;
+        File local = new File(workspaceDir);
+        File mirror = new File(local, WS_FOLDER + File.separator + ESPELHO);
+        
+        VersionedDir working = new VersionedDir();
+        VersionedDir pristine = new VersionedDir();
+                
+        String exclusions[] = {WS_FOLDER};
+        working.addItem(VersionedItemUtils.read(local, exclusions, false));//false nao le o conteudo
+        pristine.addItem(VersionedItemUtils.read(mirror, false));
+        
+        VersionedDir root = new VersionedDir();
+        preencheRec(working, pristine, root);
+        return root;
     }
 
     // Primitiva de cópia de diretórios
