@@ -36,6 +36,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class PrincipalJFrame extends javax.swing.JFrame {
 
+    boolean m_bRoot;
     /**
      * Creates new form PrincipalJFrame
      */
@@ -47,7 +48,7 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         im = Toolkit.getDefaultToolkit().createImage("Images//Logo.jpg");
         this.setIconImage(im);
         CreateTree("");
-        
+        m_bRoot  = true;
        
         
     }
@@ -326,6 +327,7 @@ public class PrincipalJFrame extends javax.swing.JFrame {
                {
                    strWorkspaceLocation =fileChooser.getSelectedFile().getPath();
                    CreateTree(strWorkspaceLocation);
+                   m_bRoot =true;
                }
                else
                {
@@ -466,17 +468,25 @@ public class PrincipalJFrame extends javax.swing.JFrame {
                     if (userObject instanceof File) 
                     {
                         File file = (File) userObject;
-                        try 
-                        {
-                            String strDirName = file.getCanonicalPath();
-                            VersionedItem vItem = FindPath(strDirName,workspaceStatus);
+                        
+                            //String strDirName = file.getCanonicalPath();
+                            VersionedItem vItem=null;
+                            String strDirName = file.getName();
+                              
+                            vItem = FindPath(strDirName,workspaceStatus);
                             if(vItem!=null)
+                            {
                                FillTable(vItem);
-                        } 
-                        catch (IOException ex) 
-                        {
-                            JOptionPane.showMessageDialog(null,ex.getMessage());
-                        }
+                               m_bRoot =false;
+                            }
+                            else
+                            { 
+                                 if(!m_bRoot)
+                                 {
+                                   CreateTree(strWorkspaceLocation);
+                                   m_bRoot =true;
+                                 }
+                            }
 
                     }
                 }
@@ -487,8 +497,11 @@ public class PrincipalJFrame extends javax.swing.JFrame {
     
     private VersionedItem FindPath(String strDirName,VersionedItem parentItem)
     {
-        if(parentItem.getName().equals(strDirName))
-            return parentItem;
+       if(parentItem.getName()!=null)
+       {
+           if(parentItem.getName().equals(strDirName))
+              return parentItem;
+       }
         
          VersionedDir vDir = (VersionedDir) parentItem;
          List<VersionedItem> listItem =vDir.getContainedItens();
@@ -496,7 +509,8 @@ public class PrincipalJFrame extends javax.swing.JFrame {
          {
              if(vItem.isDir())
              {
-                String strFullPath= parentItem.getName()+vItem.getName();
+                //String strFullPath= parentItem.getName()+vItem.getName();
+                 String strFullPath=vItem.getName();
                 if(strFullPath.equals(strDirName))
                     return vItem;
                  
