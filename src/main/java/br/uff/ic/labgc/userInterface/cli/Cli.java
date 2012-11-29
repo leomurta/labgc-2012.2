@@ -548,15 +548,16 @@ public class Cli {
     {       
         for(VersionedItem v : vItem)
         {
+            System.out.println("\n ################################## \n");
             if(v.getLastChangedRevision()!=null)
-             System.out.println(v.getLastChangedRevision() );
+             System.out.println("Revisao: "+v.getLastChangedRevision() );
            if(v.getLastChangedTime()!=null)
-             System.out.println(v.getLastChangedTime());
+             System.out.println("Data da Revisao: "+v.getLastChangedTime());
            if(v.getAuthor()!=null)
-             System.out.println(v.getAuthor() );
+             System.out.println("Autor: "+v.getAuthor() );
            if(v.getCommitMessage()!=null)
-              System.out.println(v.getCommitMessage());
-           System.out.println("\n");
+              System.out.println("Mensagem de Commit: "+v.getCommitMessage());
+           System.out.println("\n ################################## \n");
         }
       
     }
