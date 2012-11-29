@@ -348,18 +348,26 @@ public class CheckOutJFrame extends javax.swing.JFrame
        
        String [] strArrayRepo = strRepository.split("/");
        strRepository ="";
-       for(int i=0;i<strArrayRepo.length-2;i++)
+       if(strArrayRepo.length >1)
        {
-          strRepository+=strArrayRepo[i];   
+            for(int i=1;i<strArrayRepo.length;i++)
+            {
+                strRepository+=strArrayRepo[i];   
+            }
        }
-       String strHost = strArrayRepo[strArrayRepo.length-1];
+       
+       String strHost = strArrayRepo[0];
+       //strWorkspace+="\\";
+       
+       //JOptionPane.showMessageDialog(null,strHost+" -- "+strRepository+" -- "+strWorkspace);
        m_IClient = new Client(strHost, strRepository, strWorkspace) ;
+       
         try 
         {
             if(!(m_IClient.isLogged()))
             { 
                LoginJFrame loginFrame = new LoginJFrame(m_IClient);
-               loginFrame.setModalExclusionType(Dialog.ModalExclusionType.NO_EXCLUDE);
+               loginFrame.setModal(true);
                loginFrame.setVisible(true);
             }
         } 
@@ -367,17 +375,36 @@ public class CheckOutJFrame extends javax.swing.JFrame
         {
             cursor = Cursor.getDefaultCursor();  
             this.setCursor( cursor );
-            JOptionPane.showMessageDialog(null,ex.getMessage() );
-           
+            JOptionPane.showMessageDialog(null,ex.getMessage() );  
         }
+        
+        
         try 
         {
-            CheckOutOutput.setVisible(true);
+            if(!(m_IClient.isLogged()))
+            {
+                
+                JOptionPane.showMessageDialog(null,"To perform a checkout is necessary to login." );  
+                return;
+            }
+        } 
+        catch (ApplicationException ex) 
+        {
+           JOptionPane.showMessageDialog(null,ex.getMessage() );
+           return;
+        }
+        
+        try 
+        {
+            registerObserver();
             if(strRevision.isEmpty())
                 strRevision= EVCSConstants.REVISION_HEAD;
             
             m_IClient.checkout(strRevision);
-        } catch (ApplicationException ex) 
+            //CheckOutOutput.setModal(true);
+            CheckOutOutput.setVisible(true);
+        } 
+        catch (ApplicationException ex) 
         {
             cursor = Cursor.getDefaultCursor();  
             this.setCursor( cursor );
@@ -389,9 +416,24 @@ public class CheckOutJFrame extends javax.swing.JFrame
         
         cursor = Cursor.getDefaultCursor();  
         this.setCursor( cursor ); 
+        CheckOutOutput.SetText("Checkout done. \n", false);
+        this.setVisible(false);
        
     }//GEN-LAST:event_FinishjButtonActionPerformed
-     
+    
+     private void registerObserver() 
+     {
+        IObserver clientObs = new IObserver() {
+            public void sendNotify(String msg) 
+            {
+                CheckOutOutput.SetText(msg + "\n", false);
+            }
+        };
+
+        m_IClient.registerInterest(clientObs);
+    }
+   
+    
     private boolean verifyRepository()
     {
         

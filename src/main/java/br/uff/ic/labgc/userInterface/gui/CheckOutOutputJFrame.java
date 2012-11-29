@@ -8,7 +8,7 @@ package br.uff.ic.labgc.userInterface.gui;
  *
  * @author Leonardo
  */
-public class CheckOutOutputJFrame extends javax.swing.JFrame {
+public class CheckOutOutputJFrame extends javax.swing.JDialog {
 
     /**
      * Creates new form CheckOutOutputJFrame
@@ -58,8 +58,6 @@ public class CheckOutOutputJFrame extends javax.swing.JFrame {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jTextAreaOutput.setColumns(20);
@@ -70,7 +68,7 @@ public class CheckOutOutputJFrame extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -94,9 +92,9 @@ public class CheckOutOutputJFrame extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(225, 225, 225)
+                        .addGap(270, 270, 270)
                         .addComponent(OKjButton)
-                        .addGap(0, 246, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

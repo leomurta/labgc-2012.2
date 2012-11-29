@@ -27,6 +27,7 @@ public class AboutJFrame extends javax.swing.JFrame {
     public AboutJFrame() throws IOException {
         initComponents();
         ImageIcon icon = new ImageIcon("Images//Logo.jpg"); 
+        //ImageIcon icon = new ImageIcon(getClass().getResource("Images//Logo.jpg")); 
         AboutImagejLabel.setIcon(icon);
         Font f;
         f = new Font (AboutjTextArea.getFont().getName(),Font.BOLD,AboutjTextArea.getFont().getSize());
@@ -64,13 +65,13 @@ public class AboutJFrame extends javax.swing.JFrame {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
-        setTitle("About labgc-2012 -2");
+        setTitle("About SCVE");
         setAlwaysOnTop(true);
 
         AboutjTextArea.setColumns(20);
         AboutjTextArea.setEditable(false);
         AboutjTextArea.setRows(5);
-        AboutjTextArea.setText("                          Experimental Version Control System \n\n(http://www.ic.uff.br/~leomurta/courses/2012.2/labgc.html)\n\nCoordinator: \tLeoanardo Murta\n\nDevelopers: \tCristiano Cesario\n            \tFelipe Ralph\n            \tFelipe Vieira Duval\n            \tLeonardo Machado\n            \tRaphael Evangelista\n            \tVictor Hugo");
+        AboutjTextArea.setText("            SCVE - Sistema de  Controle de Versão Experimental\n\n(http://www.ic.uff.br/~leomurta/courses/2012.2/labgc.html)\n\nCoordinator: \tLeoanardo Murta\n\nDevelopers: \tCristiano Cesario\n            \tFelipe Ralph\n            \tFelipe Vieira Duval\n            \tLeonardo Machado\n            \tRaphael Evangelista\n            \tVictor Hugo");
         AboutjTextArea.setToolTipText("             Experimental Version Control System      (http://www.ic.uff.br/~leomurta/courses/2012.2/labgc.html)  Developers:");
         jScrollPane1.setViewportView(AboutjTextArea);
 

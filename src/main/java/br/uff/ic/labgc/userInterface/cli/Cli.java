@@ -50,10 +50,10 @@ public class Cli {
         m_options.addOption("help", false, "Display help");
 
 
-        m_options.addOption(OptionBuilder.withDescription("Creates a directory")
+       /* m_options.addOption(OptionBuilder.withDescription("Creates a directory")
                 .hasArg()
                 .withArgName("PATH")
-                .create("mkdir"));
+                .create("mkdir"));*/
 
         m_options.addOption(OptionBuilder.withDescription("Checkout a branch or paths to the working tree")
                 .hasArgs(2)
@@ -292,6 +292,7 @@ public class Cli {
             String strPath = this.invocationPath;
             //String path = System.getProperty("user.dir");
 
+            //System.out.println(strHost+" --- "+strRepository+" --- "+strPath);
             m_IClient = new Client(strHost, strRepository, strPath);
             registerObserver();
 
@@ -303,9 +304,15 @@ public class Cli {
                 strRevision = EVCSConstants.REVISION_HEAD;
             }
 
+             /*if(!m_IClient.hasWorkspace())
+             {
+                 
+                 System.out.println("The workspace is not available, please verify permissions or the space left on disc");
+                 return;
+             }*/
 
-
-            if (!checkLogin()) {
+            if (!checkLogin()) 
+            {
                 return;
             }
 
@@ -348,7 +355,8 @@ public class Cli {
                 boolean bLogin = false;
                 int cont = 0;
 
-                while (cont < 4) {
+                while (cont < 4) 
+                {
                     cont++;
                     System.out.println("Type Login:");
                     String strLogin = leitor.nextLine();
@@ -356,12 +364,15 @@ public class Cli {
                     System.out.println("Type Password:");
                     String strPass = leitor.nextLine();
 
+                    //System.out.println(strLogin+"---- "+strPass);
                     m_IClient.login(strLogin, strPass);
 
                     if (m_IClient.isLogged()) {
                         bLogin = true;
                         break;
-                    } else {
+                    } 
+                    else 
+                    {
                         System.out.println("Login or Password incorrect.");
                     }
                 }
@@ -458,16 +469,37 @@ public class Cli {
             return;
         }
 
-        VersionedDir dir = (VersionedDir) status;
-        List<VersionedItem> listItem = dir.getContainedItens();
-
-        for (VersionedItem v : listItem) 
+        if(status.isDir())
+        {        
+             printStatus(status,status.getName());
+        }
+        else
+        {
+            printStatus(status, "");
+        }
+                
+    }
+    
+    
+    private void printStatus(VersionedItem v, String pathDir)
+    {
+        if(!v.isDir())
         {
             if(v.getStatus()== EVCSConstants.UNMODIFIED)
-                continue;
-            System.out.println(v.getName() + "    " + getStatus(v.getStatus()));
+                return;
+            System.out.println(pathDir+"\\"+v.getName() + "    " + getStatus(v.getStatus()) );
+            return;
         }
-
+        
+        VersionedDir vDir = (VersionedDir) v;
+        
+        List<VersionedItem> listItem = vDir.getContainedItens();
+        for (VersionedItem vItem : listItem) 
+        {
+            String completePath = pathDir+"\\"+vDir.getName();
+            printStatus(vItem, completePath);
+        }
+        
     }
 
     private void runLog(String[] logArg) 
@@ -485,8 +517,11 @@ public class Cli {
         VersionedItem listItem = null; 
         try 
         {
-            if (m_IClient.isLogged()){
-                listItem = m_IClient.log();
+            if (m_IClient.isLogged())
+            {
+                VersionedItem returnItem = listItem = m_IClient.log();
+                printLog(returnItem);
+                
             }
            //Collections.sort(listItem, compare);
         } 
@@ -500,6 +535,26 @@ public class Cli {
          
      }
      
+    private void printLog(VersionedItem vItem)
+    {
+        if(!vItem.isDir())
+        {
+           System.out.println(vItem.getLastChangedRevision() );
+           System.out.println(vItem.getLastChangedTime());
+           System.out.println(vItem.getAuthor() );
+           System.out.println(vItem.getCommitMessage());
+           System.out.println("\n");
+           return;
+        }
+        
+        VersionedDir vDir = (VersionedDir) vItem;
+        List<VersionedItem> listDir = vDir.getContainedItens();
+        for(VersionedItem v : listDir)
+        {
+            printLog(v);
+        }
+      
+    }
     
       private void runRevert(String[] revertArg)
       {

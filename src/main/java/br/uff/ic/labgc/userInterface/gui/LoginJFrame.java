@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
  *
  * @author Leonardo
  */
-public class LoginJFrame extends javax.swing.JFrame{
+public class LoginJFrame extends javax.swing.JDialog{
 
     /**
      * Creates new form LoginJFrame
@@ -30,7 +30,7 @@ public class LoginJFrame extends javax.swing.JFrame{
         throw new UnsupportedOperationException("Not yet implemented");
     }
     
-    public void DoLogin()
+    public void DoLogin() 
     {
        String Login=  LoginjTextField.getText();
        String Pass =  PassjPasswordField.getText();
@@ -40,6 +40,16 @@ public class LoginJFrame extends javax.swing.JFrame{
         } catch (ApplicationException ex) 
         {
            JOptionPane.showMessageDialog(null,ex.getMessage() );
+        }
+        try 
+        {
+            if(m_IClient.isLogged())
+                this.setVisible(false);
+        } 
+        catch (ApplicationException ex) 
+        {
+            //Logger.getLogger(LoginJFrame.class.getName()).log(Level.SEVERE, null, ex);
+             JOptionPane.showMessageDialog(null,ex.getMessage() );
         }
     }
 

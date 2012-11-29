@@ -159,6 +159,8 @@ public class Versioning implements IVersioning{
 
     @Override
     public byte[] getVersionedFileContent (String hash, String projectName) throws ApplicationException{
+        
+        System.out.println(Storage.getDirPath()+projectName+"/"+storage.hashToPath(hash));
         File path = new File(Storage.getDirPath()+projectName+"/"+storage.hashToPath(hash));
         try {
             return getBytesFromFile(path);

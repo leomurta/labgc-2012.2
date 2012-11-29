@@ -6,16 +6,29 @@ package br.uff.ic.labgc.userInterface.gui;
 
 import br.uff.ic.labgc.client.Client;
 import br.uff.ic.labgc.client.IClient;
+import br.uff.ic.labgc.core.EVCSConstants;
+import br.uff.ic.labgc.core.VersionedDir;
+import br.uff.ic.labgc.core.VersionedItem;
+import br.uff.ic.labgc.exception.ApplicationException;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *
@@ -29,9 +42,14 @@ public class PrincipalJFrame extends javax.swing.JFrame {
     public PrincipalJFrame() {
         initComponents();
         //AddFileChooser();
+        this.repaint();
          Image im = null;
         im = Toolkit.getDefaultToolkit().createImage("Images//Logo.jpg");
         this.setIconImage(im);
+        CreateTree("");
+        
+       
+        
     }
 
     /**
@@ -44,8 +62,6 @@ public class PrincipalJFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         TreejPanel = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTree1 = new javax.swing.JTree();
         OutputjPanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
@@ -58,21 +74,19 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         AboutjMenu = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("LabGC 2012 -2");
+        setTitle("SCVE - Sistema de Controle de Versão Experimental");
 
         TreejPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jScrollPane1.setViewportView(jTree1);
 
         javax.swing.GroupLayout TreejPanelLayout = new javax.swing.GroupLayout(TreejPanel);
         TreejPanel.setLayout(TreejPanelLayout);
         TreejPanelLayout.setHorizontalGroup(
             TreejPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+            .addGap(0, 134, Short.MAX_VALUE)
         );
         TreejPanelLayout.setVerticalGroup(
             TreejPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+            .addGap(0, 361, Short.MAX_VALUE)
         );
 
         OutputjPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -105,7 +119,26 @@ public class PrincipalJFrame extends javax.swing.JFrame {
 
         MainjMenuBar.setName("LabGC-2012/2");
 
-        jMenu1.setText("File");
+        jMenu1.setText("Workspace");
+        jMenu1.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                jMenu1MenuSelected(evt);
+            }
+        });
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu1ActionPerformed(evt);
+            }
+        });
+        jMenu1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jMenu1KeyPressed(evt);
+            }
+        });
         MainjMenuBar.add(jMenu1);
 
         jMenu2.setText("Action");
@@ -250,15 +283,35 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         cursor = Cursor.getDefaultCursor();  
         this.setCursor( cursor );
     }//GEN-LAST:event_AboutjMenuMenuSelected
+
+    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+        // TODO add your handling code here:
+        RunFileChooser();
+        
+    }//GEN-LAST:event_jMenu1ActionPerformed
+
+    private void jMenu1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jMenu1KeyPressed
+        // TODO add your handling code here:
+       RunFileChooser();
+    }//GEN-LAST:event_jMenu1KeyPressed
+
+    private void jMenu1MenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_jMenu1MenuSelected
+        // TODO add your handling code here:
+         Cursor cursor = Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR );  
+        this.setCursor( cursor ); 
+        RunFileChooser();
+        cursor = Cursor.getDefaultCursor();  
+        this.setCursor( cursor );
+    }//GEN-LAST:event_jMenu1MenuSelected
     
-     private void AddFileChooser()
+     private void RunFileChooser()
     {
         fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new java.io.File("."));
-        fileChooser.setDialogTitle("choosertitle");
+        fileChooser.setDialogTitle("Select Workpace");
         fileChooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY);
         fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.setControlButtonsAreShown(false);
+        fileChooser.setControlButtonsAreShown(true);
         fileChooser.setSize(163, 337);
         TreejPanel.setLayout(new BorderLayout());
         TreejPanel.add(fileChooser, BorderLayout.EAST);
@@ -266,12 +319,193 @@ public class PrincipalJFrame extends javax.swing.JFrame {
         {
          public void actionPerformed(ActionEvent e) 
          {
-            if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) 
+            //System.out.println(e.getActionCommand());
+             if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) 
             {
-               strLocation = fileChooser.getSelectedFile().getPath();
+               if(isValidaWorkspace(fileChooser.getSelectedFile().getPath()))
+               {
+                   strWorkspaceLocation =fileChooser.getSelectedFile().getPath();
+                   CreateTree(strWorkspaceLocation);
+               }
+               else
+               {
+                   
+                    JOptionPane.showMessageDialog(null,"Invalid workspace!");
+               }
             }
          }
       });
+        
+       fileChooser.showOpenDialog(this);
+    }
+     
+    private void CreateTree(String strPath)
+    {
+        
+        TreejPanel.removeAll(); 
+        tree = new  FileTreePanel(strPath);
+        tree.setLocation(0,0);
+        tree.setSize(438,365);
+        TreejPanel.add(tree);
+        tree.setVisible(true);
+        tree.validate();
+        tree.invalidate();
+        TreejPanel.repaint();
+        
+        if(!strPath.isEmpty())
+        {
+           workspaceStatus = getWorkspaceStatus(strPath);
+           FillTable(workspaceStatus);
+        }
+       
+           
+    }
+    
+    private void FillTable(VersionedItem item ) 
+    {
+        
+        if(item.isDir())
+        {
+            VersionedDir vDir = (VersionedDir) item;
+            List<VersionedItem> listItem =vDir.getContainedItens();
+            table = new JTable();
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
+            model.addColumn("Item Name"); 
+            model.addColumn("Item Status"); 
+            for (VersionedItem vItem : listItem) 
+            {
+                String path = vItem.getName();
+                if(!vItem.isDir())
+                    model.addRow(new Object[]{path, getStatus(vItem.getStatus())});
+                
+            }
+            
+            PlaceTable(table);
+            AddListener();
+        }
+    }
+    
+     private String getStatus(int status) 
+     {
+        switch (status) {
+            case EVCSConstants.UNMODIFIED:
+                return "Unmodified";
+            case EVCSConstants.MODIFIED:
+                return "Modified";
+            case EVCSConstants.ADDED:
+                return "Added";
+            case EVCSConstants.DELETED:
+                return "Deleted";
+        }
+        return "";
+    }
+     
+    private void PlaceTable(JTable table )
+    {
+        JScrollPane scrollPane = new JScrollPane(table);
+        MainjPanel.removeAll();
+        scrollPane.setLocation(0,0);
+        scrollPane.setSize(495,400);
+        MainjPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setVisible(true);
+        scrollPane.validate();
+        scrollPane.invalidate();
+        MainjPanel.repaint();
+    }
+    
+     private boolean isValidaWorkspace(String strPath)
+    {
+        File file = new File(strPath);
+        FileFilter filter = new FileFilter() 
+        {
+
+            @Override
+            public boolean accept(File pathname) 
+            {
+               return  pathname.getName().contains(".labgc"); 
+            }
+        };
+        
+        File[] lisFiles = file.listFiles(filter);
+        
+        if(lisFiles.length<=0)
+            return false;
+        
+        return true;
+    }
+     
+    private VersionedItem getWorkspaceStatus(String strPath)
+    {
+        VersionedItem status = new VersionedDir();
+        IClient client = new Client(strPath) ;
+        try 
+        {
+            status= client.status();
+        } 
+        catch (ApplicationException ex) 
+        {
+            JOptionPane.showMessageDialog(null,ex.getMessage());
+        }
+        
+        
+        return (VersionedDir)status;
+    }
+    
+    
+    private void AddListener()
+    {
+        tree.getTree().addTreeSelectionListener(new TreeSelectionListener() 
+        {
+            public void valueChanged(TreeSelectionEvent event) 
+            {
+
+                Object obj = tree.getTree().getLastSelectedPathComponent();
+                if (obj instanceof DefaultMutableTreeNode) 
+                {
+                    Object userObject = ((DefaultMutableTreeNode) obj).getUserObject();
+                    if (userObject instanceof File) 
+                    {
+                        File file = (File) userObject;
+                        try 
+                        {
+                            String strDirName = file.getCanonicalPath();
+                            VersionedItem vItem = FindPath(strDirName,workspaceStatus);
+                            if(vItem!=null)
+                               FillTable(vItem);
+                        } 
+                        catch (IOException ex) 
+                        {
+                            JOptionPane.showMessageDialog(null,ex.getMessage());
+                        }
+
+                    }
+                }
+            }
+        });
+    }
+    
+    
+    private VersionedItem FindPath(String strDirName,VersionedItem parentItem)
+    {
+        if(parentItem.getName().equals(strDirName))
+            return parentItem;
+        
+         VersionedDir vDir = (VersionedDir) parentItem;
+         List<VersionedItem> listItem =vDir.getContainedItens();
+         for (VersionedItem vItem : listItem) 
+         {
+             if(vItem.isDir())
+             {
+                String strFullPath= parentItem.getName()+vItem.getName();
+                if(strFullPath.equals(strDirName))
+                    return vItem;
+                 
+                 FindPath(strDirName,vItem);
+             }
+         }
+         
+         return null;
+        
     }
     
     /**
@@ -325,11 +559,14 @@ public class PrincipalJFrame extends javax.swing.JFrame {
     private javax.swing.JPanel TreejPanel;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextPane jTextPane1;
-    private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
     private JFileChooser fileChooser;
-    private String strLocation;
+    private String strWorkspaceLocation;
+    VersionedItem workspaceStatus;
+    JTable table;
+    FileTreePanel tree;
+
+    
 }

@@ -19,7 +19,7 @@
     </Container>
   </NonVisualComponents>
   <Properties>
-    <Property name="title" type="java.lang.String" value="About labgc-2012 -2"/>
+    <Property name="title" type="java.lang.String" value="About SCVE"/>
     <Property name="alwaysOnTop" type="boolean" value="true"/>
   </Properties>
   <SyntheticProperties>
@@ -108,7 +108,7 @@
                 <Property name="columns" type="int" value="20"/>
                 <Property name="editable" type="boolean" value="false"/>
                 <Property name="rows" type="int" value="5"/>
-                <Property name="text" type="java.lang.String" value="                          Experimental Version Control System &#xa;&#xa;(http://www.ic.uff.br/~leomurta/courses/2012.2/labgc.html)&#xa;&#xa;Coordinator: &#x9;Leoanardo Murta&#xa;&#xa;Developers: &#x9;Cristiano Cesario&#xa;            &#x9;Felipe Ralph&#xa;            &#x9;Felipe Vieira Duval&#xa;            &#x9;Leonardo Machado&#xa;            &#x9;Raphael Evangelista&#xa;            &#x9;Victor Hugo"/>
+                <Property name="text" type="java.lang.String" value="            SCVE - Sistema de  Controle de Vers&#xe3;o Experimental&#xa;&#xa;(http://www.ic.uff.br/~leomurta/courses/2012.2/labgc.html)&#xa;&#xa;Coordinator: &#x9;Leoanardo Murta&#xa;&#xa;Developers: &#x9;Cristiano Cesario&#xa;            &#x9;Felipe Ralph&#xa;            &#x9;Felipe Vieira Duval&#xa;            &#x9;Leonardo Machado&#xa;            &#x9;Raphael Evangelista&#xa;            &#x9;Victor Hugo"/>
                 <Property name="toolTipText" type="java.lang.String" value="             Experimental Version Control System      (http://www.ic.uff.br/~leomurta/courses/2012.2/labgc.html)  Developers:"/>
               </Properties>
             </Component>
