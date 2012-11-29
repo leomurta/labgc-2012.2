@@ -6,6 +6,7 @@ package br.uff.ic.labgc.server;
 
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.*;
+import java.util.List;
 
 /**
  *
@@ -32,7 +33,7 @@ public interface IServer {
      * @param token Token que identifica o usuário e o repositório
      * @return Item versionado composto referente à revisão solicitada
      */
-    public VersionedItem update(String clientRevision, String revision, String token) throws ApplicationException;
+    public VersionedItem update(String revision, String token) throws ApplicationException;
 
     /**
      * Efetua o checkout da revisão solicitada.
@@ -55,9 +56,9 @@ public interface IServer {
      */
     public String login(String user, String pwd, String repository) throws ApplicationException;
 
-    public VersionedItem log(String token) throws ApplicationException;
+    public List<VersionedItem> log(String token) throws ApplicationException;
 
-    public VersionedItem log(int qtdeRevisions, String token) throws ApplicationException;
+    public List<VersionedItem> log(int qtdeRevisions, String token) throws ApplicationException;
 
     public String getRepPath();
 

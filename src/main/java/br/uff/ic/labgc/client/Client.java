@@ -96,8 +96,8 @@ public class Client implements IClient {
     }
 
     public VersionedItem update(String revision) throws ApplicationException {
-        String clientRevision = workspace.getRevision();
-        VersionedItem files = server.update(clientRevision, revision, loginToken);
+        //String clientRevision = workspace.getRevision();
+        VersionedItem files = server.update(revision, loginToken);
         workspace.update(files);
         return files;
     }
@@ -106,7 +106,8 @@ public class Client implements IClient {
         return workspace.diff(file, version);
     }
 
-    public VersionedItem log() throws ApplicationException {
+    @Override
+    public List<VersionedItem> log() throws ApplicationException {
         return server.log(loginToken);
     }
 

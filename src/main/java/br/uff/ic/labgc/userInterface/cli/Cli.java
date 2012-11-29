@@ -518,12 +518,11 @@ public class Cli {
         }    
         m_IClient = new Client(strItemPath);
 
-        VersionedItem listItem = null; 
         try 
         {
             if (m_IClient.isLogged())
             {
-                VersionedItem returnItem = listItem = m_IClient.log();
+                List<VersionedItem> returnItem = m_IClient.log();
                 printLog(returnItem);
                 
             }
@@ -539,27 +538,19 @@ public class Cli {
          
      }
      
-    private void printLog(VersionedItem vItem)
-    {
-        if(!vItem.isDir())
+    private void printLog(List<VersionedItem> vItem)
+    {       
+        for(VersionedItem v : vItem)
         {
-           if(vItem.getLastChangedRevision()!=null)
-             System.out.println(vItem.getLastChangedRevision() );
-           if(vItem.getLastChangedTime()!=null)
-             System.out.println(vItem.getLastChangedTime());
-           if(vItem.getAuthor()!=null)
-             System.out.println(vItem.getAuthor() );
-           if(vItem.getCommitMessage()!=null)
-              System.out.println(vItem.getCommitMessage());
+            if(v.getLastChangedRevision()!=null)
+             System.out.println(v.getLastChangedRevision() );
+           if(v.getLastChangedTime()!=null)
+             System.out.println(v.getLastChangedTime());
+           if(v.getAuthor()!=null)
+             System.out.println(v.getAuthor() );
+           if(v.getCommitMessage()!=null)
+              System.out.println(v.getCommitMessage());
            System.out.println("\n");
-           return;
-        }
-        
-        VersionedDir vDir = (VersionedDir) vItem;
-        List<VersionedItem> listDir = vDir.getContainedItens();
-        for(VersionedItem v : listDir)
-        {
-            printLog(v);
         }
       
     }

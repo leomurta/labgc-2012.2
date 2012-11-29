@@ -269,12 +269,11 @@ public class VersioningTest {
     //@Test
     public void testUpdateRevision() throws ApplicationException {
         System.out.println("updateRevision");
-        String revNum = "";
         String revTo = "";
         String token = "";
         Versioning instance = new Versioning();
         VersionedDir expResult = null;
-        VersionedDir result = instance.updateRevision(revNum, revTo, token);
+        VersionedDir result = instance.updateRevision(revTo, token);
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

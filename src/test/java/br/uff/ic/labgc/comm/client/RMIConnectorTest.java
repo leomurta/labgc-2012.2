@@ -74,7 +74,7 @@ public class RMIConnectorTest {
             String token = null;
             RMIConnector instance = null;
             VersionedItem expResult = null;
-            VersionedItem result = instance.update(revision,revision, token);
+            VersionedItem result = instance.update(revision, token);
             assertEquals(expResult, result);
             // TODO review the generated test code and remove the default call to fail.
             fail("The test case is a prototype.");
@@ -133,7 +133,7 @@ public class RMIConnectorTest {
             RMIConnector instance = null;
             String token = "";
             String expResult = "";
-            VersionedItem result = instance.log( token);
+            List<VersionedItem> result = instance.log( token);
             assertEquals(expResult, result);
             // TODO review the generated test code and remove the default call to fail.
             fail("The test case is a prototype.");

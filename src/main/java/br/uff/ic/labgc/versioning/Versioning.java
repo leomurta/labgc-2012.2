@@ -4,19 +4,17 @@
  */
 package br.uff.ic.labgc.versioning;
 
+import br.uff.ic.labgc.algorithms.Diff;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
-import br.uff.ic.labgc.exception.StorageCanNotCreateDirException;
 import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.VersioningException;
 import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
-import br.uff.ic.labgc.exception.StorageObjectAlreadyExistException;
-import br.uff.ic.labgc.exception.StorageUserNotFoundException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
 import br.uff.ic.labgc.storage.ConfigurationItemDAO;
 import br.uff.ic.labgc.storage.Project;
@@ -30,28 +28,16 @@ import br.uff.ic.labgc.storage.User;
 import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javassist.bytecode.Descriptor;
 
 /**
  *
@@ -70,11 +56,13 @@ public class Versioning implements IVersioning{
         protected void addProject(String projName, String userName, ConfigurationItem ci) throws StorageException{
             super.addProject(projName, userName, ci);
         }
+        @Override
         protected String hashToPath(String hash){
             return super.hashToPath(hash);
         }
-        protected void storeFiles(VersionedDir father, String projName) throws ApplicationException {
-            super.storeFiles(father, projName);
+        @Override
+        protected void persistFile(String dirPath, String filePath, byte[] content) throws ApplicationException {
+            super.persistFile(dirPath, filePath, content);
         }
     }
     
@@ -141,6 +129,7 @@ public class Versioning implements IVersioning{
     }
     
     //nao encontrado, senha incorreta, sem permissao
+    @Override
     public String login(String projectName, String userName, String pass) throws VersioningException{
         User user = userDAO.getByUserName(userName);
         if (!user.getPassword().equals(pass)){
@@ -157,6 +146,13 @@ public class Versioning implements IVersioning{
         return pu.getToken();
     }
 
+    /**
+     *
+     * @param hash
+     * @param projectName
+     * @return
+     * @throws ApplicationException
+     */
     @Override
     public byte[] getVersionedFileContent (String hash, String projectName) throws ApplicationException{
         
@@ -169,7 +165,7 @@ public class Versioning implements IVersioning{
             throw new VersioningIOException("nao foi possivel ler o conteudo do arquivo",ex);
         }
     }
-    public static byte[] getBytesFromFile(File file) throws IOException {
+    private static byte[] getBytesFromFile(File file) throws IOException {
         InputStream is = new FileInputStream(file);
     
         // Get the size of the file
@@ -275,7 +271,7 @@ public class Versioning implements IVersioning{
             previous.setNext(ci);
             configItemDAO.add(ci);
 
-            storage.storeFiles(vd, projectName);
+            storeFiles(vd, projectName);
 
             revision.setConfigItem(ci);
             HibernateUtil.commitTransaction();
@@ -304,7 +300,7 @@ public class Versioning implements IVersioning{
         
         versionedDirToConfigItem(vd,ci,true);
         configItemDAO.add(ci);
-        storage.storeFiles(vd, projectName);
+        storeFiles(vd, projectName);
     }
     
     private void versionedDirToConfigItem(VersionedDir vd, ConfigurationItem father, boolean first){
@@ -355,10 +351,20 @@ public class Versioning implements IVersioning{
 
     /*
      * Dada uma revisão, madar o diff para que esta seja atualizada para outra
+     * será feito merge no cliente
      */
     @Override
-    public VersionedDir updateRevision(String revNum, String revTo, String token) throws ApplicationException {
+    public VersionedDir updateRevision(String revTo, String token) throws ApplicationException {
         return getRevision(revTo, token);
+    }
+    
+    //para se fazer diff and apply
+    @Override
+    public byte[] updateRevision(String revNum, String revTo, String token) throws ApplicationException {
+        VersionedDir vd = getRevision(revNum, token);
+        VersionedDir vdTo = getRevision(revTo, token);
+        //return Diff.diff(vd,vdTo);
+        return null;
     }
     
     public List<VersionedItem> getLastLogs(String token) throws ApplicationException{
@@ -401,5 +407,20 @@ public class Versioning implements IVersioning{
         }
         
         return list;
+    }
+    
+    protected void storeFiles(VersionedDir father, String projName) throws ApplicationException {
+        for (Iterator<VersionedItem> it = father.getContainedItens().iterator(); it.hasNext();) {
+            VersionedItem vi = it.next();
+            if (vi.getStatus() == EVCSConstants.DELETED || vi.getStatus() == EVCSConstants.UNMODIFIED){
+                continue;
+            }
+            if (vi.isDir()) {
+                storeFiles((VersionedDir) vi, projName);
+                continue;
+            }
+            VersionedFile vf = (VersionedFile) vi;
+            storage.persistFile(projName, vf.getHash(), vf.getContent());
+        }
     }
 }
