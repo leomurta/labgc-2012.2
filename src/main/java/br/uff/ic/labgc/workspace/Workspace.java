@@ -457,7 +457,7 @@ public class Workspace implements IWorkspace {
             }
         }        
     }
-        private void preencheRec2(VersionedDir local, VersionedDir remote, VersionedDir father) throws ApplicationException{
+    private void preencheRec2(VersionedDir local, VersionedDir remote, VersionedDir father) throws ApplicationException{
         father.setAuthor(remote.getAuthor());
         father.setLastChangedTime(remote.getLastChangedTime());
         father.setStatus(EVCSConstants.UNMODIFIED);
@@ -480,10 +480,12 @@ public class Workspace implements IWorkspace {
                         if ((vip.getStatus() == (EVCSConstants.MODIFIED)) && (viw.getStatus() == (EVCSConstants.MODIFIED))){
                             vi.setName(vip.getName());
                             vi= Merge.TwoWayMerge(((VersionedFile)vip), ((VersionedFile)viw));
+                            father.setStatus(EVCSConstants.MODIFIED);
                         }
                         if ((vip.getStatus() == (EVCSConstants.UNMODIFIED)) && (viw.getStatus() == (EVCSConstants.MODIFIED))){
                             vi.setName(vip.getName());
                             ((VersionedFile)vi).setContent(((VersionedFile)viw).getContent());
+                            father.setStatus(EVCSConstants.MODIFIED);
                         }
                     }
                     break;
@@ -495,6 +497,17 @@ public class Workspace implements IWorkspace {
         //adicionados
         for (VersionedItem viw : remote.getContainedItens()) {
             if (viw.getStatus() == EVCSConstants.ADDED){ //adicionado
+                father.addItem(viw); // viw já tem o content
+                father.setStatus(EVCSConstants.MODIFIED);
+            }
+            boolean naoachou = true;
+            for (VersionedItem vip : local.getContainedItens()) {
+                if (viw.getName().equals(vip.getName())){
+                    naoachou = false;
+                    break;
+                }                 
+            }
+            if (naoachou == true){ //adicionado
                 father.addItem(viw); // viw já tem o content
                 father.setStatus(EVCSConstants.MODIFIED);
             }
