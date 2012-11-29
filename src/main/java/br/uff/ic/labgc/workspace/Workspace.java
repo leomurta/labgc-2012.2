@@ -530,6 +530,16 @@ public class Workspace implements IWorkspace {
         return result;
     }
     
+    private void mudaStatusDeTodos(VersionedDir vd, int status){
+        for (VersionedItem vi : vd.getContainedItens()) {
+            vi.setStatus(status);
+            vi.setAuthor(System.getProperty("user.name"));
+            if (vi.isDir()){
+                mudaStatusDeTodos((VersionedDir)vi,status);
+            }
+        }
+    }
+    
     private void preencheRec(VersionedDir working, VersionedDir pristine, VersionedDir father){
         father.setName(pristine.getName());
         father.setAuthor(pristine.getAuthor());
@@ -584,9 +594,13 @@ public class Workspace implements IWorkspace {
                 }                 
             }
             if (naoachou == true){ //adicionado
+                viw.setStatus(EVCSConstants.ADDED);
+                viw.setAuthor(System.getProperty("user.name"));
                 father.addItem(viw);
-                father.setStatus(EVCSConstants.ADDED);
-                father.setAuthor(System.getProperty("user.name"));
+                father.setStatus(EVCSConstants.MODIFIED);
+                if (viw.isDir()){
+                    mudaStatusDeTodos((VersionedDir)viw, EVCSConstants.ADDED);
+                }  
             }
         }        
     }

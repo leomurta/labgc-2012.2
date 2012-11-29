@@ -237,7 +237,7 @@ public class WorkspaceTests {
         Workspace instance = new Workspace(path);
         VersionedItem expResult = null;
         VersionedDir result = (VersionedDir)instance.status();
-        //assertEquals(expResult, result);
+        assertEquals(expResult, result);
     }
 
     /**
