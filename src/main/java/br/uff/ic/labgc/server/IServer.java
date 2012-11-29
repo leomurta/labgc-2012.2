@@ -6,6 +6,7 @@ package br.uff.ic.labgc.server;
 
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.*;
+import java.util.List;
 
 /**
  *
@@ -55,9 +56,9 @@ public interface IServer {
      */
     public String login(String user, String pwd, String repository) throws ApplicationException;
 
-    public VersionedItem log(String token) throws ApplicationException;
+    public List<VersionedItem> log(String token) throws ApplicationException;
 
-    public VersionedItem log(int qtdeRevisions, String token) throws ApplicationException;
+    public List<VersionedItem> log(int qtdeRevisions, String token) throws ApplicationException;
 
     public String getRepPath();
 

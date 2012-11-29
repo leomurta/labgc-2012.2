@@ -8,6 +8,7 @@ import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 /**
  *
@@ -50,7 +51,7 @@ public interface ICommunicationServer extends Remote {
      */
     public String login(String user, String pwd, String repository)throws RemoteException;
 
-    public VersionedItem log(String token) throws RemoteException;
+    public List<VersionedItem> log(String token) throws RemoteException;
 
     /**
      * Retorna o conteúdo do item versionado representado pelo hash informado.
@@ -62,7 +63,7 @@ public interface ICommunicationServer extends Remote {
     
     public String hello(String name) throws RemoteException;
 
-    public VersionedItem log(int qtdeRevisions, String token) throws RemoteException;
+    public List<VersionedItem> log(int qtdeRevisions, String token) throws RemoteException;
 
     /**
      * ADM Método  para adicionar projeto ao repostório

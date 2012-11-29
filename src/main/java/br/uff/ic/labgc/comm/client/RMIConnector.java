@@ -13,6 +13,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.List;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -125,9 +126,9 @@ public class RMIConnector extends AbstractServer {
      * efetuar o log
      */
     @Override
-    public VersionedItem log(String token) throws ApplicationException {
+    public List<VersionedItem> log(String token) throws ApplicationException {
         LoggerFactory.getLogger(RMIConnector.class).trace("log -> Entry");
-        VersionedItem result = null;
+        List<VersionedItem> result = null;
         try {
             result = server.log(token);
         } catch (RemoteException ex) {
@@ -232,9 +233,9 @@ public class RMIConnector extends AbstractServer {
     }
 
     @Override
-    public VersionedItem log(int qtdeRevisions, String token) throws ApplicationException {
+    public List<VersionedItem> log(int qtdeRevisions, String token) throws ApplicationException {
         LoggerFactory.getLogger(RMIConnector.class).trace("log -> Entry");
-        VersionedItem result = null;
+        List<VersionedItem> result = null;
         try {
             result = server.log(qtdeRevisions, token);
         } catch (RemoteException ex) {

@@ -106,7 +106,8 @@ public class Client implements IClient {
         return workspace.diff(file, version);
     }
 
-    public VersionedItem log() throws ApplicationException {
+    @Override
+    public List<VersionedItem> log() throws ApplicationException {
         return server.log(loginToken);
     }
 

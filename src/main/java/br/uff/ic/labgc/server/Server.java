@@ -8,6 +8,7 @@ import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.storage.Storage;
 import br.uff.ic.labgc.versioning.Versioning;
+import java.util.List;
 
 
 /**
@@ -39,17 +40,13 @@ public class Server extends AbstractServer {
         return versioning.getRevision(revision, token);
     }
 
-    public  VersionedItem log(String token) throws ApplicationException { 
-        VersionedDir vd = new VersionedDir();
-        vd.setContainedItens(versioning.getLastLogs(token));
-        return vd;
+    public  List<VersionedItem> log(String token) throws ApplicationException { 
+        return versioning.getLastLogs(token);
     }
     
     @Override
-    public VersionedItem log(int qtdeRevisions, String token) throws ApplicationException {
-        VersionedDir vd = new VersionedDir();
-        vd.setContainedItens(versioning.getLastLogs(token));
-        return vd;
+    public List<VersionedItem> log(int qtdeRevisions, String token) throws ApplicationException {
+        return versioning.getLastLogs(token);
     }
     
     public String login(String user, String pwd, String repository) throws ApplicationException {

@@ -14,6 +14,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -100,9 +101,9 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public  VersionedItem log(String token) throws RemoteException {
+    public  List<VersionedItem> log(String token) throws RemoteException {
         LoggerFactory.getLogger(CommunicationServer.class).trace("log -> Entry");
-        VersionedItem result = null;
+        List<VersionedItem> result = null;
         try {
             result = server.log(token);
         } catch (ApplicationException ex) {
@@ -164,9 +165,9 @@ public class CommunicationServer implements ICommunicationServer {
     }
 
     @Override
-    public VersionedItem log(int qtdeRevisions, String token) throws RemoteException {
+    public List<VersionedItem> log(int qtdeRevisions, String token) throws RemoteException {
         LoggerFactory.getLogger(CommunicationServer.class).trace("log -> Entry");
-        VersionedItem result = null;
+        List<VersionedItem> result = null;
         try {
             result = server.log(qtdeRevisions, token);
         } catch (ApplicationException ex) {
