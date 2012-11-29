@@ -486,6 +486,9 @@ public class Cli {
     
     private void printStatus(VersionedItem v, String pathDir)
     {
+        
+        if(pathDir==null)
+            pathDir="";
         if(!v.isDir())
         {
             if(v.getStatus()== EVCSConstants.UNMODIFIED)
@@ -629,6 +632,7 @@ public class Cli {
               try 
               {
                   m_IClient.setHost(strHost);
+                  //System.out.println(strProjectName+"---"+strLogin);
                   m_IClient.admCreateProject(strProjectName, strLogin);
               } 
               catch (ApplicationException ex) 
