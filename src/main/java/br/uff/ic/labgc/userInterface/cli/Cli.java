@@ -487,7 +487,8 @@ public class Cli {
         {
             if(v.getStatus()== EVCSConstants.UNMODIFIED)
                 return;
-            System.out.println(pathDir+"\\"+v.getName() + "    " + getStatus(v.getStatus()) );
+            if(v.getName() != null)
+              System.out.println(pathDir+"\\"+v.getName() + "    " + getStatus(v.getStatus()) );
             return;
         }
         
@@ -496,7 +497,10 @@ public class Cli {
         List<VersionedItem> listItem = vDir.getContainedItens();
         for (VersionedItem vItem : listItem) 
         {
-            String completePath = pathDir+"\\"+vDir.getName();
+            String strName ="";
+            if(vDir.getName() != null)
+            strName = vDir.getName();
+            String completePath = pathDir+"\\"+strName;
             printStatus(vItem, completePath);
         }
         
@@ -539,10 +543,14 @@ public class Cli {
     {
         if(!vItem.isDir())
         {
-           System.out.println(vItem.getLastChangedRevision() );
-           System.out.println(vItem.getLastChangedTime());
-           System.out.println(vItem.getAuthor() );
-           System.out.println(vItem.getCommitMessage());
+           if(vItem.getLastChangedRevision()!=null)
+             System.out.println(vItem.getLastChangedRevision() );
+           if(vItem.getLastChangedTime()!=null)
+             System.out.println(vItem.getLastChangedTime());
+           if(vItem.getAuthor()!=null)
+             System.out.println(vItem.getAuthor() );
+           if(vItem.getCommitMessage()!=null)
+              System.out.println(vItem.getCommitMessage());
            System.out.println("\n");
            return;
         }
