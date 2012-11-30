@@ -4,6 +4,7 @@
  */
 package br.uff.ic.labgc.workspace;
 
+import br.uff.ic.labgc.algorithms.Diff;
 import br.uff.ic.labgc.algorithms.Merge;
 import br.uff.ic.labgc.core.*;
 import br.uff.ic.labgc.exception.ApplicationException;
@@ -422,6 +423,7 @@ public class Workspace implements IWorkspace {
                         vi.setStatus(EVCSConstants.MODIFIED);
                         if (getContent){
                             ((VersionedFile)vi).setContent(((VersionedFile)viw).getContent());
+                            //((VersionedFile)vi).setDiffContent(Diff.run(viw,vip)); //diff
                         }
                         father.setStatus(EVCSConstants.MODIFIED);
                         vi.setAuthor(System.getProperty("user.name"));
