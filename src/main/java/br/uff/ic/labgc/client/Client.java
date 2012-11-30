@@ -27,7 +27,7 @@ public class Client implements IClient {
     /**
      * instancia do workspace
      */
-    private Workspace workspace;
+    private IWorkspace workspace;
     /**
      * token de login, criado quando o usuario efetua login para o servidor
      */
@@ -81,7 +81,7 @@ public class Client implements IClient {
         try {
             this.hostname = workspace.getHost();
             this.repository = workspace.getProject();
-        } catch (WorkspaceException ex) {
+        } catch (ApplicationException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -179,7 +179,7 @@ public class Client implements IClient {
         if (loginToken == null && workspace.isWorkspace()) {
             try {
                 loginToken = workspace.getParam(AUTHENTICATION_TOKEN);
-            } catch (WorkspaceException ex) {
+            } catch (ApplicationException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 throw new ClientWorkspaceNotInitialized();
             }
