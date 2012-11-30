@@ -45,4 +45,17 @@ public interface EVCSConstants {
      */
     public static final int DELETED = 3;
     
+    //tipos de delta
+    public static final int FORWARD = 0;
+    public static final int REVERSE = 1;
+    public static final int DELTATYPE = REVERSE;
+    
+    //diz se irá utilizar deltas ou fazer versionamento completo
+    public static final boolean DELTAENABLED = false;
+    
+    public static final int POSTGRES = 0;
+    public static final int DERBY = 1;
+    public static final int HSQLDB = 2;
+    
+    public static final int BDTYPE = POSTGRES;
 }

@@ -155,8 +155,6 @@ public class Versioning implements IVersioning{
      */
     @Override
     public byte[] getVersionedFileContent (String hash, String projectName) throws ApplicationException{
-        
-        System.out.println(Storage.getDirPath()+projectName+"/"+storage.hashToPath(hash));
         File path = new File(Storage.getDirPath()+projectName+"/"+storage.hashToPath(hash));
         try {
             return getBytesFromFile(path);
@@ -322,7 +320,7 @@ public class Versioning implements IVersioning{
                         configItemDAO.add(ci);
                         break;
                     case EVCSConstants.DELETED:
-                        previous = configItemDAO.getByValuesAnParent(vi.getName(),hash,father.getPrevious().getId(),vi.isDir()?1:0);
+                        previous = configItemDAO.getByValuesAndParent(vi.getName(),hash,father.getPrevious().getId(),vi.isDir()?1:0);
                         ci = new ConfigurationItem(previous.getNumber()+1, vi.getName(), 
                                 hash, 'D', vi.isDir()?1:0,0, null, previous, father.getRevision());
                         previous.setNext(ci);
@@ -330,14 +328,14 @@ public class Versioning implements IVersioning{
                         break;
                     case EVCSConstants.MODIFIED:
                         //hash changed
-                        previous = configItemDAO.getByValuesAnParent(vi.getName(),null,father.getPrevious().getId(),vi.isDir()?1:0);
+                        previous = configItemDAO.getByValuesAndParent(vi.getName(),null,father.getPrevious().getId(),vi.isDir()?1:0);
                         ci = new ConfigurationItem(previous.getNumber()+1, vi.getName(), 
                                 hash, 'M', vi.isDir()?1:0,vi.getSize(), null, previous, father.getRevision());
                         previous.setNext(ci);
                         configItemDAO.add(ci);
                         break;
                     case EVCSConstants.UNMODIFIED:
-                        ci = configItemDAO.getByValuesAnParent(vi.getName(),hash,father.getPrevious().getId(),vi.isDir()?1:0);
+                        ci = configItemDAO.getByValuesAndParent(vi.getName(),hash,father.getPrevious().getId(),vi.isDir()?1:0);
                         break;
                 }
             }

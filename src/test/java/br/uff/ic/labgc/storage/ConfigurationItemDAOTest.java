@@ -142,7 +142,7 @@ public class ConfigurationItemDAOTest implements IDAOTest{
         String name = "arquivo1.txt";
         int parentId = 1;
         int isDir = 0;
-        ConfigurationItem result = configItemDAO.getByValuesAnParent(name,hash,parentId,isDir);
+        ConfigurationItem result = configItemDAO.getByValuesAndParent(name,hash,parentId,isDir);
         assertNotNull(result);
     }
 }

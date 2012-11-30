@@ -45,7 +45,7 @@ public class ConfigurationItemDAO extends DAO{
     //pior caso, 2 arquivos com mesmo nome, mesmo hash e do mesmo projeto, mas em 
     //locais diferentes.
     //seriam diferenciados pelo pai
-    public ConfigurationItem getByValuesAnParent(String name, String hash, int parentId, int isDir) {
+    public ConfigurationItem getByValuesAndParent(String name, String hash, int parentId, int isDir) {
         try {
             Session sessao = HibernateUtil.getSession();
             String hashQuery = (hash == null)?"":"hash = '"+hash+"' and ";

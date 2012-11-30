@@ -1,5 +1,6 @@
 package br.uff.ic.labgc.storage.util;
 
+import br.uff.ic.labgc.core.EVCSConstants;
 import java.io.File;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -15,7 +16,17 @@ public class HibernateUtil
 
 	static 
 	{	
-            sessionFactory = new Configuration().configure("postgres.hibernate.cfg.xml").buildSessionFactory();
+            switch (EVCSConstants.BDTYPE){
+                case EVCSConstants.DERBY:
+                    sessionFactory = new Configuration().configure("derby.hibernate.cfg.xml").buildSessionFactory();
+                    break;
+                case EVCSConstants.HSQLDB:
+                    sessionFactory = new Configuration().configure("hsqldb.hibernate.cfg.xml").buildSessionFactory();
+                    break;
+                case EVCSConstants.POSTGRES:    
+                default:
+                    sessionFactory = new Configuration().configure("postgres.hibernate.cfg.xml").buildSessionFactory();
+            }
 	}
 
 	public static Session getSession() 
