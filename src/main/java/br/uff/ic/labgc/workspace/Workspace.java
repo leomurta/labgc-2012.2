@@ -315,6 +315,8 @@ public class Workspace implements IWorkspace {
             throw new WorkspaceException("Conteúdo não foi modificado");
         }
         root.setStatus(EVCSConstants.MODIFIED);
+        root.setLastChangedRevision(this.getRevision());
+        root.setName(WS_FOLDER);
         return root;
         
     }
