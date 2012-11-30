@@ -78,7 +78,7 @@ public class Cli {
         m_options.addOption(OptionBuilder.withLongOpt("m")
                 .withDescription("Commit the changes made")
                 .hasOptionalArg()
-                .withArgName("COMMIT_MESSAGE")
+                .withArgName("PATH COMMIT_MESSAGE")
                 .create("commit"));
 
 

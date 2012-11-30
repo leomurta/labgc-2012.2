@@ -6,7 +6,10 @@ import br.uff.ic.labgc.core.VersionedFile;
 import br.uff.ic.labgc.core.VersionedItem;
 import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncompatibleItensException;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,8 +23,8 @@ public class Diff {
     // OUTPUT DELTA
     // <- Não definido ainda ! ->
     //
-    private final static byte[] EOL = (new String("\n")).getBytes();
-    private final static byte[] EOF = (new String("\n")).getBytes();
+    private final static byte[] EOL = ("\n").getBytes();
+    private final static byte[] EOF = ("\n").getBytes();
     
     private final static byte[] ID_DIR  = (new String("/§D")).getBytes();
     private final static byte[] ID_END_DIR  = (new String("/§§D")).getBytes();
@@ -36,6 +39,22 @@ public class Diff {
     private final static byte[] DIR_PARAM  = (new String("-D")).getBytes();
     
     private static byte[] delta1;
+    
+    private static byte[] read_file( String name ){
+        byte[] ret = new byte[0];
+        System.out.println(System.getProperty("user.home"));
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(System.getProperty("user.home") + "\\" + name));
+            String str;
+            while (in.ready()) {
+                str = in.readLine() + "\n";
+                ret = appends_at_the_end(str.getBytes(), ret);
+            }
+            in.close();
+        } catch (IOException e) {
+        }
+        return ret;
+    }
 
     public static void main(String args[]) throws ApplicationException {
         byte[] testeA;
@@ -61,86 +80,113 @@ public class Diff {
         
         // ATIVOS DE TESTE
         // // DIRETÓRIO 1
-        VersionedDir dir1 = new VersionedDir();
-        dir1.setName("MyDirectory1");
-        dir1.setAuthor("Raphael");
+//        VersionedDir dir1 = new VersionedDir();
+//        dir1.setName("MyDirectory1");
+//        dir1.setAuthor("Raphael");
         
-        // // // ARQUIVO 1
-        VersionedFile file1 = new VersionedFile();
-        file1.setName("FILE1");
-        file1.setAuthor("Raphael");
-        file1.setContent(testeA);
+//        // // // ARQUIVO 1
+//        VersionedFile file1 = new VersionedFile();
+//        file1.setName("FILE1");
+//        file1.setAuthor("Raphael");
+//        file1.setContent(read_file("labgc_diff v2.txt"));
+//        
+//        // // // ARQUIVO 3
+//        VersionedFile file3 = new VersionedFile();
+//        file3.setName("FILE3");
+//        file3.setAuthor("Raphael");
+//        file3.setContent(testeA);
         
-        // // // ARQUIVO 3
-        VersionedFile file3 = new VersionedFile();
-        file3.setName("FILE3");
-        file3.setAuthor("Raphael");
-        file3.setContent(testeA);
+//        // // // SUB-DIRETÓRIO 1
+//        VersionedDir dir3 = new VersionedDir();
+//        dir3.setName("MyDirectory10");
+//        
+//        // // // ARQUIVO 5
+//        VersionedFile file5 = new VersionedFile();
+//        file5.setName("FILE5");
+//        file5.setAuthor("Raphael");
+//        file5.setContent(testeB);
+//        
+//        dir3.addItem(file5);
+//        
+//        // // DIRETÓRIO 2
+//        VersionedDir dir2 = new VersionedDir();
+//        dir2.setName("MyDirectory2");
+//        dir2.setAuthor("Raphael");
         
-        // // // SUB-DIRETÓRIO 1
-        VersionedDir dir3 = new VersionedDir();
-        dir3.setName("MyDirectory3");
+//        // // // SUB-DIRETÓRIO 1
+//        VersionedDir dir4 = new VersionedDir();
+//        dir4.setName("MyDirectory4");
+//        
+//        // // // ARQUIVO 6
+//        VersionedFile file6 = new VersionedFile();
+//        file6.setName("FILE7");
+//        file6.setAuthor("Raphael");
+//        file6.setContent(testeB);
+//        
+//        dir4.addItem(file6);
         
-        // // // ARQUIVO 5
-        VersionedFile file5 = new VersionedFile();
-        file5.setName("FILE5");
-        file5.setAuthor("Raphael");
-        file5.setContent(testeB);
+        // // // SUB-DIRETÓRIO 2
+//        VersionedDir dir5 = new VersionedDir();
+//        dir5.setName("MyDirectory10");
+//        
+//        // // // ARQUIVO 7
+//        VersionedFile file7 = new VersionedFile();
+//        file7.setName("FILE7");
+//        file7.setAuthor("Raphael");
+//        file7.setContent(testeB);
+//        
+//        dir5.addItem(file7);
         
-        dir3.addItem(file5);
-        
-        // // DIRETÓRIO 2
-        VersionedDir dir2 = new VersionedDir();
-        dir2.setName("MyDirectory2");
-        dir2.setAuthor("Raphael");
-        
-        // // // SUB-DIRETÓRIO 1
-        VersionedDir dir4 = new VersionedDir();
-        dir4.setName("MyDirectory4");
-        
-        // // // ARQUIVO 6
-        VersionedFile file6 = new VersionedFile();
-        file6.setName("FILE5");
-        file6.setAuthor("Raphael");
-        file6.setContent(testeB);
-        
-        dir4.addItem(file6);
-        
-        // // // ARQUIVO 2
-        VersionedFile file2 = new VersionedFile();
-        file2.setName("FILE2");
-        file2.setAuthor("Raphael");
-        file2.setContent(testeB);
-        
-        // // // ARQUIVO 4
-        VersionedFile file4 = new VersionedFile();
-        file4.setName("FILE3");
-        file4.setAuthor("Raphael");
-        file4.setContent(testeB);
-        
-        dir1.addItem(file1);
-        dir1.addItem(file3);
-        dir1.addItem(dir4);
-        
-        dir2.addItem(dir3);
-        dir2.addItem(file2);
-        dir2.addItem(file4);
+//        // // // ARQUIVO 2
+//        VersionedFile file2 = new VersionedFile();
+//        file2.setName("FILE2");
+//        file2.setAuthor("Raphael");
+//        file2.setContent(read_file("labgc_diff v3.txt"));
+//        
+//        // // // ARQUIVO 4
+//        VersionedFile file4 = new VersionedFile();
+//        file4.setName("FILE3");
+//        file4.setAuthor("Raphael");
+//        file4.setContent(testeB);
+//        
+//        dir1.addItem(file1);
+//        dir1.addItem(file3);
+//        dir1.addItem(dir3);
 
-        System.out.println("-------------------------");
-        for( int i = 0; i < dir1.getContainedItens().size(); i++ ){
-            System.out.println( dir1.getContainedItens().get(i).getName() );
-        }
-        System.out.println("-------------------------");
-        for( int i = 0; i < dir2.getContainedItens().size(); i++ ){
-            System.out.println( dir2.getContainedItens().get(i).getName() );
-        }
-        System.out.println("-------------------------");
-        //System.out.println(new String(diff(dir1, dir2)));
-        VersionedDir teste_final = apply( dir1, diff(dir1, dir2) );
-        System.out.println(teste_final.getName());
-        show(teste_final.getContainedItens(), 1);
-        System.out.println("-------------------------");
-        System.out.println(new String(diff(file1, file2)));
+//        dir2.addItem(file2);
+//        dir2.addItem(file4);
+//        dir2.addItem(dir5);
+//
+//        System.out.println("-------------------------");
+//        for( int i = 0; i < dir1.getContainedItens().size(); i++ ){
+//            System.out.println( dir1.getContainedItens().get(i).getName() );
+//        }
+//        System.out.println("-------------------------");
+//        for( int i = 0; i < dir2.getContainedItens().size(); i++ ){
+//            System.out.println( dir2.getContainedItens().get(i).getName() );
+//        }
+//        System.out.println("-------------------------");
+//        List<VersionedItem> teste = lcs(dir1.getContainedItens(), dir2.getContainedItens());
+//        for( int i = 0; i < teste.size(); i++ ){
+//            System.out.println( teste.get(i).getName() );
+//        }
+//        System.out.println("-------------------------");
+//        System.out.println(new String(diff(dir1, dir2)));
+//        System.out.println("-------------------------");
+//        VersionedDir teste_final = apply( dir1, diff(dir1, dir2) );
+//        System.out.println("-------------------------");
+//        System.out.println(teste_final.getName());
+//        show(teste_final.getContainedItens(), 1);
+//        System.out.println("-------------------------");
+//        Memorization.init_matrix();
+//        Memorization.consider_values(file1.getContent().clone(), file2.getContent().clone(), file1.getContent().clone());
+//        Memorization.consider_values(file1.getContent().clone(), file1.getContent().clone(), file1.getContent().clone());
+//        System.out.println(new String(lcs_dp(file1.getContent().clone(), file2.getContent().clone())));
+//        System.out.println(new String(lcs(file1.getContent().clone(), file2.getContent().clone())));
+//        System.out.println(new String(lcs_dp(file1.getContent().clone(), file2.getContent().clone())));
+//        System.out.println(new String(diff(file1, file2)));
+//        System.out.println(new String(lcs(file1.getContent().clone(), file1.getContent().clone())));
+        //System.out.println(new String(lcs(file1.getContent().clone(), file2.getContent().clone())));
         //show( teste_final.getContainedItens(), 0 );
         
     }
@@ -166,7 +212,7 @@ public class Diff {
             return diff( ((VersionedFile)file1), ((VersionedFile)file2) );
         } else {
             if ( file1.isDir() && file2.isDir() ) {
-                return null; //diff_directories((VersionedDir) file1, (VersionedDir) file2);
+                return diff( ((VersionedDir)file1), ((VersionedDir)file2) );
             } else {
                 if ( file1.isDir() && !file2.isDir() ){
                     return null;
@@ -523,7 +569,7 @@ public class Diff {
                         ret = mod_recursively(ret, ((VersionedDir)dir1.get(Set.belongs_to(dir2.get(0), dir1))).getContainedItens(), ((VersionedDir)dir2.get(0)).getContainedItens());
                         ret = appends_at_the_beginning(ret, add_tail( ret, d2 ));
                     } else {
-                        ret = add(ret, (VersionedFile)dir2.get(0));
+                        ret = mod(ret, ((VersionedFile)dir1.get(Set.belongs_to(dir2.get(0), dir1))), (VersionedFile)dir2.get(0));
                     }
                     dir1.remove(Set.belongs_to(dir2.get(0), dir1));
                 }
@@ -569,7 +615,7 @@ public class Diff {
                     main = mod(main, (VersionedFile)dir.get(i), (VersionedFile)dir_final.get(Set.belongs_to(dir.get(i), dir_final)));
                     dir_final.remove(Set.belongs_to(dir.get(i), dir_final));
                 } else {
-                    main = appends_at_the_beginning(main, ("R -M " + dir.get(i).getName() + '\n').getBytes());
+                    main = appends_at_the_beginning(main, ("R -F " + dir.get(i).getName() + '\n').getBytes());
                 }
             }
         }
@@ -604,20 +650,27 @@ public class Diff {
         return Set.intersection(seq1, seq2);
     }
     
-    // Finalizado
     protected static byte[] lcs(byte[] seq1, byte[] seq2) {
+        Memorization.init_matrix();
+        return lcs_dp(seq1, seq2);
+    }
+    
+    // Finalizado
+    protected static byte[] lcs_wdp(byte[] seq1, byte[] seq2) {
 
         if (!isNull(seq1) && !isNull(seq2)) {
             byte[] fline_seq1 = get_first_sequence(seq1); // Identifica primeira linha seq1
             byte[] fline_seq2 = get_first_sequence(seq2); // Identifica segunda  linha seq2
 
-            byte[] new_seq1 = del_first_sequence( fline_seq1.length, seq1); // Remove primeiras linhas das sequências
-            byte[] new_seq2 = del_first_sequence( fline_seq2.length, seq2);
+            byte[] new_seq1 = del_first_sequence( fline_seq1.length, seq1.clone()); // Remove primeiras linhas das sequências
+            byte[] new_seq2 = del_first_sequence( fline_seq2.length, seq2.clone());
 
             if (has_diff( del_line_wraps( fline_seq1 ), del_line_wraps( fline_seq2 ) )) {
                 // Chamar duas frentes de LCS
-                byte[] lcs1 = lcs(new_seq1, seq2);
-                byte[] lcs2 = lcs(seq1, new_seq2);
+                byte[] lcs1;
+                byte[] lcs2;
+                lcs1 = lcs_wdp(new_seq1, seq2);
+                lcs2 = lcs_wdp(seq1, new_seq2);
 
                 // Verifica qual das duas frentes possui maior sequência comum
                 // Retorna
@@ -627,7 +680,42 @@ public class Diff {
                     return lcs2;
                 }
             } else {
-                return appends_at_the_beginning(fline_seq1, lcs(new_seq1, new_seq2));
+                return appends_at_the_beginning(fline_seq1, lcs_wdp(new_seq1, new_seq2));
+            }
+
+        } else {
+            return new byte[0];
+        }
+
+    }
+    
+    protected static byte[] lcs_dp(byte[] seq1, byte[] seq2) {
+
+        if (!isNull(seq1) && !isNull(seq2)) {
+            
+            byte[] fline_seq1 = get_first_sequence(seq1); // Identifica primeira linha seq1
+            byte[] fline_seq2 = get_first_sequence(seq2); // Identifica segunda  linha seq2
+
+            byte[] new_seq1 = del_first_sequence( fline_seq1.length, seq1.clone()); // Remove primeiras linhas das sequências
+            byte[] new_seq2 = del_first_sequence( fline_seq2.length, seq2.clone());
+
+            if (has_diff( del_line_wraps( fline_seq1 ), del_line_wraps( fline_seq2 ) )) {
+                // Chamar duas frentes de LCS
+                byte[] lcs1;
+                byte[] lcs2;
+                lcs1 = Memorization.consider_values(new_seq1, seq2);
+                lcs2 = Memorization.consider_values(seq1, new_seq2);
+
+                // Verifica qual das duas frentes possui maior sequência comum
+                // Retorna
+                if (countLines(lcs1) >= countLines(lcs2)) {
+                    return lcs1;
+                } else {
+                    return lcs2;
+                }
+            } else {
+                //System.out.println(new String(Memorization.consider_values(new_seq1, new_seq2)));
+                return appends_at_the_beginning(fline_seq1, Memorization.consider_values(new_seq1, new_seq2));
             }
 
         } else {
@@ -725,6 +813,7 @@ public class Diff {
     }
 
     private static int countLines(byte[] lcs_file) {
+        if( lcs_file != null ){
         int tam = 0;
         for (int i = 0; i < lcs_file.length; i++) {
             if (Byte.compare(lcs_file[i], EOL[0]) == 0) {
@@ -732,9 +821,12 @@ public class Diff {
             }
         }
         return tam+1;
+        } else {
+            return 0;
+        }
     }
 
-    private static boolean isNull(byte[] seq) {
+    protected static boolean isNull(byte[] seq) {
         return (seq.length == 0 );
     }
     
