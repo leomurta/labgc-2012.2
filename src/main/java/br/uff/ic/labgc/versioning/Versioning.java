@@ -77,6 +77,10 @@ public class Versioning implements IVersioning{
     }
     
     private VersionedDir configItemToVersionedDir(ConfigurationItem ci){
+        return configItemToVersionedDir(ci, true);
+    }
+    
+    private VersionedDir configItemToVersionedDir(ConfigurationItem ci, boolean deleted){
         VersionedDir vd = new VersionedDir();
         for (Iterator it = ci.getChildren().iterator(); it.hasNext(); )
         {	
@@ -84,6 +88,9 @@ public class Versioning implements IVersioning{
             Revision ciRev = configItem.getRevision();
             String projectName = ciRev.getProject().getName();
             VersionedItem vi;
+            if ((configItem.getType() == 'D') && (!deleted)){
+                continue;
+            }
             if (configItem.getDir() == 1){
                 vi = configItemToVersionedDir(configItem);
             }
@@ -124,7 +131,7 @@ public class Versioning implements IVersioning{
         }
         Revision revision = revisionDAO.getByProjectAndNumber(pu.getProject().getId(), revNum);
         ConfigurationItem ci = revision.getConfigItem();
-        VersionedDir vd = configItemToVersionedDir(ci);
+        VersionedDir vd = configItemToVersionedDir(ci, false);
         return vd;
     }
     
