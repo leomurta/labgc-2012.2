@@ -4,7 +4,6 @@
  */
 package br.uff.ic.labgc.versioning;
 
-import br.uff.ic.labgc.algorithms.Diff;
 import br.uff.ic.labgc.core.EVCSConstants;
 import br.uff.ic.labgc.core.VersionedDir;
 import br.uff.ic.labgc.core.VersionedFile;
@@ -13,7 +12,6 @@ import br.uff.ic.labgc.exception.ApplicationException;
 import br.uff.ic.labgc.exception.IncorrectPasswordException;
 import br.uff.ic.labgc.exception.StorageException;
 import br.uff.ic.labgc.exception.VersioningException;
-import br.uff.ic.labgc.exception.VersioningIOException;
 import br.uff.ic.labgc.exception.VersioningNeedToUpdateException;
 import br.uff.ic.labgc.storage.ConfigurationItem;
 import br.uff.ic.labgc.storage.ConfigurationItemDAO;
@@ -29,9 +27,6 @@ import br.uff.ic.labgc.storage.UserDAO;
 import br.uff.ic.labgc.storage.util.HibernateUtil;
 import br.uff.ic.labgc.storage.util.ObjectNotFoundException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -64,6 +59,11 @@ public class Versioning implements IVersioning{
         protected void persistFile(String dirPath, String filePath, byte[] content) throws ApplicationException {
             super.persistFile(dirPath, filePath, content);
         }
+        
+        protected static byte[] getBytesFromFile(File file) throws ApplicationException {
+            return Storage.getBytesFromFile(file);
+        }
+        
     }
     
     //public static String dirPath = "../../repositorio/";
@@ -163,42 +163,7 @@ public class Versioning implements IVersioning{
     @Override
     public byte[] getVersionedFileContent (String hash, String projectName) throws ApplicationException{
         File path = new File(Storage.getDirPath()+projectName+"/"+storage.hashToPath(hash));
-        try {
-            return getBytesFromFile(path);
-        } catch (IOException ex) {
-            Logger.getLogger(Versioning.class.getName()).log(Level.SEVERE, null, ex);
-            throw new VersioningIOException("nao foi possivel ler o conteudo do arquivo",ex);
-        }
-    }
-    private static byte[] getBytesFromFile(File file) throws IOException {
-        InputStream is = new FileInputStream(file);
-    
-        // Get the size of the file
-        long length = file.length();
-    
-        if (length > Integer.MAX_VALUE) {
-            // File is too large
-        }
-    
-        // Create the byte array to hold the data
-        byte[] bytes = new byte[(int)length];
-    
-        // Read in the bytes
-        int offset = 0;
-        int numRead = 0;
-        while (offset < bytes.length
-               && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
-            offset += numRead;
-        }
-    
-        // Ensure all the bytes have been read in
-        if (offset < bytes.length) {
-            throw new IOException("Could not completely read file "+file.getName());
-        }
-    
-        // Close the input stream and return bytes
-        is.close();    
-        return bytes;
+        return MyStorage.getBytesFromFile(path);
     }
     
     private String incrementRevision(String revision){
